@@ -46,7 +46,8 @@ export async function getPapers(filters: {
             language: p.language,
             addedBy: p.added_by,
             addedDate: p.added_date,
-            pdfUrl: p.pdf_url
+            pdfUrl: p.pdf_url,
+            contentHash: p.content_hash
         })) as Paper[];
     } catch (error) {
         console.error('Database Error (getPapers):', error);

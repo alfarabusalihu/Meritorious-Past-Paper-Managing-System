@@ -1,3 +1,5 @@
+"use client";
+
 import { ROUTES } from '@/constants/routes';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, BookOpen } from 'lucide-react';
@@ -8,7 +10,7 @@ export default function Hero() {
     const { t } = useLanguage();
 
     return (
-        <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        <section className="relative min-h-screen flex items-center overflow-hidden">
             {/* Background elements */}
             {/* Background elements */}
             <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-primary/20 blur-[120px] rounded-full -z-10 animate-pulse" />

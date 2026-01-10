@@ -67,7 +67,7 @@ export default function PdfModal({ paper, isOpen, onClose }: PdfModalProps) {
                 {/* Iframe content */}
                 <div className="flex-grow bg-secondary/5 relative w-full h-full">
                     <iframe
-                        src={`${paper.pdfUrl}#toolbar=0`}
+                        src={paper.pdfUrl}
                         className="w-full h-full border-none shadow-inner"
                         title={`PDF Preview: ${paper.paperName}`}
                         loading="lazy"

@@ -11,7 +11,21 @@ export async function PUT(
     try {
         const { id } = await params;
         const body = await request.json();
-        const { paperName, subject, year, category, part, language } = body;
+        const { paperName, subject, year, category, part, language, pdfUrl, contentHash } = body;
+
+        // De-duplication check: content_hash (exclude self)
+        if (contentHash) {
+            const [existing] = await sql`
+                SELECT paper_id FROM papers 
+                WHERE content_hash = ${contentHash} AND paper_id != ${id}
+            `;
+            if (existing) {
+                return NextResponse.json({
+                    error: 'DUPLICATE_CONTENT',
+                    message: 'This exact PDF file has already been uploaded.'
+                }, { status: 409 });
+            }
+        }
 
         const [updatedPaper] = await sql`
             UPDATE papers 
@@ -21,7 +35,9 @@ export async function PUT(
                 year = ${parseInt(year)},
                 category = ${category},
                 part = ${part},
-                language = ${language}
+                language = ${language},
+                pdf_url = COALESCE(${pdfUrl}, pdf_url),
+                content_hash = COALESCE(${contentHash}, content_hash)
             WHERE paper_id = ${id}
             RETURNING *
         `;

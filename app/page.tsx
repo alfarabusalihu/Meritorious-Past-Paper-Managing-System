@@ -6,6 +6,8 @@ import Pagination from '@/components/pagination/Pagination';
 import { getPapers } from '@/lib/papers';
 import ClientPageActions from '../components/papers/ClientPageActions';
 
+export const dynamic = 'force-dynamic';
+
 interface HomeProps {
     searchParams: {
         subject?: string;
@@ -19,10 +21,11 @@ interface HomeProps {
 }
 
 export default async function Home({ searchParams }: HomeProps) {
-    const papers = await getPapers(searchParams);
+    const resolvedParams = await searchParams;
+    const papers = await getPapers(resolvedParams);
 
     const PAPERS_PER_PAGE = 8;
-    const currentPage = Number(searchParams.page) || 1;
+    const currentPage = Number(resolvedParams.page) || 1;
     const startIndex = (currentPage - 1) * PAPERS_PER_PAGE;
 
     // In a real database scenario, getPapers should handle pagination with LIMIT/OFFSET

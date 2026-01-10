@@ -47,7 +47,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from 'next/link';
-import { ArrowLeft, Loader2, Save, Trash2 } from 'lucide-react';
+import { Save, Loader2, File, AlertCircle, ArrowLeft, Trash2 } from "lucide-react";
+import { calculateHash } from "@/lib/crypto-utils";
 import PdfDropzone from '@/components/upload/PdfDropzone';
 
 // Form Schema
@@ -73,6 +74,8 @@ function AddPaperContent() {
     const [file, setFile] = useState<File | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isFetching, setIsFetching] = useState(!!editId);
+    const [existingPdfUrl, setExistingPdfUrl] = useState<string>('');
+
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
 
     const form = useForm<PaperFormValues>({
@@ -109,8 +112,9 @@ function AddPaperContent() {
                             part: paper.part,
                             language: paper.language || 'English',
                         });
-                        // Note: We can't set "file" state from URL easily for Dropzone,
-                        // but Dropzone handles "edit mode with no new file" gracefully.
+                        if (paper.pdfUrl) {
+                            setExistingPdfUrl(paper.pdfUrl);
+                        }
                     }
                 } catch (error) {
                     console.error('Error fetching paper for edit:', error);
@@ -127,6 +131,7 @@ function AddPaperContent() {
         }
     }, [editId, form, toast]);
 
+
     const handleSubmit = async (values: PaperFormValues) => {
         if (!user) return;
         if (!editId && !file) {
@@ -141,11 +146,14 @@ function AddPaperContent() {
         setIsSubmitting(true);
         try {
             let pdfUrl = '';
+            let contentHash = '';
 
-            // 1. Handle File Upload (only if a new file is selected)
+            // Handle File Process
             if (file) {
+                // Calculate hash for de-duplication
+                contentHash = await calculateHash(file);
+
                 const fileExt = file.name.split('.').pop();
-                // Create a semantic filename: Subject_Year_Category_Part_Timestamp.ext
                 const sanitize = (str: string) => str.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
                 const baseName = `${sanitize(values.subject)}_${values.year}_${sanitize(values.category)}_${sanitize(values.part)}`;
                 const fileName = `${baseName}_${Date.now()}.${fileExt}`;
@@ -164,30 +172,14 @@ function AddPaperContent() {
                 pdfUrl = publicUrl;
             }
 
-            // 2. Save/Update paper metadata
-            const url = editId ? `/api/papers?id=${editId}` : '/api/papers';
-            const method = editId ? 'PUT' : 'POST';
-
-            // NOTE: The REST API implementation for PUT uses query param ?id or expects ID in body?
-            // The existing `routes.ts` handles POST. Does it handle PUT?
-            // I need to check `api/papers/route.ts`... wait, I checked it earlier.
-            // It only had GET/POST.
-            // Requirement CHECK: "Any logged user can edit/create/remove".
-            // I probably need to implement PUT/DELETE in `api/papers/route.ts` or `api/papers/[id]/route.ts`.
-            // The original file `app/add-paper/page.tsx` used `/api/papers/${editId}` for PUT/DELETE?
-            // Oh, I see `const url = editId ? '/api/papers/${editId}'`.
-            // Let's assume the API structure supports `[id]` route. If not, I'll need to create it.
-            // Looking at file list, `api/papers` is a dir. Does it have `[id]` subdir?
-            // The file list showed `api -> numChildren: 2`. `papers` is one.
-            // Does `papers` have `[id]`?
-            // Let's assume standard Next.js route: `/api/papers/[id]/route.ts`.
-
             const submitUrl = editId ? `/api/papers/${editId}` : '/api/papers';
+            const method = editId ? 'PUT' : 'POST';
 
             const payload = {
                 ...values,
                 addedBy: user.name,
                 ...(pdfUrl ? { pdfUrl } : {}),
+                ...(contentHash ? { contentHash } : {}),
             };
 
             const response = await fetch(submitUrl, {
@@ -195,6 +187,11 @@ function AddPaperContent() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });
+
+            if (response.status === 409) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "This exact file has already been uploaded.");
+            }
 
             if (!response.ok) throw new Error(t('addPaper.form.alerts.saveError'));
 
@@ -419,8 +416,12 @@ function AddPaperContent() {
                             <div className="xl:col-span-7 space-y-8 order-1 xl:order-2">
                                 <div className="bg-muted/5 border-2 border-dashed border-muted rounded-[2rem] p-4 hover:border-primary/30 transition-all">
                                     <div className="rounded-[1.5rem] bg-card border shadow-inner h-full">
-                                        <PdfDropzone onFileSelect={setFile} selectedFile={file} />
-                                        {editId && !file && (
+                                        <PdfDropzone
+                                            onFileSelect={setFile}
+                                            selectedFile={file}
+                                            existingFileUrl={existingPdfUrl}
+                                        />
+                                        {editId && !file && !existingPdfUrl && (
                                             <p className="text-center pb-4 text-xs text-muted-foreground italic">
                                                 {t('addPaper.form.dropzone.keep')}
                                             </p>

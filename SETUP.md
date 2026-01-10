@@ -29,31 +29,21 @@ npm install
 
 ## Step 3: Database Initialization
 
-You have two options to initialize the database:
+MPPMS uses an automated script to set up your tables, security policies, and initial data.
 
-### Option A: Manual via Supabase Dashboard (Recommended)
-1.  Go to the **SQL Editor** in your Supabase dashboard.
-2.  Open [seed.sql](file:///d:/Projects/MPPMS/seed.sql) and copy its contents.
-3.  Paste into the SQL Editor and run it. This creates the tables, policies, and triggers.
-
-### Option B: Using the automated script
 1.  Ensure `DATABASE_URL` is set in your `.env`.
 2.  Run the initialization script:
     ```bash
     node scripts/init-db.mjs
     ```
-    *Note: This script also seeds initial mock data and creates the admin user specified in your `.env`.*
+    *This script creates the schema, sets up RBAC triggers, and seeds an admin user if `ADMIN_EMAIL` and `ADMIN_PASSWORD` are provided in your `.env`.*
 
-## Step 4: Admin Account Setup
+## Step 4: Admin Account Access
 
-If you used **Option A**, you'll need to create an admin user:
-1.  Go to **Authentication > Users** in Supabase and create a new user.
-2.  Once created, go to the **SQL Editor** and run:
-    ```sql
-    UPDATE profiles SET role = 'admin' WHERE email = 'your-admin-email@example.com';
-    ```
+If you provided admin credentials in your `.env`, you can now log in at `/auth` to access the Admin Dashboard. 
 
-If you used **Option B**, the admin user is automatically created based on `ADMIN_EMAIL` and `ADMIN_PASSWORD` in your `.env`.
+For Google OAuth users:
+- Ensure `NEXT_PUBLIC_ADMIN_EMAIL` in `.env` matches your Google email to receive admin privileges automatically upon first login.
 
 ## Step 5: Start Development
 

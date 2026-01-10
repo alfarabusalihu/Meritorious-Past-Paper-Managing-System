@@ -8,9 +8,10 @@ import { UI_CONSTANTS } from '@/constants/ui';
 interface PdfDropzoneProps {
     onFileSelect: (file: File | null) => void;
     selectedFile: File | null;
+    existingFileUrl?: string;
 }
 
-export default function PdfDropzone({ onFileSelect, selectedFile }: PdfDropzoneProps) {
+export default function PdfDropzone({ onFileSelect, selectedFile, existingFileUrl }: PdfDropzoneProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -104,6 +105,27 @@ export default function PdfDropzone({ onFileSelect, selectedFile }: PdfDropzoneP
                             <X className="h-4 w-4" />
                             <span>Remove File</span>
                         </button>
+                    </div>
+                ) : existingFileUrl ? (
+                    <div className="relative z-20 flex flex-col items-center space-y-4">
+                        <div className="p-4 bg-primary/10 rounded-full">
+                            <File className="h-10 w-10 text-primary" />
+                        </div>
+                        <div className="space-y-1">
+                            <p className="font-bold text-lg italic opacity-70">Current File Uploaded</p>
+                            <a
+                                href={existingFileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-primary hover:underline font-bold"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                View Current PDF
+                            </a>
+                        </div>
+                        <div className="text-xs text-muted-foreground font-medium">
+                            Drag or click to replace this file
+                        </div>
                     </div>
                 ) : (
                     <>

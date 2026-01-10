@@ -1,3 +1,5 @@
+"use client";
+
 import { Paper } from '@/types/paper';
 import PaperCard from './PaperCard';
 
@@ -6,7 +8,7 @@ interface PaperGridProps {
     onPaperClick?: (paper: Paper) => void;
 }
 
-export default function PaperGrid({ papers, onPaperClick }: PaperGridProps) {
+export default function PaperGrid({ papers }: PaperGridProps) {
     if (papers.length === 0) {
         return (
             <div className="text-center py-20">
@@ -21,7 +23,6 @@ export default function PaperGrid({ papers, onPaperClick }: PaperGridProps) {
                 <PaperCard
                     key={paper.paperId}
                     paper={paper}
-                    onClick={(p) => onPaperClick?.(p)}
                 />
             ))}
         </div>

@@ -56,25 +56,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (error && error.code !== 'PGRST116') throw error;
 
             // Check if this user is the "Env Admin"
-            // Note: process.env.ADMIN_EMAIL needs to be available. If it's server-only, this check fails on client.
-            // But since this is a "Provider" inside a "use client" file, it runs in browser.
-            // We'll assume standard method or role from DB if env check fails.
-            // Actually, best practice is to set role=admin IN THE DB if email matches env during signup/trigger.
-            // But here we enforce it on client for immediate UI feedback.
-            // We'll assume the user put 'admin@gmail.com' (from .env view earlier)
-            // Hardcoding for safety fallback based on previous view_file of .env
-            const envAdminEmail = "admin@gmail.com";
+            const envAdminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@gmail.com";
             const isEnvAdmin = email === envAdminEmail;
+
+            let finalProfile = profile;
+
+            // If profile doesn't exist (e.g., first-time OAuth login), create it
+            if (!profile) {
+                const { data: newProfile, error: createError } = await supabase
+                    .from('profiles')
+                    .insert([
+                        {
+                            id: userId,
+                            email: email,
+                            name: email.split('@')[0],
+                            role: isEnvAdmin ? 'admin' : 'staff' // Assign admin role if email matches env
+                        }
+                    ])
+                    .select()
+                    .single();
+
+                if (createError) {
+                    console.error('Error creating profile for OAuth user:', createError);
+                } else {
+                    finalProfile = newProfile;
+                }
+            }
 
             let role: 'admin' | 'staff' = 'staff';
 
             if (isEnvAdmin) {
                 role = 'admin';
-            } else if (profile?.role) {
-                role = profile.role as 'admin' | 'staff';
+            } else if (finalProfile?.role) {
+                role = finalProfile.role as 'admin' | 'staff';
             }
 
-            if (profile?.is_blocked) {
+            if (finalProfile?.is_blocked) {
                 await logout();
                 alert('Your account has been blocked.');
                 return;
@@ -83,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser({
                 id: userId,
                 email: email,
-                name: profile?.name || email.split('@')[0],
+                name: finalProfile?.name || email.split('@')[0],
                 role: role,
             });
 

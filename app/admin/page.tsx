@@ -2,6 +2,8 @@ import { getProfiles, getNotifications } from '@/lib/users';
 import UserTable from '@/components/admin/UserTable';
 import NotificationList from '@/components/admin/NotificationList';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDashboard() {
     // In a real app, you would verify admin session here using cookies() or headers()
     // For this migration, we are focusing on the structural change to Server Components

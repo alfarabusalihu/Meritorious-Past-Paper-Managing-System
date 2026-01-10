@@ -22,7 +22,10 @@ async function init() {
     console.log('Initializing database...');
 
     try {
-        // Create profiles table for role-based access
+        // 1. Enable pgcrypto
+        await sql`CREATE EXTENSION IF NOT EXISTS pgcrypto`;
+
+        // 2. Create profiles table
         await sql`
             CREATE TABLE IF NOT EXISTS profiles (
                 id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -34,10 +37,35 @@ async function init() {
         `;
         console.log('Table "profiles" created/verified.');
 
-        // Enable RLS on profiles if not already enabled (simple check)
-        // Note: For a real app, you'd want proper RLS policies here.
+        // 3. Add handle_new_user trigger
+        await sql`
+            CREATE OR REPLACE FUNCTION public.handle_new_user()
+            RETURNS TRIGGER AS $$
+            BEGIN
+              INSERT INTO public.profiles (id, email, name, role)
+              VALUES (
+                new.id, 
+                new.email, 
+                COALESCE(new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
+                'staff'
+              );
+              RETURN new;
+            END;
+            $$ LANGUAGE plpgsql SECURITY DEFINER;
+        `;
+        await sql`
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'on_auth_user_created') THEN
+                    CREATE TRIGGER on_auth_user_created
+                    AFTER INSERT ON auth.users
+                    FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+                END IF;
+            END $$;
+        `;
+        console.log('Trigger "on_auth_user_created" verified/created.');
 
-        // Create papers table
+        // 4. Create papers table
         await sql`
             CREATE TABLE IF NOT EXISTS papers (
                 paper_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -49,12 +77,13 @@ async function init() {
                 language TEXT DEFAULT 'English',
                 pdf_url TEXT NOT NULL,
                 added_by TEXT NOT NULL,
+                content_hash TEXT UNIQUE,
                 added_date TIMESTAMPTZ DEFAULT NOW()
             );
         `;
         console.log('Table "papers" created/verified.');
 
-        // Create notifications table
+        // 5. Create notifications table
         await sql`
             CREATE TABLE IF NOT EXISTS notifications (
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -68,17 +97,12 @@ async function init() {
         `;
         console.log('Table "notifications" created/verified.');
 
-        // Seed Admin User
+        // 6. Seed Admin User
         const adminEmail = process.env.ADMIN_EMAIL;
         const adminPassword = process.env.ADMIN_PASSWORD;
 
         if (adminEmail && adminPassword) {
             console.log(`Seeding admin user: ${adminEmail}`);
-
-            // 1. Ensure pgcrypto is enabled
-            await sql`CREATE EXTENSION IF NOT EXISTS pgcrypto`;
-
-            // 2. Insert into auth.users if not exists
             const [existingAuthUser] = await sql`SELECT id FROM auth.users WHERE email = ${adminEmail}`;
             let adminId;
 
@@ -100,44 +124,26 @@ async function init() {
                     RETURNING id
                 `;
                 adminId = newAuthUser.id;
-                console.log('Admin user created in auth.users');
             } else {
                 adminId = existingAuthUser.id;
-                console.log('Admin user already exists in auth.users');
             }
 
-            // 3. Insert into public.profiles if not exists
             const [existingProfile] = await sql`SELECT id FROM profiles WHERE id = ${adminId}`;
             if (!existingProfile) {
                 await sql`
                     INSERT INTO profiles (id, email, name, role)
                     VALUES (${adminId}, ${adminEmail}, 'Admin', 'admin')
                 `;
-                console.log('Admin profile created in public.profiles');
             } else {
-                await sql`
-                    UPDATE profiles SET role = 'admin' WHERE id = ${adminId}
-                `;
-                console.log('Admin profile updated for admin role');
+                await sql`UPDATE profiles SET role = 'admin' WHERE id = ${adminId}`;
             }
+            console.log('Admin user setup complete.');
         }
 
-        // Alter table to add language if it doesn't exist
-        await sql`
-            DO $$ 
-            BEGIN 
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='papers' AND column_name='language') THEN
-                    ALTER TABLE papers ADD COLUMN language TEXT NOT NULL DEFAULT 'English';
-                END IF;
-            END $$;
-        `;
-
-        // Check if data exists
-        const existing = await sql`SELECT count(*) FROM papers`;
-        if (parseInt(existing[0].count) <= 6) { // Re-seed if only original mock data exists or empty
-            console.log('Cleaning and re-seeding initial data...');
-            await sql`TRUNCATE TABLE papers`;
-
+        // 7. Seed initial mock data if empty
+        const [existingCount] = await sql`SELECT count(*) FROM papers`;
+        if (parseInt(existingCount.count) == 0) {
+            console.log('Seeding initial mock data...');
             const mockPapers = [
                 {
                     paper_name: 'Mathematics 2023 - Annual',
@@ -158,46 +164,6 @@ async function init() {
                     language: 'English',
                     added_by: 'Staff',
                     pdf_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
-                },
-                {
-                    paper_name: 'Chemistry 2023 - Tamil',
-                    subject: 'Chemistry',
-                    year: 2023,
-                    category: 'PAPER',
-                    part: 'Part 1',
-                    language: 'Tamil',
-                    added_by: 'Admin',
-                    pdf_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
-                },
-                {
-                    paper_name: 'Biology 2021 - Annual',
-                    subject: 'Biology',
-                    year: 2021,
-                    category: 'PAPER',
-                    part: 'Part 2',
-                    language: 'English',
-                    added_by: 'Staff',
-                    pdf_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
-                },
-                {
-                    paper_name: 'Comb. Mathematics 2024',
-                    subject: 'Comb. Mathematics',
-                    year: 2024,
-                    category: 'PAPER',
-                    part: 'Part 1',
-                    language: 'English',
-                    added_by: 'Admin',
-                    pdf_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
-                },
-                {
-                    paper_name: 'History 2023 - Tamil',
-                    subject: 'History',
-                    year: 2023,
-                    category: 'PAPER',
-                    part: 'Part 1',
-                    language: 'Tamil',
-                    added_by: 'Staff',
-                    pdf_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
                 }
             ];
 
@@ -207,13 +173,11 @@ async function init() {
                     VALUES (${paper.paper_name}, ${paper.subject}, ${paper.year}, ${paper.category}, ${paper.part}, ${paper.language}, ${paper.added_by}, ${paper.pdf_url})
                 `;
             }
-            console.log('Seeding completed.');
-        } else {
-            console.log('Table already has production data, skipping seed.');
+            console.log('Initial papers seeded.');
         }
 
     } catch (error) {
-        console.error('Error initializing database:', error);
+        console.error('Error during init:', error);
     } finally {
         await sql.end();
     }

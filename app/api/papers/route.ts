@@ -1,53 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
+import { getPapers } from '@/lib/papers';
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
-    const subject = searchParams.get('subject');
-    const year = searchParams.get('year');
-    const category = searchParams.get('category');
-    const part = searchParams.get('part');
-    const language = searchParams.get('language');
+    const filters = {
+        subject: searchParams.get('subject') || undefined,
+        year: searchParams.get('year') || undefined,
+        category: searchParams.get('category') || undefined,
+        part: searchParams.get('part') || undefined,
+        language: searchParams.get('language') || undefined,
+    };
 
     try {
-        // Start building the query
-        let query = sql`SELECT * FROM papers WHERE 1=1`;
-
-        if (subject) {
-            query = sql`${query} AND subject = ${subject}`;
-        }
-        if (year) {
-            query = sql`${query} AND year = ${parseInt(year)}`;
-        }
-        if (category) {
-            query = sql`${query} AND category = ${category}`;
-        }
-        if (part) {
-            query = sql`${query} AND part = ${part}`;
-        }
-        if (language) {
-            query = sql`${query} AND language = ${language}`;
-        }
-
-        // Add sorting
-        query = sql`${query} ORDER BY added_date DESC`;
-
-        const papers = await query;
-
-        // Transform database fields to frontend camelCase if necessary
-        const transformedPapers = papers.map(p => ({
-            paperId: p.paper_id,
-            paperName: p.paper_name,
-            subject: p.subject,
-            year: p.year,
-            category: p.category,
-            part: p.part,
-            language: p.language, // Added language
-            addedBy: p.added_by,
-            addedDate: p.added_date,
-            pdfUrl: p.pdf_url
-        }));
-
+        const transformedPapers = await getPapers(filters);
         return NextResponse.json(transformedPapers);
     } catch (error) {
         console.error('API Error (GET /api/papers):', error);
@@ -58,15 +24,26 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { paperName, subject, year, category, part, language, addedBy, pdfUrl } = body; // Added language
+        const { paperName, subject, year, category, part, language, addedBy, pdfUrl, contentHash } = body;
 
         if (!paperName || !subject || !year || !category || !part || !pdfUrl) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
+        // De-duplication check: content_hash
+        if (contentHash) {
+            const [existing] = await sql`SELECT paper_id FROM papers WHERE content_hash = ${contentHash}`;
+            if (existing) {
+                return NextResponse.json({
+                    error: 'DUPLICATE_CONTENT',
+                    message: 'This exact PDF file has already been uploaded.'
+                }, { status: 409 });
+            }
+        }
+
         const [newPaper] = await sql`
-            INSERT INTO papers (paper_name, subject, year, category, part, language, added_by, pdf_url)
-            VALUES (${paperName}, ${subject}, ${parseInt(year)}, ${category}, ${part}, ${language || 'English'}, ${addedBy || 'Anonymous'}, ${pdfUrl})
+            INSERT INTO papers (paper_name, subject, year, category, part, language, added_by, pdf_url, content_hash)
+            VALUES (${paperName}, ${subject}, ${parseInt(year)}, ${category}, ${part}, ${language || 'English'}, ${addedBy || 'Anonymous'}, ${pdfUrl}, ${contentHash || null})
             RETURNING *
         `;
 

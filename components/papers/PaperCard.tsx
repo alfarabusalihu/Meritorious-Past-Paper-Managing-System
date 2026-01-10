@@ -5,6 +5,8 @@ import { FileText, Calendar, User, ArrowRight, BookOpen, Edit2, Trash2 } from 'l
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ROUTES } from '@/constants/routes';
 
 interface PaperCardProps {
     paper: Paper;
@@ -13,11 +15,25 @@ interface PaperCardProps {
     onDelete?: (paper: Paper) => void;
 }
 
-export default function PaperCard({ paper, onClick, onEdit }: PaperCardProps) {
+export default function PaperCard({ paper }: PaperCardProps) {
     const { user } = useAuth();
     const { t } = useLanguage();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
     // Allow any logged in user to see edit button, as per "any logged user can edit/create/remove"
     const canEdit = !!user;
+
+    const handleCardClick = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('view', paper.paperId);
+        router.push(`?${params.toString()}`, { scroll: false });
+    };
+
+    const handleEditClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        router.push(`${ROUTES.ADD_PAPER}?edit=${paper.paperId}`);
+    };
 
     return (
         <motion.div
@@ -26,16 +42,13 @@ export default function PaperCard({ paper, onClick, onEdit }: PaperCardProps) {
             animate={{ opacity: 1, scale: 1 }}
             whileHover={{ y: -5 }}
             className="group relative bg-muted/20 border border-muted rounded-[2rem] p-6 shadow-sm hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 cursor-pointer overflow-hidden"
-            onClick={() => onClick?.(paper)}
+            onClick={handleCardClick}
         >
             {/* Action Buttons (Any Logged User) */}
             {canEdit && (
                 <div className="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                     <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onEdit?.(paper);
-                        }}
+                        onClick={handleEditClick}
                         className="p-2 bg-background border hover:border-primary hover:text-primary rounded-xl transition-all shadow-sm"
                         title={t('papers.card.edit')}
                     >
