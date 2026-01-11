@@ -2,6 +2,7 @@
 
 import { X, Download } from 'lucide-react';
 import { Paper } from '@/types/paper';
+import { useEffect } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -17,6 +18,16 @@ interface PdfModalProps {
 }
 
 export default function PdfModal({ paper, isOpen, onClose }: PdfModalProps) {
+    useEffect(() => {
+        if (isOpen && paper) {
+            fetch('/api/stats/increment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'downloads' }),
+            }).catch(err => console.error('Failed to increment download count:', err));
+        }
+    }, [isOpen, paper]);
+
     if (!paper) return null;
 
     return (
@@ -44,15 +55,6 @@ export default function PdfModal({ paper, isOpen, onClose }: PdfModalProps) {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <a
-                            href={paper.pdfUrl}
-                            download
-                            className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-full font-bold transition-all duration-300 hidden sm:flex"
-                            title="Download Paper"
-                        >
-                            <Download className="h-5 w-5" />
-                            <span className="text-xs">Download</span>
-                        </a>
                         <button
                             onClick={onClose}
                             className="p-2.5 hover:bg-destructive hover:text-destructive-foreground rounded-full transition-all duration-300"

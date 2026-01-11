@@ -1,10 +1,11 @@
 "use client";
 
-import { FILTERS } from '@/constants/filters';
 import { useLanguage } from '@/context/LanguageContext';
 import { Search, ChevronDown, Filter as FilterIcon, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { cn } from '@/lib/cn';
+import { PART_OPTIONS, YEAR_OPTIONS } from '@/constants/filters';
 
 export default function FilterBar() {
     const { t } = useLanguage();
@@ -12,6 +13,37 @@ export default function FilterBar() {
     const searchParams = useSearchParams();
 
     const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+    const [dynamicFilters, setDynamicFilters] = useState<any>(null);
+
+    useEffect(() => {
+        fetch('/api/configs')
+            .then(res => res.json())
+            .then(data => setDynamicFilters(data.filters))
+            .catch(err => console.error('Failed to fetch filters:', err));
+    }, []);
+
+    const filters = [
+        {
+            key: 'subject',
+            label: 'Subject',
+            options: dynamicFilters?.subjects || ['Mathematics', 'Science']
+        },
+        {
+            key: 'year',
+            label: 'Year',
+            options: YEAR_OPTIONS
+        },
+        {
+            key: 'category',
+            label: 'Category',
+            options: dynamicFilters?.categories || ['PAPER', 'SCHEME']
+        },
+        {
+            key: 'part',
+            label: 'Part',
+            options: dynamicFilters?.parts || PART_OPTIONS
+        }
+    ];
 
     // Synchronize local search state with URL if it changes externally
     useEffect(() => {
@@ -66,7 +98,7 @@ export default function FilterBar() {
                 <div className="space-y-1">
                     <div className="flex items-center gap-2">
                         <FilterIcon className="h-4 w-4 text-primary" />
-                        <h2 className="text-sm font-bold uppercase tracking-widest text-secondary/60">
+                        <h2 className="text-xs sm:text-sm font-bold uppercase tracking-widest text-secondary/60">
                             {t('filters.title')}
                         </h2>
                     </div>
@@ -86,17 +118,17 @@ export default function FilterBar() {
 
             <div className="bg-card border rounded-[2rem] p-4 lg:p-6 shadow-sm">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
-                    {FILTERS.map((filter) => (
+                    {filters.map((filter) => (
                         <div key={filter.key} className="relative group">
                             <select
-                                className="w-full h-12 pl-4 pr-10 bg-muted/30 border border-transparent rounded-xl focus:bg-background focus:border-primary/30 outline-none transition-all font-bold text-sm appearance-none cursor-pointer"
+                                className="w-full h-12 pl-4 pr-10 bg-muted border border-transparent rounded-xl focus:bg-background focus:border-primary/30 outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
                                 value={searchParams.get(filter.key) || ''}
                                 onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                             >
                                 <option value="">{getPlaceholder(filter.key)}</option>
-                                {filter.options.map((opt) => (
-                                    <option key={String(opt)} value={String(opt)}>
-                                        {String(opt)}
+                                {filter.options.map((opt: string) => (
+                                    <option key={opt} value={opt} className="truncate">
+                                        {opt}
                                     </option>
                                 ))}
                             </select>

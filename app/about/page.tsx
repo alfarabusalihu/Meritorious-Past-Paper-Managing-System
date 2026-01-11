@@ -3,9 +3,20 @@
 import { motion } from 'framer-motion';
 import { BookOpen, Shield, Users, Zap } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useState, useEffect } from 'react';
+import { Download, Eye, Heart } from 'lucide-react';
+import { cn } from '@/lib/cn';
 
 export default function About() {
     const { t } = useLanguage();
+    const [stats, setStats] = useState({ visitors: 0, contributors: 0, downloads: 0 });
+
+    useEffect(() => {
+        fetch('/api/stats')
+            .then(res => res.json())
+            .then(data => setStats(data))
+            .catch(err => console.error('Failed to fetch stats:', err));
+    }, []);
 
     const featureIcons = [BookOpen, Zap, Shield, Users];
     const featuresData = t('about.features');
@@ -14,8 +25,14 @@ export default function About() {
         icon: featureIcons[i] || BookOpen
     }));
 
+    const statsConfig = [
+        { label: 'Visitors', value: stats.visitors, icon: Eye, color: 'text-blue-500', bg: 'bg-blue-50' },
+        { label: 'Contributors', value: stats.contributors, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-50' },
+        { label: 'Papers Engagement', value: stats.downloads, icon: Download, color: 'text-amber-500', bg: 'bg-amber-50' },
+    ];
+
     return (
-        <div className="container py-20 space-y-24 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto py-12 md:py-20 space-y-16 md:space-y-24 px-4 sm:px-6 lg:px-8">
             {/* Hero Section */}
             <section className="text-center space-y-8 max-w-3xl mx-auto">
                 <motion.div
@@ -31,6 +48,27 @@ export default function About() {
                         {t('about.hero.description')}
                     </p>
                 </motion.div>
+            </section>
+
+            {/* Statistics Section */}
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {statsConfig.map((stat, index) => (
+                    <motion.div
+                        key={stat.label}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="bg-card border-none shadow-xl shadow-muted/20 rounded-[2.5rem] p-8 text-center space-y-4 hover:scale-[1.02] transition-transform"
+                    >
+                        <div className={cn("mx-auto p-4 rounded-2xl w-fit", stat.bg)}>
+                            <stat.icon className={cn("h-8 w-8", stat.color)} />
+                        </div>
+                        <div className="space-y-1">
+                            <h4 className="text-4xl font-black text-secondary">{stat.value.toLocaleString()}</h4>
+                            <p className="text-sm font-black uppercase tracking-widest text-muted-foreground">{stat.label}</p>
+                        </div>
+                    </motion.div>
+                ))}
             </section>
 
             {/* Features Grid */}

@@ -1,6 +1,7 @@
 import { getProfiles, getNotifications } from '@/lib/users';
 import UserTable from '@/components/admin/UserTable';
 import NotificationList from '@/components/admin/NotificationList';
+import SettingsManager from '@/components/admin/SettingsManager';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +33,12 @@ export default async function AdminDashboard() {
                 <div className="lg:col-span-2">
                     <UserTable initialUsers={users} />
                 </div>
+            </div>
+
+            {/* Dynamic Settings Section */}
+            <div className="space-y-4">
+                <h2 className="text-2xl font-black tracking-tight text-secondary">Site Configuration</h2>
+                <SettingsManager />
             </div>
         </div>
     );

@@ -77,6 +77,18 @@ function AddPaperContent() {
     const [existingPdfUrl, setExistingPdfUrl] = useState<string>('');
 
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+    const [dynamicFilters, setDynamicFilters] = useState<any>(null);
+
+    useEffect(() => {
+        fetch('/api/configs')
+            .then(res => res.json())
+            .then(data => setDynamicFilters(data.filters))
+            .catch(err => console.error('Failed to fetch filters:', err));
+    }, []);
+
+    const SUBJECTS = dynamicFilters?.subjects || SUBJECT_OPTIONS;
+    const CATEGORIES = dynamicFilters?.categories || CATEGORY_OPTIONS;
+    const PARTS = dynamicFilters?.parts || PART_OPTIONS;
 
     const form = useForm<PaperFormValues>({
         resolver: zodResolver(paperSchema),
@@ -254,7 +266,7 @@ function AddPaperContent() {
             <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] -z-10" />
             <div className="absolute bottom-0 left-0 w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[120px] -z-10" />
 
-            <div className="container py-8 lg:py-12 max-w-7xl">
+            <div className="container mx-auto py-8 lg:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl">
                 <div className="space-y-8">
                     {/* Header */}
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-muted">
@@ -344,7 +356,7 @@ function AddPaperContent() {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {CATEGORY_OPTIONS.map((c) => (
+                                                        {CATEGORIES.map((c: string) => (
                                                             <SelectItem key={c} className='bg-background' value={c}>{c}</SelectItem>
                                                         ))}
                                                     </SelectContent>
@@ -384,7 +396,7 @@ function AddPaperContent() {
                                             <FormItem>
                                                 <FormLabel>{t('addPaper.form.part')}</FormLabel>
                                                 <div className="grid grid-cols-2 gap-3">
-                                                    {PART_OPTIONS.map((opt) => (
+                                                    {PARTS.map((opt: string) => (
                                                         <div
                                                             key={opt}
                                                             onClick={() => field.onChange(opt)}
@@ -457,7 +469,7 @@ function AddPaperContent() {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {SUBJECT_OPTIONS.map((opt) => (
+                                                        {SUBJECTS.map((opt: string) => (
                                                             <SelectItem className='bg-background' key={opt} value={opt}>{opt}</SelectItem>
                                                         ))}
                                                     </SelectContent>

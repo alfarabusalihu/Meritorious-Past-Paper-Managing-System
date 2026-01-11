@@ -5,19 +5,34 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
+import { useEffect } from 'react';
 
 export default function Hero() {
     const { t } = useLanguage();
 
+    useEffect(() => {
+        // Increment visitor count once per session
+        const hasVisited = sessionStorage.getItem('hasVisited');
+        if (!hasVisited) {
+            fetch('/api/stats/increment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'visitors' }),
+            }).then(() => {
+                sessionStorage.setItem('hasVisited', 'true');
+            }).catch(err => console.error('Failed to increment visitor count:', err));
+        }
+    }, []);
+
     return (
-        <section className="relative min-h-screen flex items-center overflow-hidden">
+        <section className="relative min-h-[80vh] md:min-h-screen flex items-center py-20 md:py-0 overflow-hidden">
             {/* Background elements */}
             {/* Background elements */}
             <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-primary/20 blur-[120px] rounded-full -z-10 animate-pulse" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-secondary/10 blur-[130px] rounded-full -z-10" />
             <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-blue-500/20 blur-[120px] rounded-full -z-10" />
 
-            <div className="container px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto text-center space-y-8">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -32,16 +47,16 @@ export default function Hero() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="space-y-4"
+                        className="space-y-4 px-2"
                     >
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tight text-secondary leading-[1.1]">
-                            {t('hero.title.main')} <span className="text-primary italic relative">
+                        <h1 className="text-3xl sm:text-5xl md:text-7xl font-black tracking-tight text-secondary leading-tight md:leading-[1.1] break-words hyphens-auto">
+                            {t('hero.title.main')} <span className="text-primary italic relative whitespace-nowrap">
                                 {t('hero.title.highlight')}
-                                <div className="absolute -bottom-2 left-0 w-full h-1 bg-primary/20 rounded-full" />
+                                <div className="absolute-bottom-2 left-0 w-full h-1 bg-primary/20 rounded-full" />
                             </span><br className="hidden md:block" />
-                            {t('hero.title.sub')}
+                             {t('hero.title.sub')}
                         </h1>
-                        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium">
+                        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium break-words hyphens-auto leading-relaxed">
                             {t('hero.description')}
                         </p>
                     </motion.div>

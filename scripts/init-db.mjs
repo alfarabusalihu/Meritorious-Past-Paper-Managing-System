@@ -97,7 +97,44 @@ async function init() {
         `;
         console.log('Table "notifications" created/verified.');
 
-        // 6. Seed Admin User
+        // 6. Create system_stats table
+        await sql`
+            CREATE TABLE IF NOT EXISTS system_stats (
+                id TEXT PRIMARY KEY,
+                value BIGINT DEFAULT 0,
+                updated_at TIMESTAMPTZ DEFAULT NOW()
+            );
+        `;
+        await sql`INSERT INTO system_stats (id, value) VALUES ('visitors', 0) ON CONFLICT (id) DO NOTHING;`;
+        await sql`INSERT INTO system_stats (id, value) VALUES ('downloads', 0) ON CONFLICT (id) DO NOTHING;`;
+        console.log('Table "system_stats" created/verified.');
+
+        // 7. Create site_configs table
+        await sql`
+            CREATE TABLE IF NOT EXISTS site_configs (
+                id TEXT PRIMARY KEY,
+                data JSONB NOT NULL,
+                updated_at TIMESTAMPTZ DEFAULT NOW()
+            );
+        `;
+
+        // Seed initial site configurations
+        const initialFilters = {
+            subjects: ['Mathematics', 'Science'],
+            categories: ['PAPER', 'SCHEME'],
+            parts: ['Part 1', 'Part 2']
+        };
+        const initialSocials = {
+            facebook: 'https://facebook.com',
+            twitter: 'https://twitter.com',
+            instagram: 'https://instagram.com'
+        };
+
+        await sql`INSERT INTO site_configs (id, data) VALUES ('filters', ${JSON.stringify(initialFilters)}) ON CONFLICT (id) DO NOTHING;`;
+        await sql`INSERT INTO site_configs (id, data) VALUES ('socials', ${JSON.stringify(initialSocials)}) ON CONFLICT (id) DO NOTHING;`;
+        console.log('Table "site_configs" created/verified.');
+
+        // 8. Seed Admin User
         const adminEmail = process.env.ADMIN_EMAIL;
         const adminPassword = process.env.ADMIN_PASSWORD;
 

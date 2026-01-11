@@ -74,14 +74,14 @@ export default function PaperCard({ paper }: PaperCardProps) {
                             {paper.part}
                         </span>
                     </div>
-                    <h3 className="text-xl font-black text-secondary group-hover:text-primary transition-colors line-clamp-2 leading-tight">
+                    <h3 className="text-xl font-black text-secondary group-hover:text-primary transition-colors line-clamp-2 leading-tight break-words hyphens-auto">
                         {paper.paperName}
                     </h3>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-semibold">
-                        <BookOpen className="h-4 w-4" />
+                        <BookOpen className="h-4 w-4 shrink-0" />
                         <span className="truncate">{paper.subject}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-semibold">

@@ -37,7 +37,7 @@ export default async function Home({ searchParams }: HomeProps) {
         <main className="min-h-screen">
             <Hero />
 
-            <div id="papers-section" className="container py-20 px-4 sm:px-6 lg:px-8">
+            <div id="papers-section" className="container mx-auto py-12 md:py-20 px-4 sm:px-6 lg:px-8">
                 <div className="space-y-12">
                     <FilterBar />
 
