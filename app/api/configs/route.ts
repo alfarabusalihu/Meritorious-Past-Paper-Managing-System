@@ -7,10 +7,30 @@ export async function GET() {
     try {
         const configs = await sql`SELECT id, data FROM site_configs`;
         const configMap = configs.reduce((acc, curr) => {
-            acc[curr.id] = curr.data;
+            let cleanData = curr.data;
+            // Handle double-encoded JSON if present
+            if (typeof cleanData === 'string') {
+                try {
+                    cleanData = JSON.parse(cleanData);
+                } catch (e) {
+                    console.error('Failed to parse config data:', e);
+                }
+            }
+            if (typeof cleanData === 'string') {
+                try {
+                    cleanData = JSON.parse(cleanData);
+                } catch (e) { }
+            }
+            acc[curr.id] = cleanData;
             return acc;
         }, {});
-        return NextResponse.json(configMap);
+        return NextResponse.json(configMap, {
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+            }
+        });
     } catch (error) {
         console.error('Config fetch error:', error);
         return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 });
@@ -27,7 +47,7 @@ export async function POST(request: Request) {
 
         await sql`
             INSERT INTO site_configs (id, data, updated_at)
-            VALUES (${id}, ${JSON.stringify(data)}, NOW())
+            VALUES (${id}, ${data}, NOW())
             ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()
         `;
 

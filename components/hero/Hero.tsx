@@ -28,6 +28,8 @@ export default function Hero() {
         <section className="relative min-h-[80vh] md:min-h-screen flex items-center py-20 md:py-0 overflow-hidden">
             {/* Background elements */}
             {/* Background elements */}
+            <div className="absolute inset-0 bg-grid-black/[0.02] -z-[10]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background -z-[10]" />
             <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-primary/20 blur-[120px] rounded-full -z-10 animate-pulse" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-secondary/10 blur-[130px] rounded-full -z-10" />
             <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-blue-500/20 blur-[120px] rounded-full -z-10" />
@@ -52,9 +54,9 @@ export default function Hero() {
                         <h1 className="text-3xl sm:text-5xl md:text-7xl font-black tracking-tight text-secondary leading-tight md:leading-[1.1] break-words hyphens-auto">
                             {t('hero.title.main')} <span className="text-primary italic relative whitespace-nowrap">
                                 {t('hero.title.highlight')}
-                                <div className="absolute-bottom-2 left-0 w-full h-1 bg-primary/20 rounded-full" />
+                                <div className="absolute -bottom-2 left-0 w-full h-1 bg-primary/20 rounded-full" />
                             </span><br className="hidden md:block" />
-                             {t('hero.title.sub')}
+                            {t('hero.title.sub')}
                         </h1>
                         <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium break-words hyphens-auto leading-relaxed">
                             {t('hero.description')}

@@ -16,7 +16,7 @@ export default function FilterBar() {
     const [dynamicFilters, setDynamicFilters] = useState<any>(null);
 
     useEffect(() => {
-        fetch('/api/configs')
+        fetch(`/api/configs?t=${Date.now()}`, { cache: 'no-store' })
             .then(res => res.json())
             .then(data => setDynamicFilters(data.filters))
             .catch(err => console.error('Failed to fetch filters:', err));

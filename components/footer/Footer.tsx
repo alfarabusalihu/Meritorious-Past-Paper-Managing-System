@@ -7,7 +7,7 @@ export default function Footer() {
     const [socials, setSocials] = useState<any>(null);
 
     useEffect(() => {
-        fetch('/api/configs')
+        fetch(`/api/configs?t=${Date.now()}`, { cache: 'no-store' })
             .then(res => res.json())
             .then(data => setSocials(data.socials))
             .catch(err => console.error('Failed to fetch socials:', err));
