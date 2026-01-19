@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mppms.vercel.app/sitemap.xml

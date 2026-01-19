@@ -1,0 +1,18 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /papers/{allPaths=**} {
+      // Anyone can read past papers
+      allow read: if true;
+      
+      // Only authenticated users can upload papers
+      allow write: if request.auth != null && request.resource.size < 50 * 1024 * 1024; // 50MB limit
+    }
+    
+    match /configs/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}
