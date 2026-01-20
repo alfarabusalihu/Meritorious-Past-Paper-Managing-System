@@ -12,7 +12,6 @@ export const generateReceipt = (contribution: Contribution) => {
 
     // Brand Colors
     const primaryColor = '#0f172a'; // Deep Navy
-    const accentColor = '#3b82f6';
 
     // Header Background
     doc.setFillColor(primaryColor);
