@@ -26,6 +26,11 @@ export interface Paper {
 
     createdAt: Timestamp | Date; // Firestore Timestamp
     updatedAt?: Timestamp | Date;
+
+    // Soft Delete Metadata
+    deleted?: boolean;
+    deletedAt?: Timestamp | Date;
+    deletedBy?: string;
 }
 
 export interface UserProfile {

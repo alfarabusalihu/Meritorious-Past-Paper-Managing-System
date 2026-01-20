@@ -49,11 +49,20 @@ export function AuthForm() {
 
     const handleGoogleLogin = async () => {
         const provider = new GoogleAuthProvider()
+        setLoading(true)
+        setAuthError(null)
         try {
             await signInWithPopup(auth, provider)
             navigate('/')
-        } catch (err) {
+        } catch (err: any) {
             console.error('Login failed:', err)
+            if (err.code === 'auth/popup-closed-by-user') {
+                setAuthError('Sign-in cancelled.')
+            } else {
+                setAuthError(err.message || 'Failed to sign in with Google.')
+            }
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -139,11 +148,11 @@ export function AuthForm() {
     )
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-6">
+        <div className="min-h-screen w-full flex items-center justify-center p-4 py-12 sm:px-6 lg:px-8 bg-background">
             <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-full max-w-md bg-card border border-muted rounded-[2.5rem] p-8 shadow-2xl shadow-black/5 space-y-8 relative overflow-hidden"
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                className="w-full max-w-md bg-card border border-muted rounded-[2rem] p-6 sm:p-8 shadow-2xl shadow-black/5 space-y-8 relative overflow-hidden my-auto"
             >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl" />
 
