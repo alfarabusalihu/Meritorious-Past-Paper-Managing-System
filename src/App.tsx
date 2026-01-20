@@ -12,8 +12,14 @@ import { Contribute } from './components/pages/Contribute'
 import { seedData } from './lib/firebase/seed'
 import { useEffect } from 'react'
 
+import { isAdminHost } from './lib/utils/hostname'
+
+import { AuthProvider } from './context/AuthContext'
+import { ProtectedRoute } from './components/auth/ProtectedRoute'
+
 function AppContent() {
     const { t } = useLanguage()
+    const isSpecialAdminPortal = isAdminHost()
 
     useEffect(() => {
         seedData()
@@ -24,29 +30,39 @@ function AppContent() {
             <Navigation />
             <main id="main-content" role="main">
                 <Routes>
-                    <Route path="/" element={
-                        <div className="space-y-0">
-                            <Hero />
-
-                            <div id="papers-section" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 space-y-12">
-                                <div className="space-y-4 text-center md:text-left">
-                                    <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-secondary">
-                                        {t('papers.title')}
-                                    </h2>
-                                    <div className="h-1.5 w-20 bg-primary/20 rounded-full" />
+                    {isSpecialAdminPortal ? (
+                        /* Admin-Only Domain Routes */
+                        <Route path="/" element={<AdminDashboard />} />
+                    ) : (
+                        /* Public Domain Routes */
+                        <>
+                            <Route path="/" element={
+                                <div className="space-y-0">
+                                    <Hero />
+                                    <div id="papers-section" className="section-container section-spacing space-y-12">
+                                        <div className="space-y-4 text-center md:text-left">
+                                            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-secondary">
+                                                {t('papers.title')}
+                                            </h2>
+                                            <div className="h-1.5 w-20 bg-primary/20 rounded-full" />
+                                        </div>
+                                        <PaperGrid />
+                                    </div>
                                 </div>
+                            } />
+                            <Route path="/about" element={<About />} />
+                        </>
+                    )}
 
-                                <PaperGrid />
-                            </div>
-                        </div>
-                    } />
-                    <Route path="/about" element={<About />} />
+                    {/* Common Routes (accessible from both or for convenience) */}
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/contribute" element={<Contribute />} />
                     <Route path="/add-paper" element={
-                        <div className="py-20 mx-auto max-w-7xl px-4">
-                            <AddPaperForm />
-                        </div>
+                        <ProtectedRoute>
+                            <div className="section-container page-header-padding pb-20">
+                                <AddPaperForm />
+                            </div>
+                        </ProtectedRoute>
                     } />
                 </Routes>
             </main>
@@ -57,13 +73,15 @@ function AppContent() {
 
 function App() {
     return (
-        <LanguageProvider>
-            <FilterProvider>
-                <BrowserRouter>
-                    <AppContent />
-                </BrowserRouter>
-            </FilterProvider>
-        </LanguageProvider>
+        <AuthProvider>
+            <LanguageProvider>
+                <FilterProvider>
+                    <BrowserRouter>
+                        <AppContent />
+                    </BrowserRouter>
+                </FilterProvider>
+            </LanguageProvider>
+        </AuthProvider>
     )
 }
 

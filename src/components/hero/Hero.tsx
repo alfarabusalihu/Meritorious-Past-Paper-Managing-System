@@ -7,7 +7,7 @@ export function Hero() {
     const { t } = useLanguage()
 
     return (
-        <section className="relative min-h-[80vh] md:min-h-screen flex items-center py-20 md:py-0 overflow-hidden">
+        <section className="relative min-h-[85vh] md:min-h-screen flex items-center py-12 md:py-0 overflow-hidden">
             {/* Background elements */}
             <div className="absolute inset-0 bg-grid-black -z-10 opacity-[0.05]" />
             <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background -z-10" />
@@ -17,7 +17,7 @@ export function Hero() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-secondary/10 blur-[130px] rounded-full -z-10" />
             <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-blue-500/20 blur-[120px] rounded-full -z-10" />
 
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
+            <div className="section-container">
                 <div className="max-w-4xl mx-auto text-center space-y-8">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -34,7 +34,7 @@ export function Hero() {
                         transition={{ delay: 0.1 }}
                         className="space-y-4 px-2"
                     >
-                        <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-secondary leading-tight md:leading-[1.1]">
+                        <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-secondary leading-tight md:leading-[1.1]">
                             {t('hero.title.main')} <span className="text-primary italic relative whitespace-nowrap">
                                 {t('hero.title.highlight')}
                                 <div className="absolute -bottom-2 left-0 w-full h-1 bg-primary/20 rounded-full" />

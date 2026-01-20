@@ -40,7 +40,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                 <div className="flex items-center justify-between w-full lg:w-auto">
                     <div className="flex items-center gap-2">
                         <Filter className="h-4 w-4 text-primary" />
-                        <h2 className="text-xs sm:text-sm font-black uppercase tracking-widest text-foreground/60">
+                        <h2 className="text-xs sm:text-sm font-bold uppercase tracking-widest text-foreground/60">
                             {t('filters.title')}
                         </h2>
                     </div>
@@ -68,7 +68,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
 
                     <Link
                         to="/add-paper"
-                        className="hidden lg:flex items-center gap-2 px-6 h-14 bg-primary text-primary-foreground rounded-2xl font-black text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap"
+                        className="hidden lg:flex items-center gap-2 px-6 h-14 bg-primary text-primary-foreground rounded-2xl font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap"
                     >
                         <Plus size={18} />
                         {t('addPaper.title.add')} {t('addPaper.title.highlight')}
@@ -76,14 +76,14 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                 </div>
             </div>
 
-            <div className="bg-card border border-muted rounded-[2rem] p-4 lg:p-6 shadow-xl shadow-black/5">
+            <div className="bg-card border border-muted rounded-[2rem] p-6 lg:p-8 shadow-xl shadow-black/5">
                 <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-center">
                     {/* Subject Filter */}
                     <div className="relative group">
                         <select
                             value={subject}
                             onChange={(e) => setSubject(e.target.value)}
-                            className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-black text-xs sm:text-sm appearance-none cursor-pointer truncate"
+                            className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
                         >
                             <option value="">{t('filters.placeholders.subject')}</option>
                             {(filters?.subjects || []).slice().sort().map(s => (
@@ -98,7 +98,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                         <select
                             value={year}
                             onChange={(e) => setYear(e.target.value)}
-                            className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-black text-xs sm:text-sm appearance-none cursor-pointer truncate"
+                            className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
                         >
                             <option value="">{t('filters.placeholders.year')}</option>
                             {(filters?.years || []).slice().sort((a, b) => parseInt(b) - parseInt(a)).map((y) => (
@@ -115,7 +115,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                         <select
                             value={examType}
                             onChange={(e) => setExamType(e.target.value)}
-                            className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-black text-xs sm:text-sm appearance-none cursor-pointer truncate"
+                            className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
                         >
                             <option value="">{t('filters.placeholders.category')}</option>
                             {(filters?.categories || []).map(c => (
@@ -130,7 +130,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                         <select
                             value={part}
                             onChange={(e) => setPart(e.target.value)}
-                            className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-black text-xs sm:text-sm appearance-none cursor-pointer truncate"
+                            className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
                         >
                             <option value="">{t('filters.placeholders.part')}</option>
                             {(filters?.parts || []).map(p => (
@@ -145,7 +145,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                         <select
                             value={language}
                             onChange={(e) => setLanguage(e.target.value)}
-                            className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-black text-xs sm:text-sm appearance-none cursor-pointer truncate"
+                            className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
                         >
                             <option value="">Language</option>
                             {(filters?.languages || []).map(l => (
@@ -158,7 +158,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                     <div className="flex items-center gap-2 lg:col-span-1">
                         <Button
                             type="submit"
-                            className="flex-1 h-12 rounded-xl font-black text-sm px-4"
+                            className="flex-1 h-12 rounded-xl font-bold text-sm px-4"
                         >
                             Apply
                         </Button>

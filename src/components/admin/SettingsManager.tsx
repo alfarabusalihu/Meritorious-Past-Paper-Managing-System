@@ -88,13 +88,13 @@ export function SettingsManager() {
             {/* Filters Card */}
             <div className="bg-card border border-muted rounded-[2.5rem] shadow-xl shadow-black/5 p-8 space-y-6">
                 <div className="flex items-center justify-between gap-4 border-b border-muted pb-6">
-                    <h2 className="text-xl font-black text-foreground flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
                         <List className="h-5 w-5 text-primary" />
                         Dynamic Filters
                     </h2>
                     <Button
                         size="sm"
-                        className="font-black rounded-xl h-10 px-4"
+                        className="font-bold rounded-xl h-10 px-4"
                         onClick={handleSaveFilters}
                         disabled={isSavingFilters}
                     >
@@ -107,10 +107,10 @@ export function SettingsManager() {
                     {(['subjects', 'categories', 'parts', 'languages', 'years'] as const).map((type) => (
                         <div key={type} className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                                <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                                     {titles[type] || type}
                                 </h3>
-                                <button onClick={() => addFilterItem(type)} className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-1">
+                                <button onClick={() => addFilterItem(type)} className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline flex items-center gap-1">
                                     <Plus className="h-3 w-3" /> Add New
                                 </button>
                             </div>
@@ -139,13 +139,13 @@ export function SettingsManager() {
             {/* Social Links Card */}
             <div className="bg-card border border-muted rounded-[2.5rem] shadow-xl shadow-black/5 p-8 space-y-6">
                 <div className="flex items-center justify-between gap-4 border-b border-muted pb-6">
-                    <h2 className="text-xl font-black text-secondary-foreground flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-secondary-foreground flex items-center gap-2">
                         <Globe className="h-5 w-5 text-primary" />
                         Platform Settings
                     </h2>
                     <Button
                         size="sm"
-                        className="font-black rounded-xl h-10 px-4"
+                        className="font-bold rounded-xl h-10 px-4"
                         onClick={handleSaveSocials}
                         disabled={isSavingSocials}
                     >
@@ -157,7 +157,7 @@ export function SettingsManager() {
                 <div className="space-y-6">
                     {(['twitter', 'facebook', 'instagram'] as const).map(platform => (
                         <div key={platform} className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+                            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
                                 {platform === 'twitter' && <Twitter className="h-3 w-3" />}
                                 {platform === 'facebook' && <Facebook className="h-3 w-3" />}
                                 {platform === 'instagram' && <Instagram className="h-3 w-3" />}

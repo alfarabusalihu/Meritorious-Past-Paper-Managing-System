@@ -27,7 +27,7 @@ export function About() {
     ]
 
     return (
-        <div className="container mx-auto py-12 md:py-20 space-y-16 md:space-y-24 px-4 sm:px-6 lg:px-8">
+        <div className="section-container section-spacing space-y-16 md:space-y-24">
             {/* Hero Section */}
             <section className="text-center space-y-8 max-w-3xl mx-auto">
                 <motion.div
@@ -35,7 +35,7 @@ export function About() {
                     animate={{ opacity: 1, y: 0 }}
                     className="space-y-4"
                 >
-                    <h1 className="text-4xl md:text-5xl font-black text-foreground leading-tight">
+                    <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
                         {t('about.hero.title')} <br />
                         <span className="text-primary italic">{t('about.hero.highlight')}</span>
                     </h1>
@@ -59,8 +59,8 @@ export function About() {
                             <stat.icon className={clsx("h-8 w-8", stat.color)} />
                         </div>
                         <div className="space-y-1">
-                            <h4 className="text-4xl font-black text-foreground">{stat.value.toLocaleString()}</h4>
-                            <p className="text-sm font-black uppercase tracking-widest text-muted-foreground">{stat.label}</p>
+                            <h4 className="text-4xl font-bold text-foreground">{stat.value.toLocaleString()}</h4>
+                            <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">{stat.label}</p>
                         </div>
                     </motion.div>
                 ))}
@@ -95,7 +95,7 @@ export function About() {
             <section className="rounded-[3rem] bg-secondary text-secondary-foreground p-12 md:p-20 text-center space-y-8 relative overflow-hidden shadow-2xl shadow-secondary/20">
                 <div className="absolute top-0 right-0 w-1/3 h-full bg-white/5 skew-x-12 -z-0" />
                 <div className="relative z-10 space-y-8">
-                    <h2 className="text-4xl font-black tracking-tight">{t('about.mission.title')}</h2>
+                    <h2 className="text-4xl font-bold tracking-tight">{t('about.mission.title')}</h2>
                     <p className="text-xl text-secondary-foreground/80 max-w-2xl mx-auto leading-relaxed font-medium">
                         {t('about.mission.description')}
                     </p>

@@ -32,7 +32,7 @@ export function Admin() {
         return () => unsubscribe()
     }, [navigate])
 
-    if (isAuthorized === null) return <div className="p-20 text-center font-black animate-pulse">Checking credentials...</div>
+    if (isAuthorized === null) return <div className="p-20 text-center font-bold animate-pulse">Checking credentials...</div>
 
     return (
         <div className="container mx-auto py-12 md:py-20 space-y-12 px-4 sm:px-6 lg:px-8">
@@ -41,7 +41,7 @@ export function Admin() {
                     <div className="p-3 bg-primary/10 rounded-2xl text-primary">
                         <ShieldCheck size={28} />
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
+                    <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
                         Admin Dashboard
                     </h1>
                 </div>

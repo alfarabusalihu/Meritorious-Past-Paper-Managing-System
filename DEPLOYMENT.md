@@ -253,12 +253,33 @@ npm run build
 firebase deploy --only hosting
 ```
 
-### Vercel
+### Vercel (Recommended)
 
-```bash
-npm install -g vercel
-vercel --prod
+Vercel is the simplest and most performant way to deploy this React + Vite application.
+
+#### Handling Client-Side Routing (SPA)
+Since this project is a Single Page Application (SPA), all routes (like `/admin`, `/about`) must be redirected to `index.html` so that `react-router-dom` can take over. 
+
+I have added a `vercel.json` file to the root with this configuration:
+```json
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
 ```
+
+#### Steps to Deploy
+1. Push your code to GitHub.
+2. Link your repository in the Vercel Dashboard.
+3. Vercel will auto-detect the Vite build settings.
+4. **Crucial**: Add your Firebase & Stripe keys in the **Environment Variables** section:
+   - `VITE_FIREBASE_API_KEY`
+   - `VITE_FIREBASE_AUTH_DOMAIN`
+   - `VITE_FIREBASE_PROJECT_ID`
+   - `VITE_FIREBASE_STORAGE_BUCKET`
+   - `VITE_FIREBASE_MESSAGING_SENDER_ID`
+   - `VITE_FIREBASE_APP_ID`
+   - `VITE_STRIPE_PUBLIC_KEY`
+5. Deploy! Your routes will now resolve correctly even on a browser refresh.
 
 ### Netlify
 

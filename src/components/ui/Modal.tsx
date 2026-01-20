@@ -70,7 +70,7 @@ export const Modal = ({ isOpen, onClose, title, children, className }: ModalProp
         >
             <div className="bg-card w-full max-w-5xl max-h-[90vh] rounded-[2rem] shadow-2xl overflow-hidden border border-muted relative group-data-[open]:animate-in group-data-[open]:zoom-in-95 group-data-[open]:duration-300">
                 <div className="flex items-center justify-between p-4 border-b border-muted">
-                    {title && <h3 className="text-lg font-black text-foreground px-2">{title}</h3>}
+                    {title && <h3 className="text-lg font-bold text-foreground px-2">{title}</h3>}
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground"

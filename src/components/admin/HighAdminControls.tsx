@@ -6,7 +6,8 @@ import { UserProfile, Contribution } from '../../lib/firebase/schema'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 import { Tabs, Tab, Box, Snackbar, Alert } from '@mui/material'
-import { People, Settings, Save, Lock, LockOpen, Shield, AttachMoney, LocalCafe } from '@mui/icons-material'
+import { People, Settings, Save, Lock, LockOpen, Shield, AttachMoney, LocalCafe, SwapHoriz } from '@mui/icons-material'
+import { useAuth } from '../../context/AuthContext'
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -28,6 +29,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export function HighAdminControls() {
+    const { user: currentUser } = useAuth()
     const [tabValue, setTabValue] = useState(0)
     const [users, setUsers] = useState<UserProfile[]>([])
     const [filters, setFilters] = useState<FilterConfig | null>(null)
@@ -66,6 +68,22 @@ export function HighAdminControls() {
     const handleToggleBlock = async (uid: string, blocked: boolean) => {
         await usersApi.toggleBlockUser(uid, blocked)
         setUsers(users.map(u => u.uid === uid ? { ...u, blocked } : u))
+    }
+
+    const handleTransferOwnership = async (targetUid: string) => {
+        if (!currentUser) return
+        if (!window.confirm("Are you sure? You will lose Super Admin status.")) return
+
+        setLoading(true)
+        try {
+            await usersApi.transferSuperAdmin(currentUser.uid, targetUid)
+            setSnackbar({ open: true, message: 'Ownership transferred! Reloading...', severity: 'success' })
+            setTimeout(() => window.location.reload(), 2000)
+        } catch (error) {
+            setSnackbar({ open: true, message: 'Transfer failed', severity: 'error' })
+        } finally {
+            setLoading(false)
+        }
     }
 
     const handleSaveFilters = async () => {
@@ -115,20 +133,20 @@ export function HighAdminControls() {
     return (
         <div className="bg-white p-6 min-h-[600px]">
             <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)} centered variant="fullWidth">
-                <Tab icon={<People />} label="User Management" sx={{ fontWeight: 900 }} />
-                <Tab icon={<Settings />} label="System Config" sx={{ fontWeight: 900 }} />
-                <Tab icon={<LocalCafe />} label="Donations" sx={{ fontWeight: 900 }} />
+                <Tab icon={<People />} label="User Management" sx={{ fontWeight: 700 }} />
+                <Tab icon={<Settings />} label="System Config" sx={{ fontWeight: 700 }} />
+                <Tab icon={<LocalCafe />} label="Donations" sx={{ fontWeight: 700 }} />
             </Tabs>
 
             <TabPanel value={tabValue} index={0}>
                 <div className="space-y-4 pb-8">
-                    <h3 className="text-xl font-black text-secondary mb-4">Registered Users</h3>
+                    <h3 className="text-xl font-bold text-secondary mb-4">Registered Users</h3>
                     <div className="grid gap-4">
                         {users.map(user => (
                             <div key={user.uid} className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-muted">
                                 <div className="flex items-center gap-4">
-                                    <div className={`p-3 rounded-full ${user.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                                        {user.role === 'admin' ? <Shield /> : <People />}
+                                    <div className={`p-3 rounded-full ${user.role === 'admin' ? 'bg-primary/20 text-primary' : user.role === 'super-admin' ? 'bg-secondary/20 text-secondary' : 'bg-muted text-muted-foreground'}`}>
+                                        {user.role === 'admin' || user.role === 'super-admin' ? <Shield /> : <People />}
                                     </div>
                                     <div>
                                         <p className="font-bold text-foreground">{user.displayName || 'Unknown User'}</p>
@@ -136,7 +154,18 @@ export function HighAdminControls() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    {user.role !== 'admin' && ( // Cannot block other admins safely effectively via UI, keep it simple
+                                    {user.role !== 'super-admin' && (
+                                        <Button
+                                            size="sm"
+                                            variant="secondary"
+                                            onClick={() => handleTransferOwnership(user.uid)}
+                                            className="border-primary text-primary hover:bg-primary/10"
+                                            title="Make Super Admin"
+                                        >
+                                            <SwapHoriz sx={{ fontSize: 16 }} />
+                                        </Button>
+                                    )}
+                                    {user.role === 'user' && (
                                         <Button
                                             size="sm"
                                             onClick={() => handleToggleBlock(user.uid, !user.blocked)}
@@ -146,7 +175,8 @@ export function HighAdminControls() {
                                             {user.blocked ? 'Unblock' : 'Block'}
                                         </Button>
                                     )}
-                                    <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground bg-muted px-2 py-1 rounded">
+                                    <span className={`text-xs font-bold uppercase tracking-widest px-2 py-1 rounded ${user.role === 'super-admin' ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-muted-foreground'
+                                        }`}>
                                         {user.role}
                                     </span>
                                 </div>
@@ -159,12 +189,12 @@ export function HighAdminControls() {
             <TabPanel value={tabValue} index={1}>
                 <div className="space-y-8 pb-8">
                     <div>
-                        <h3 className="text-xl font-black text-secondary mb-4">Global Filters</h3>
+                        <h3 className="text-xl font-bold text-secondary mb-4">Global Filters</h3>
                         <p className="text-sm text-muted-foreground mb-4">Comma-separated values for dropdowns.</p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {filters && Object.keys(filters).map((key) => (
                                 <div key={key}>
-                                    <label className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1 block">{key}</label>
+                                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1 block">{key}</label>
                                     <textarea
                                         className="w-full rounded-xl border-muted bg-muted/10 p-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 min-h-[80px]"
                                         value={(filters as any)[key].join(', ')}
@@ -173,21 +203,25 @@ export function HighAdminControls() {
                                 </div>
                             ))}
                         </div>
-                        <Button onClick={handleSaveFilters} className="mt-4 font-black px-8" isLoading={loading}>
-                            <Save sx={{ fontSize: 18, marginRight: 1 }} /> Save Filter Config
-                        </Button>
+                        <div className="flex justify-end">
+                            <Button onClick={handleSaveFilters} className="mt-8 font-bold px-12 h-14 rounded-2xl shadow-lg" isLoading={loading}>
+                                <Save sx={{ fontSize: 20, marginRight: 1 }} /> Save Filter Config
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="border-t border-muted pt-8">
-                        <h3 className="text-xl font-black text-secondary mb-4">Social Links</h3>
+                        <h3 className="text-xl font-bold text-secondary mb-4">Social Links</h3>
                         <div className="grid grid-cols-1 gap-4">
                             <Input label="Facebook" value={socials?.facebook || ''} onChange={e => setSocials({ ...socials!, facebook: e.target.value })} />
                             <Input label="Twitter" value={socials?.twitter || ''} onChange={e => setSocials({ ...socials!, twitter: e.target.value })} />
                             <Input label="Instagram" value={socials?.instagram || ''} onChange={e => setSocials({ ...socials!, instagram: e.target.value })} />
                         </div>
-                        <Button onClick={handleSaveSocials} className="mt-4 font-black px-8" isLoading={loading}>
-                            <Save sx={{ fontSize: 18, marginRight: 1 }} /> Save Socials
-                        </Button>
+                        <div className="flex justify-end">
+                            <Button onClick={handleSaveSocials} className="mt-8 font-bold px-12 h-14 rounded-2xl shadow-lg" isLoading={loading}>
+                                <Save sx={{ fontSize: 20, marginRight: 1 }} /> Save Socials
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </TabPanel>
@@ -195,17 +229,17 @@ export function HighAdminControls() {
             <TabPanel value={tabValue} index={2}>
                 <div className="space-y-8 pb-8">
                     <div>
-                        <h3 className="text-xl font-black text-secondary mb-4">Donation History</h3>
+                        <h3 className="text-xl font-bold text-secondary mb-4">Donation History</h3>
                         <div className="overflow-x-auto rounded-xl border border-muted">
                             <table className="w-full text-sm">
                                 <thead className="bg-muted/30 border-b border-muted">
                                     <tr>
-                                        <th className="text-left p-4 font-black uppercase tracking-wider text-xs text-muted-foreground">Date</th>
-                                        <th className="text-left p-4 font-black uppercase tracking-wider text-xs text-muted-foreground">Donor</th>
-                                        <th className="text-left p-4 font-black uppercase tracking-wider text-xs text-muted-foreground">Email</th>
-                                        <th className="text-right p-4 font-black uppercase tracking-wider text-xs text-muted-foreground">Coffees</th>
-                                        <th className="text-right p-4 font-black uppercase tracking-wider text-xs text-muted-foreground">Amount</th>
-                                        <th className="text-center p-4 font-black uppercase tracking-wider text-xs text-muted-foreground">Status</th>
+                                        <th className="text-left p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Date</th>
+                                        <th className="text-left p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Donor</th>
+                                        <th className="text-left p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Email</th>
+                                        <th className="text-right p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Coffees</th>
+                                        <th className="text-right p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Amount</th>
+                                        <th className="text-center p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -222,9 +256,9 @@ export function HighAdminControls() {
                                                 <td className="p-4 font-bold">{donation.donorName}</td>
                                                 <td className="p-4 text-muted-foreground font-medium">{donation.email}</td>
                                                 <td className="p-4 text-right font-bold">{donation.coffeeCount}</td>
-                                                <td className="p-4 text-right font-black text-lg">${donation.amount.toFixed(2)}</td>
+                                                <td className="p-4 text-right font-bold text-lg">${donation.amount.toFixed(2)}</td>
                                                 <td className="p-4 text-center">
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-black uppercase ${donation.status === 'succeeded' ? 'bg-green-100 text-green-700' :
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${donation.status === 'succeeded' ? 'bg-green-100 text-green-700' :
                                                         donation.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                                                             'bg-destructive/10 text-destructive'
                                                         }`}>
@@ -240,14 +274,14 @@ export function HighAdminControls() {
                     </div>
 
                     <div className="border-t border-muted pt-8">
-                        <h3 className="text-xl font-black text-secondary mb-4 flex items-center gap-2">
+                        <h3 className="text-xl font-bold text-secondary mb-4 flex items-center gap-2">
                             <AttachMoney className="text-primary" />
                             Donation Settings
                         </h3>
                         <div className="bg-muted/20 rounded-2xl p-6 space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-2">Coffee Price (USD)</label>
+                                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground block mb-2">Coffee Price (USD)</label>
                                     <Input
                                         type="number"
                                         value={donationConfig.coffeePrice || 5}
@@ -258,14 +292,16 @@ export function HighAdminControls() {
                                 </div>
                                 <div className="flex items-end">
                                     <div className="p-6 bg-white rounded-xl border border-muted w-full">
-                                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Total Raised</p>
-                                        <p className="text-3xl font-black text-primary">${donations.reduce((sum, d) => sum + d.amount, 0).toFixed(2)}</p>
+                                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Total Raised</p>
+                                        <p className="text-3xl font-bold text-primary">${donations.reduce((sum, d) => sum + d.amount, 0).toFixed(2)}</p>
                                     </div>
                                 </div>
                             </div>
-                            <Button onClick={handleSaveDonationConfig} className="font-black px-8" isLoading={loading}>
-                                <Save sx={{ fontSize: 18, marginRight: 1 }} /> Save Donation Settings
-                            </Button>
+                            <div className="flex justify-end pt-4">
+                                <Button onClick={handleSaveDonationConfig} className="font-bold px-12 h-14 rounded-2xl shadow-lg" isLoading={loading}>
+                                    <Save sx={{ fontSize: 20, marginRight: 1 }} /> Save Donation Settings
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>

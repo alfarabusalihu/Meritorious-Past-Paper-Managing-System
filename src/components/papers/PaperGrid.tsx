@@ -70,7 +70,7 @@ export function PaperGrid() {
                         <BookOpen className="h-10 w-10 text-muted-foreground" />
                     </div>
                     <div>
-                        <h3 className="text-2xl font-black text-secondary-foreground">{t('papers.empty.title')}</h3>
+                        <h3 className="text-2xl font-bold text-secondary-foreground">{t('papers.empty.title')}</h3>
                         <p className="text-muted-foreground font-medium max-w-sm mx-auto">{t('papers.empty.description')}</p>
                     </div>
                 </div>
@@ -98,7 +98,7 @@ export function PaperGrid() {
                     p: 3,
                     pb: 1,
                     fontFamily: 'inherit',
-                    fontWeight: 900,
+                    fontWeight: 700,
                     color: 'var(--color-secondary)'
                 }}>
                     <span className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export function PaperGrid() {
                                 href={selectedPaper.fileUrl}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-black shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
+                                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
                             >
                                 <Download size={16} />
                                 Download PDF

@@ -30,7 +30,7 @@ export interface UserProfile {
     uid: string;
     email: string;
     displayName: string;
-    role: 'admin' | 'user';
+    role: 'admin' | 'user' | 'super-admin';
     blocked?: boolean;
     photoURL?: string;
     createdAt: any;

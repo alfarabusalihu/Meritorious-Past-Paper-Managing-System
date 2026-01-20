@@ -9,42 +9,54 @@ export const usersApi = {
         const userRef = doc(db, USERS_COLLECTION, uid);
         const snapshot = await getDoc(userRef);
 
-        const envAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@gmail.com';
-        const isEnvAdmin = email === envAdminEmail;
+        const envSuperAdminEmail = import.meta.env.VITE_SUPER_ADMIN_EMAIL || 'admin@gmail.com';
+
+        // Check if any super-admin exists in the DB
+        const usersSnapshot = await getDocs(collection(db, USERS_COLLECTION));
+        const hasSuperAdmin = usersSnapshot.docs.some(d => (d.data() as UserProfile).role === 'super-admin');
 
         if (snapshot.exists()) {
             const data = snapshot.data() as UserProfile;
-            if (isEnvAdmin && data.role !== 'admin') {
-                await setDoc(userRef, { ...data, role: 'admin' }, { merge: true });
-                return { ...data, role: 'admin' };
+            // If no super-admin exists and this user matches the env email, promote them
+            if (!hasSuperAdmin && email === envSuperAdminEmail && data.role !== 'super-admin') {
+                const updated = { ...data, role: 'super-admin' as const };
+                await setDoc(userRef, updated, { merge: true });
+                return updated;
             }
             return data;
         }
 
+        // New User
         const newUser: UserProfile = {
             uid,
             email,
             displayName,
-            role: isEnvAdmin ? 'admin' : 'user',
+            role: (!hasSuperAdmin && email === envSuperAdminEmail) ? 'super-admin' : 'user',
             createdAt: new Date().toISOString()
         };
         await setDoc(userRef, newUser);
         return newUser;
     },
-    async getUserRole(uid: string): Promise<'admin' | 'user'> {
+
+    async getUserRole(uid: string): Promise<UserProfile['role']> {
         const userRef = doc(db, USERS_COLLECTION, uid);
         const snapshot = await getDoc(userRef);
-        const data = snapshot.data();
-
-        const envAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@gmail.com';
-        if (data?.email === envAdminEmail) return 'admin';
-
-        return data?.role || 'user';
+        return (snapshot.data() as UserProfile)?.role || 'user';
     },
 
-    async updateUserRole(uid: string, role: 'admin' | 'user') {
-        const userRef = doc(db, USERS_COLLECTION, uid)
-        await setDoc(userRef, { role }, { merge: true })
+    async updateUserRole(uid: string, role: UserProfile['role']) {
+        const userRef = doc(db, USERS_COLLECTION, uid);
+        await setDoc(userRef, { role }, { merge: true });
+    },
+
+    async transferSuperAdmin(currentUid: string, targetUid: string) {
+        // This is a sensitive operation - ideally should be a Cloud Function, 
+        // but for now we do it client-side as requested for simplicity in this stage.
+        const currentRef = doc(db, USERS_COLLECTION, currentUid);
+        const targetRef = doc(db, USERS_COLLECTION, targetUid);
+
+        await setDoc(currentRef, { role: 'admin' }, { merge: true });
+        await setDoc(targetRef, { role: 'super-admin' }, { merge: true });
     },
 
     async getAllUsers(): Promise<UserProfile[]> {

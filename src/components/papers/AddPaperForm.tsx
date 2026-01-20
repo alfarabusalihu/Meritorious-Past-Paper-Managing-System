@@ -164,10 +164,10 @@ export function AddPaperForm() {
                     <ArrowLeft size={20} />
                 </Button>
                 <div>
-                    <h1 className="text-3xl font-black text-secondary tracking-tight">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-secondary tracking-tight">
                         {paperToEdit ? 'Edit Paper' : 'Add New Paper'}
                     </h1>
-                    <p className="text-muted-foreground font-medium">
+                    <p className="text-sm sm:text-base text-muted-foreground font-medium">
                         {paperToEdit ? 'Update existing paper details' : 'Upload and catalogue a new past paper'}
                     </p>
                 </div>
@@ -182,7 +182,7 @@ export function AddPaperForm() {
                                 <div className="flex items-center gap-3 mb-4">
                                     <FileText className="text-primary" size={24} aria-hidden="true" />
                                     <div>
-                                        <h3 className="font-black text-lg text-secondary">Currently Editing</h3>
+                                        <h3 className="font-bold text-lg text-secondary">Currently Editing</h3>
                                         <p className="text-xs font-medium text-muted-foreground">Original paper details loaded</p>
                                     </div>
                                 </div>
@@ -263,7 +263,7 @@ export function AddPaperForm() {
                                                 <FileText size={32} />
                                             </div>
                                             <div>
-                                                <span className="font-black text-lg block truncate max-w-[400px]">{file.name}</span>
+                                                <span className="font-bold text-lg block truncate max-w-[400px]">{file.name}</span>
                                                 <span className="text-sm font-bold text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
                                             </div>
                                         </div>
@@ -273,7 +273,7 @@ export function AddPaperForm() {
                                                 <Upload size={28} />
                                             </div>
                                             <div className="space-y-1">
-                                                <span className="font-black text-lg block">Click to upload PDF</span>
+                                                <span className="font-bold text-lg block">Click to upload PDF</span>
                                                 <span className="font-bold text-xs text-muted-foreground/60 italic uppercase tracking-widest">Max 50MB</span>
                                             </div>
                                         </div>
@@ -292,7 +292,7 @@ export function AddPaperForm() {
                             />
 
                             <div className="space-y-2">
-                                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/60 px-1">{t('addPaper.form.subject')}</label>
+                                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 px-1">{t('addPaper.form.subject')}</label>
                                 <select
                                     className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                     value={subject}
@@ -312,7 +312,7 @@ export function AddPaperForm() {
                 <div className="lg:col-span-4 space-y-6">
                     <Card className="p-8 space-y-6">
                         <div className="space-y-2">
-                            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/60">{t('addPaper.form.year')}</label>
+                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{t('addPaper.form.year')}</label>
                             <select
                                 className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
                                 value={year}
@@ -327,7 +327,7 @@ export function AddPaperForm() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/60">{t('addPaper.form.category')}</label>
+                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{t('addPaper.form.category')}</label>
                             <select
                                 className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                 value={examType}
@@ -342,7 +342,7 @@ export function AddPaperForm() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/60">Part / Component</label>
+                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Part / Component</label>
                             <div className="grid grid-cols-2 gap-2">
                                 {((dynamicFilters?.parts as string[]) || []).map(p => (
                                     <button
@@ -350,7 +350,7 @@ export function AddPaperForm() {
                                         type="button"
                                         onClick={() => setPart(p)}
                                         className={clsx(
-                                            "py-3 px-2 rounded-xl text-xs font-black transition-all border-2",
+                                            "py-3 px-2 rounded-xl text-xs font-bold transition-all border-2",
                                             part === p ? "bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20" : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted/50"
                                         )}
                                     >
@@ -361,7 +361,7 @@ export function AddPaperForm() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/60">Language</label>
+                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Language</label>
                             <select
                                 className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                 value={language}
@@ -377,9 +377,9 @@ export function AddPaperForm() {
                     </Card>
                 </div>
 
-                {/* Submit Button at Bottom */}
-                <div className="lg:col-span-12">
-                    <Button type="submit" className="w-full h-16 rounded-[2rem] font-black text-xl shadow-2xl shadow-primary/20 hover:-translate-y-1 transition-all" isLoading={loading}>
+                {/* Submit Button at Bottom Right */}
+                <div className="lg:col-span-12 flex justify-end">
+                    <Button type="submit" className="w-full sm:w-auto px-12 h-16 rounded-[2rem] font-bold text-xl shadow-2xl shadow-primary/20 hover:-translate-y-1 transition-all" isLoading={loading}>
                         <Save className="mr-3" />
                         {paperToEdit ? 'Update Paper Details' : t('addPaper.form.submit.publish')}
                     </Button>

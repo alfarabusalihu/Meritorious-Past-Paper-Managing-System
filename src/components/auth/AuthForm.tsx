@@ -24,7 +24,7 @@ export function AuthForm() {
     const [isSystemAdmin, setIsSystemAdmin] = useState(false)
     const [loading, setLoading] = useState(true)
     const [isLogin, setIsLogin] = useState(true)
-    const [role, setRole] = useState<'admin' | 'user' | null>(null)
+    const [role, setRole] = useState<'user' | 'admin' | 'super-admin' | null>(null)
 
     // Email/Password state
     const [email, setEmail] = useState('')
@@ -137,7 +137,7 @@ export function AuthForm() {
     )
 
     return (
-        <div className="min-h-[60vh] flex items-center justify-center px-4">
+        <div className="min-h-screen flex items-center justify-center px-6">
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -146,7 +146,7 @@ export function AuthForm() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl" />
 
                 <div className="text-center space-y-2 relative z-10">
-                    <h1 className="text-3xl font-black text-secondary-foreground">
+                    <h1 className="text-3xl font-bold text-secondary">
                         {(user || isSystemAdmin) ? 'Welcome Back!' : (isLogin ? 'Hello Again!' : 'Join MPPMS')}
                     </h1>
                     <p className="text-muted-foreground font-medium text-sm">
@@ -162,7 +162,7 @@ export function AuthForm() {
                             <button
                                 onClick={() => { setIsLogin(true); setAuthError(null); }}
                                 className={clsx(
-                                    "flex-1 py-3 rounded-xl text-sm font-black transition-all duration-300",
+                                    "flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300",
                                     isLogin ? "bg-white text-primary shadow-lg shadow-black/5" : "text-muted-foreground hover:text-foreground"
                                 )}
                             >
@@ -171,7 +171,7 @@ export function AuthForm() {
                             <button
                                 onClick={() => { setIsLogin(false); setAuthError(null); }}
                                 className={clsx(
-                                    "flex-1 py-3 rounded-xl text-sm font-black transition-all duration-300",
+                                    "flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300",
                                     !isLogin ? "bg-white text-primary shadow-lg shadow-black/5" : "text-muted-foreground hover:text-foreground"
                                 )}
                             >
@@ -190,7 +190,7 @@ export function AuthForm() {
                                 {isLogin && (
                                     <form onSubmit={handleEmailLogin} className="space-y-4">
                                         <div className="space-y-1">
-                                            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/60 px-1">Email Address</label>
+                                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 px-1">Email Address</label>
                                             <div className="relative">
                                                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                                 <input
@@ -205,7 +205,7 @@ export function AuthForm() {
                                         </div>
 
                                         <div className="space-y-1">
-                                            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/60 px-1">Password</label>
+                                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 px-1">Password</label>
                                             <div className="relative">
                                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                                 <input
@@ -228,7 +228,7 @@ export function AuthForm() {
                                                 {authError}
                                             </Alert>
                                         )}
-                                        <Button type="submit" className="w-full h-14 rounded-2xl font-black text-lg">
+                                        <Button type="submit" className="w-full h-14 rounded-2xl font-bold text-lg">
                                             Sign In
                                             <ArrowRight className="ml-2 h-5 w-5" />
                                         </Button>
@@ -240,14 +240,14 @@ export function AuthForm() {
                                         <span className="w-full border-t border-muted" />
                                     </div>
                                     <div className="relative flex justify-center text-xs uppercase">
-                                        <span className="bg-card px-4 text-muted-foreground/50 font-black">Or continue with</span>
+                                        <span className="bg-card px-4 text-muted-foreground/50 font-bold">Or continue with</span>
                                     </div>
                                 </div>
 
                                 <div className="pt-0">
                                     <Button
                                         onClick={handleGoogleLogin}
-                                        className="w-full h-14 bg-white hover:bg-slate-50 text-secondary-foreground border-2 border-muted hover:border-primary/30 shadow-none text-base font-black rounded-2xl flex items-center justify-center gap-3 transition-all"
+                                        className="w-full h-14 bg-white hover:bg-slate-100 text-secondary border-2 border-muted hover:border-primary/30 shadow-none text-base font-bold rounded-2xl flex items-center justify-center gap-3 transition-all"
                                     >
                                         <svg className="h-5 w-5" viewBox="0 0 24 24">
                                             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -258,7 +258,7 @@ export function AuthForm() {
                                         Google Account
                                     </Button>
                                 </div>
-                                <div className="text-center text-[10px] font-black uppercase tracking-widest text-muted-foreground/30 py-4">
+                                <div className="text-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground/30 py-4">
                                     Trusted by Students & Educators
                                 </div>
                             </motion.div>
@@ -282,11 +282,11 @@ export function AuthForm() {
                                 )}
                             </div>
                             <div className="text-center">
-                                <h2 className="text-2xl font-black text-foreground">{user?.displayName || 'System Admin'}</h2>
+                                <h2 className="text-2xl font-bold text-foreground">{user?.displayName || 'System Admin'}</h2>
                                 <p className="text-sm font-bold text-muted-foreground">{user?.email || localStorage.getItem('adminEmail')}</p>
                             </div>
                             <div className={clsx(
-                                "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest",
+                                "px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest",
                                 (role === 'admin' || isSystemAdmin) ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
                             )}>
                                 {isSystemAdmin ? 'System Admin' : (role || 'Standard Staff')}
@@ -294,11 +294,11 @@ export function AuthForm() {
                         </div>
 
                         <div className="pt-4 flex gap-4">
-                            <Button variant="secondary" className="flex-1 h-12 font-black rounded-2xl border-muted" onClick={handleLogout}>
+                            <Button variant="secondary" className="flex-1 h-12 font-bold rounded-2xl border-muted" onClick={handleLogout}>
                                 <LogOut size={18} className="mr-2" />
                                 Logout
                             </Button>
-                            <Button className="flex-1 h-12 font-black rounded-2xl shadow-primary/20" onClick={() => navigate('/')}>
+                            <Button className="flex-1 h-12 font-bold rounded-2xl shadow-primary/20" onClick={() => navigate('/')}>
                                 Go Home
                                 <ArrowRight size={18} className="ml-2" />
                             </Button>

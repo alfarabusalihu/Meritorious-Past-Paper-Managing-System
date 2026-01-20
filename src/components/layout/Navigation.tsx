@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom'
-import { School, Language, ExpandMore, Person, Shield, Logout, Dashboard, Settings, LocalCafe, LogoutRounded } from '@mui/icons-material'
+import { School, Language, ExpandMore, Person, Shield, Dashboard, Settings, LocalCafe, LogoutRounded, Menu, Close } from '@mui/icons-material'
 import { useLanguage } from '../../context/LanguageContext'
+import { useAuth } from '../../context/AuthContext'
 import { useState, useRef, useEffect } from 'react'
 import { auth } from '../../lib/firebase'
-import { onAuthStateChanged, signOut as firebaseSignOut, User as FirebaseUser } from 'firebase/auth'
-import { usersApi } from '../../lib/firebase/users'
+import { signOut as firebaseSignOut } from 'firebase/auth'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { AnimatePresence, motion } from 'framer-motion'
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -14,31 +15,12 @@ function cn(...inputs: ClassValue[]) {
 
 export function Navigation() {
     const { language, setLanguage, t } = useLanguage()
+    const { user, isAdmin, isSuperAdmin } = useAuth()
     const [isLangOpen, setIsLangOpen] = useState(false)
     const [isUserOpen, setIsUserOpen] = useState(false)
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const langRef = useRef<HTMLDivElement>(null)
     const userRef = useRef<HTMLDivElement>(null)
-
-    const [user, setUser] = useState<FirebaseUser | null>(null)
-    const [isAdmin, setIsAdmin] = useState(false)
-    const [isSystemAdmin, setIsSystemAdmin] = useState(false)
-
-    useEffect(() => {
-        const sysAdmin = localStorage.getItem('isSystemAdmin') === 'true'
-        setIsSystemAdmin(sysAdmin)
-        setIsAdmin(sysAdmin)
-
-        const unsubscribe = onAuthStateChanged(auth, async (u) => {
-            setUser(u)
-            if (u) {
-                const role = await usersApi.getUserRole(u.uid)
-                setIsAdmin(role === 'admin' || sysAdmin)
-            } else {
-                setIsAdmin(sysAdmin)
-            }
-        })
-        return () => unsubscribe()
-    }, [])
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -55,19 +37,19 @@ export function Navigation() {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-muted bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
-            <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+            <div className="section-container flex h-20 items-center justify-between">
                 <div className="flex items-center gap-3">
                     <Link to="/" className="flex items-center gap-2 group">
                         <div className="p-1.5 bg-primary rounded-lg text-primary-foreground transform transition-transform group-hover:scale-110 shadow-lg shadow-primary/20">
                             <School sx={{ fontSize: 24 }} />
                         </div>
-                        <span className="font-extrabold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+                        <span className="font-bold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
                             MPPMS
                         </span>
                     </Link>
                 </div>
 
-                <nav className="hidden md:flex items-center gap-8 text-sm font-black uppercase tracking-widest text-secondary/70">
+                <nav className="hidden md:flex items-center gap-8 text-sm font-bold uppercase tracking-widest text-secondary/70">
                     <Link to="/" className="transition-all hover:text-primary border-b-2 border-transparent hover:border-primary py-1">
                         {t('nav.papers')}
                     </Link>
@@ -79,7 +61,7 @@ export function Navigation() {
                         Donate
                     </Link>
                     {isAdmin && (
-                        <Link to="/admin" className="text-primary hover:text-primary/80 transition-all flex items-center gap-2 font-black border-b-2 border-transparent hover:border-primary py-1">
+                        <Link to="/admin" className="text-primary hover:text-primary/80 transition-all flex items-center gap-2 font-bold border-b-2 border-transparent hover:border-primary py-1">
                             <Shield sx={{ fontSize: 16 }} />
                             Admin Panel
                         </Link>
@@ -88,7 +70,7 @@ export function Navigation() {
 
                 <div className="flex items-center gap-4 relative">
                     {/* Language Switcher */}
-                    <div className="relative" ref={langRef}>
+                    <div className="relative hidden sm:block" ref={langRef}>
                         <button
                             onClick={() => setIsLangOpen(!isLangOpen)}
                             className="flex items-center gap-2 px-3 py-2 bg-muted hover:bg-muted/60 rounded-xl font-bold text-xs transition-all border border-transparent hover:border-primary/20"
@@ -122,26 +104,26 @@ export function Navigation() {
                         )}
                     </div>
 
-                    {(user || isSystemAdmin) && (
+                    {user && (
                         <div className="relative" ref={userRef}>
                             <button
                                 onClick={() => setIsUserOpen(!isUserOpen)}
                                 className={cn(
                                     "flex h-10 w-10 items-center justify-center rounded-full transition-all shadow-sm",
-                                    isSystemAdmin
-                                        ? "bg-primary text-primary-foreground border-2 border-primary-foreground/20 shadow-primary/20"
+                                    isSuperAdmin
+                                        ? "bg-secondary text-secondary-foreground border-2 border-secondary-foreground/20 shadow-secondary/20"
                                         : "bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20"
                                 )}
                             >
-                                {isSystemAdmin ? <Shield sx={{ fontSize: 20 }} /> : <Person sx={{ fontSize: 20 }} />}
+                                {isSuperAdmin ? <Shield sx={{ fontSize: 20 }} /> : <Person sx={{ fontSize: 20 }} />}
                             </button>
 
                             {isUserOpen && (
                                 <div className="absolute right-0 mt-3 w-48 bg-background border border-muted rounded-2xl shadow-2xl py-2 z-[100] animate-in fade-in slide-in-from-top-1 duration-200 overflow-hidden">
                                     <div className="px-4 py-2 bg-muted/30 border-b border-muted mb-2">
-                                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">User Session</p>
+                                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">User Session</p>
                                         <p className="text-sm font-bold text-foreground truncate">
-                                            {isSystemAdmin ? 'System Admin' : user?.displayName}
+                                            {user?.displayName || 'User'}
                                         </p>
                                     </div>
                                     {isAdmin && (
@@ -169,7 +151,7 @@ export function Navigation() {
                                             await firebaseSignOut(auth)
                                             window.location.reload()
                                         }}
-                                        className="w-full flex items-center gap-3 px-4 py-3 text-sm font-black text-destructive hover:bg-destructive/5 transition-colors"
+                                        className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-destructive hover:bg-destructive/5 transition-colors"
                                     >
                                         <LogoutRounded className="h-4 w-4" />
                                         {t('nav.logout')}
@@ -178,8 +160,67 @@ export function Navigation() {
                             )}
                         </div>
                     )}
+
+                    {/* Mobile Menu Toggle */}
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="p-2 md:hidden text-secondary hover:bg-muted rounded-xl transition-colors"
+                    >
+                        {isMobileMenuOpen ? <Close /> : <Menu />}
+                    </button>
                 </div>
             </div>
+
+            {/* Mobile Menu Backdrop */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="absolute top-[80px] left-0 w-full bg-background border-b border-muted shadow-2xl md:hidden z-40 overflow-hidden"
+                    >
+                        <div className="flex flex-col p-6 space-y-6">
+                            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3">
+                                <Dashboard sx={{ fontSize: 20 }} className="text-primary/60" />
+                                {t('nav.papers')}
+                            </Link>
+                            <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3">
+                                <Person sx={{ fontSize: 20 }} className="text-primary/60" />
+                                {t('nav.about')}
+                            </Link>
+                            <Link to="/contribute" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3">
+                                <LocalCafe sx={{ fontSize: 20 }} className="text-primary/60" />
+                                Donate
+                            </Link>
+
+                            {isAdmin && (
+                                <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-primary flex items-center gap-3 py-4 border-t border-muted">
+                                    <Shield sx={{ fontSize: 20 }} />
+                                    Admin Panel
+                                </Link>
+                            )}
+
+                            <div className="pt-6 border-t border-muted flex items-center justify-between">
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => { setLanguage('en'); setIsMobileMenuOpen(false); }}
+                                        className={cn("px-4 py-2 rounded-xl text-xs font-bold", language === 'en' ? "bg-primary text-white" : "bg-muted")}
+                                    >
+                                        EN
+                                    </button>
+                                    <button
+                                        onClick={() => { setLanguage('ta'); setIsMobileMenuOpen(false); }}
+                                        className={cn("px-4 py-2 rounded-xl text-xs font-bold", language === 'ta' ? "bg-primary text-white" : "bg-muted")}
+                                    >
+                                        TA
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </header>
     )
 }
