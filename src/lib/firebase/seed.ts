@@ -62,7 +62,7 @@ export const seedData = async () => {
             uid: 'system-admin',
             email: adminEmail,
             displayName: 'System Admin',
-            role: 'admin'
+            role: 'super-admin'
         })
     }
 }

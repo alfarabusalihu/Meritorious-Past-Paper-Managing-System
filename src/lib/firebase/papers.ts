@@ -11,7 +11,8 @@ import {
     updateDoc,
     doc,
     deleteDoc,
-    getDoc
+    getDoc,
+    FieldValue
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Paper, FilterOptions } from "./schema";
@@ -82,7 +83,29 @@ export const papersApi = {
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Paper));
     },
 
-    async deletePaper(id: string) {
+    async getDeletedPapers() {
+        const q = query(collection(db, PAPERS_COLLECTION), where("deleted", "==", true));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Paper));
+    },
+
+    async deletePaper(id: string, user: { uid: string }) {
+        await updateDoc(doc(db, PAPERS_COLLECTION, id), {
+            deleted: true,
+            deletedAt: Timestamp.now(),
+            deletedBy: user.uid
+        });
+    },
+
+    async restorePaper(id: string) {
+        await updateDoc(doc(db, PAPERS_COLLECTION, id), {
+            deleted: false,
+            deletedAt: FieldValue.delete(),
+            deletedBy: FieldValue.delete()
+        });
+    },
+
+    async permanentDeletePaper(id: string) {
         await deleteDoc(doc(db, PAPERS_COLLECTION, id));
     },
 
