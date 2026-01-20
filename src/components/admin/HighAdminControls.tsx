@@ -3,6 +3,7 @@ import { usersApi } from '../../lib/firebase/users'
 import { configsApi, FilterConfig, SocialConfig, DonationConfig } from '../../lib/firebase/configs'
 import { donationsApi } from '../../lib/firebase/donations'
 import { UserProfile, Contribution } from '../../lib/firebase/schema'
+import { statsApi } from '../../lib/firebase/stats'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 import { Tabs, Tab, Box, Snackbar, Alert } from '@mui/material'
@@ -20,7 +21,7 @@ function TabPanel(props: TabPanelProps) {
     return (
         <div role="tabpanel" hidden={value !== index} {...other}>
             {value === index && (
-                <Box sx={{ p: 3 }}>
+                <Box sx={{ p: { xs: 2, sm: 3 } }}>
                     {children}
                 </Box>
             )}
@@ -32,10 +33,10 @@ export function HighAdminControls() {
     const { user: currentUser } = useAuth()
     const [tabValue, setTabValue] = useState(0)
     const [users, setUsers] = useState<UserProfile[]>([])
-    const [filters, setFilters] = useState<FilterConfig | null>(null)
     const [socials, setSocials] = useState<SocialConfig | null>(null)
     const [donations, setDonations] = useState<Contribution[]>([])
     const [donationConfig, setDonationConfig] = useState<DonationConfig>({ coffeePrice: 5, enabled: true })
+    const [filterTexts, setFilterTexts] = useState<Record<string, string>>({})
     const [loading, setLoading] = useState(false)
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' })
 
@@ -54,7 +55,11 @@ export function HighAdminControls() {
                 configsApi.getDonationSettings()
             ])
             setUsers(u)
-            setFilters(f)
+            const texts: any = {}
+            Object.keys(f).forEach(key => {
+                texts[key] = f[key as keyof FilterConfig].join(', ')
+            })
+            setFilterTexts(texts)
             setSocials(s)
             setDonations(d)
             setDonationConfig(dc)
@@ -87,10 +92,14 @@ export function HighAdminControls() {
     }
 
     const handleSaveFilters = async () => {
-        if (!filters) return
+        if (!filterTexts) return
         setLoading(true)
         try {
-            await configsApi.updateFilters(filters)
+            const newFilters: any = {}
+            Object.keys(filterTexts).forEach(key => {
+                newFilters[key] = filterTexts[key].split(',').map(s => s.trim()).filter(Boolean)
+            })
+            await configsApi.updateFilters(newFilters as FilterConfig)
             setSnackbar({ open: true, message: 'Filters updated successfully!', severity: 'success' })
         } catch (error) {
             setSnackbar({ open: true, message: 'Failed to update filters', severity: 'error' })
@@ -112,10 +121,8 @@ export function HighAdminControls() {
         }
     }
 
-    const updateFilterList = (key: keyof FilterConfig, value: string) => {
-        if (!filters) return
-        const list = value.split(',').map(s => s.trim()).filter(Boolean)
-        setFilters({ ...filters, [key]: list })
+    const updateFilterList = (key: string, value: string) => {
+        setFilterTexts(prev => ({ ...prev, [key]: value }))
     }
 
     const handleSaveDonationConfig = async () => {
@@ -130,52 +137,83 @@ export function HighAdminControls() {
         }
     }
 
+    const handleResetVisitors = async () => {
+        if (!window.confirm("Are you sure you want to reset the visitor count to zero?")) return
+        setLoading(true)
+        try {
+            await statsApi.resetVisitors()
+            setSnackbar({ open: true, message: 'Visitor count reset successfully!', severity: 'success' })
+        } catch (error) {
+            setSnackbar({ open: true, message: 'Failed to reset visitor count', severity: 'error' })
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
-        <div className="bg-white p-6 min-h-[600px]">
-            <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)} centered variant="fullWidth">
-                <Tab icon={<People />} label="User Management" sx={{ fontWeight: 700 }} />
-                <Tab icon={<Settings />} label="System Config" sx={{ fontWeight: 700 }} />
-                <Tab icon={<LocalCafe />} label="Donations" sx={{ fontWeight: 700 }} />
-            </Tabs>
+        <div className="bg-white min-h-[500px]">
+            <div className="border-b border-muted bg-muted/10 sticky top-0 z-30">
+                <Tabs
+                    value={tabValue}
+                    onChange={(_, v) => setTabValue(v)}
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    allowScrollButtonsMobile
+                    sx={{
+                        '& .MuiTab-root': {
+                            minHeight: 64,
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            fontSize: '0.9rem'
+                        }
+                    }}
+                >
+                    <Tab icon={<People />} label="Users" iconPosition="start" />
+                    <Tab icon={<Settings />} label="Config" iconPosition="start" />
+                    <Tab icon={<LocalCafe />} label="Donations" iconPosition="start" />
+                </Tabs>
+            </div>
 
             <TabPanel value={tabValue} index={0}>
                 <div className="space-y-4 pb-8">
                     <h3 className="text-xl font-bold text-secondary mb-4">Registered Users</h3>
                     <div className="grid gap-4">
                         {users.map(user => (
-                            <div key={user.uid} className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-muted">
+                            <div key={user.uid} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-muted/30 border border-muted gap-4">
                                 <div className="flex items-center gap-4">
-                                    <div className={`p-3 rounded-full ${user.role === 'admin' ? 'bg-primary/20 text-primary' : user.role === 'super-admin' ? 'bg-secondary/20 text-secondary' : 'bg-muted text-muted-foreground'}`}>
+                                    <div className={`p-3 rounded-full flex-shrink-0 ${user.role === 'admin' ? 'bg-primary/20 text-primary' : user.role === 'super-admin' ? 'bg-secondary/20 text-secondary' : 'bg-muted text-muted-foreground'}`}>
                                         {user.role === 'admin' || user.role === 'super-admin' ? <Shield /> : <People />}
                                     </div>
-                                    <div>
-                                        <p className="font-bold text-foreground">{user.displayName || 'Unknown User'}</p>
-                                        <p className="text-xs font-medium text-muted-foreground">{user.email}</p>
+                                    <div className="min-w-0">
+                                        <p className="font-bold text-foreground truncate">{user.displayName || 'Unknown User'}</p>
+                                        <p className="text-xs font-medium text-muted-foreground truncate">{user.email}</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    {user.role !== 'super-admin' && (
-                                        <Button
-                                            size="sm"
-                                            variant="secondary"
-                                            onClick={() => handleTransferOwnership(user.uid)}
-                                            className="border-primary text-primary hover:bg-primary/10"
-                                            title="Make Super Admin"
-                                        >
-                                            <SwapHoriz sx={{ fontSize: 16 }} />
-                                        </Button>
-                                    )}
-                                    {user.role === 'user' && (
-                                        <Button
-                                            size="sm"
-                                            onClick={() => handleToggleBlock(user.uid, !user.blocked)}
-                                            className={user.blocked ? "bg-green-500 hover:bg-green-600" : "bg-destructive hover:bg-destructive/90"}
-                                        >
-                                            {user.blocked ? <LockOpen sx={{ fontSize: 16, marginRight: 1 }} /> : <Lock sx={{ fontSize: 16, marginRight: 1 }} />}
-                                            {user.blocked ? 'Unblock' : 'Block'}
-                                        </Button>
-                                    )}
-                                    <span className={`text-xs font-bold uppercase tracking-widest px-2 py-1 rounded ${user.role === 'super-admin' ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-muted-foreground'
+                                <div className="flex items-center justify-between sm:justify-end gap-2 border-t sm:border-t-0 pt-3 sm:pt-0">
+                                    <div className="flex items-center gap-2">
+                                        {user.role !== 'super-admin' && (
+                                            <Button
+                                                size="sm"
+                                                variant="secondary"
+                                                onClick={() => handleTransferOwnership(user.uid)}
+                                                className="border-primary text-primary hover:bg-primary/10 h-9"
+                                                title="Make Super Admin"
+                                            >
+                                                <SwapHoriz sx={{ fontSize: 16 }} />
+                                            </Button>
+                                        )}
+                                        {user.role === 'user' && (
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleToggleBlock(user.uid, !user.blocked)}
+                                                className={`h-9 ${user.blocked ? "bg-green-500 hover:bg-green-600" : "bg-destructive hover:bg-destructive/90"}`}
+                                            >
+                                                {user.blocked ? <LockOpen sx={{ fontSize: 16, marginRight: 1 }} /> : <Lock sx={{ fontSize: 16, marginRight: 1 }} />}
+                                                {user.blocked ? 'Unblock' : 'Block'}
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg ${user.role === 'super-admin' ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-muted-foreground'
                                         }`}>
                                         {user.role}
                                     </span>
@@ -192,19 +230,20 @@ export function HighAdminControls() {
                         <h3 className="text-xl font-bold text-secondary mb-4">Global Filters</h3>
                         <p className="text-sm text-muted-foreground mb-4">Comma-separated values for dropdowns.</p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {filters && Object.keys(filters).map((key) => (
+                            {filterTexts && Object.keys(filterTexts).map((key) => (
                                 <div key={key}>
                                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1 block">{key}</label>
                                     <textarea
                                         className="w-full rounded-xl border-muted bg-muted/10 p-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 min-h-[80px]"
-                                        value={(filters as any)[key].join(', ')}
-                                        onChange={(e) => updateFilterList(key as keyof FilterConfig, e.target.value)}
+                                        value={filterTexts[key]}
+                                        onChange={(e) => updateFilterList(key, e.target.value)}
+                                        placeholder={`Enter ${key} separated by commas...`}
                                     />
                                 </div>
                             ))}
                         </div>
-                        <div className="flex justify-end">
-                            <Button onClick={handleSaveFilters} className="mt-8 font-bold px-12 h-14 rounded-2xl shadow-lg" isLoading={loading}>
+                        <div className="flex justify-end sticky bottom-0 bg-white/80 backdrop-blur-sm p-4 -mx-4 border-t border-muted/50 mt-8">
+                            <Button onClick={handleSaveFilters} className="w-full sm:w-auto font-bold px-12 h-14 rounded-2xl shadow-lg" isLoading={loading}>
                                 <Save sx={{ fontSize: 20, marginRight: 1 }} /> Save Filter Config
                             </Button>
                         </div>
@@ -217,9 +256,26 @@ export function HighAdminControls() {
                             <Input label="Twitter" value={socials?.twitter || ''} onChange={e => setSocials({ ...socials!, twitter: e.target.value })} />
                             <Input label="Instagram" value={socials?.instagram || ''} onChange={e => setSocials({ ...socials!, instagram: e.target.value })} />
                         </div>
-                        <div className="flex justify-end">
-                            <Button onClick={handleSaveSocials} className="mt-8 font-bold px-12 h-14 rounded-2xl shadow-lg" isLoading={loading}>
+                        <div className="flex justify-end sticky bottom-0 bg-white/80 backdrop-blur-sm p-4 -mx-4 border-t border-muted/50 mt-8">
+                            <Button onClick={handleSaveSocials} className="w-full sm:w-auto font-bold px-12 h-14 rounded-2xl shadow-lg" isLoading={loading}>
                                 <Save sx={{ fontSize: 20, marginRight: 1 }} /> Save Socials
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className="border-t border-muted pt-8">
+                        <h3 className="text-xl font-bold text-secondary mb-4">System Maintenance</h3>
+                        <div className="p-6 bg-destructive/5 rounded-2xl border border-destructive/20 space-y-4">
+                            <div>
+                                <h4 className="font-bold text-destructive mb-1">Reset Analytics</h4>
+                                <p className="text-sm text-muted-foreground">Clear the public visitor counter. This action cannot be undone.</p>
+                            </div>
+                            <Button
+                                onClick={handleResetVisitors}
+                                className="bg-destructive hover:bg-destructive/90 text-white font-bold px-8 h-12 rounded-xl shadow-lg shadow-destructive/20"
+                                isLoading={loading}
+                            >
+                                <Lock sx={{ fontSize: 18, marginRight: 1 }} /> Reset Visitor Count
                             </Button>
                         </div>
                     </div>
@@ -297,8 +353,8 @@ export function HighAdminControls() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex justify-end pt-4">
-                                <Button onClick={handleSaveDonationConfig} className="font-bold px-12 h-14 rounded-2xl shadow-lg" isLoading={loading}>
+                            <div className="flex justify-end sticky bottom-0 bg-white/80 backdrop-blur-sm p-4 -mx-6 border-t border-muted/50 mt-4 rounded-b-2xl">
+                                <Button onClick={handleSaveDonationConfig} className="w-full sm:w-auto font-bold px-12 h-14 rounded-2xl shadow-lg" isLoading={loading}>
                                     <Save sx={{ fontSize: 20, marginRight: 1 }} /> Save Donation Settings
                                 </Button>
                             </div>

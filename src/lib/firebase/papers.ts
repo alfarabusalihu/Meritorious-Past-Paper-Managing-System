@@ -10,7 +10,8 @@ import {
     Query,
     updateDoc,
     doc,
-    deleteDoc
+    deleteDoc,
+    getDoc
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Paper, FilterOptions } from "./schema";
@@ -99,8 +100,15 @@ export const papersApi = {
 
         // Regenerate keywords if title/subject/year changed
         let updates = { ...data };
-        if (data.title && data.subject && data.year) {
-            updates.keywords = generateKeywords(data.title, data.subject, data.year);
+        if (data.title || data.subject || data.year) {
+            const snapshot = await getDoc(docRef);
+            if (snapshot.exists()) {
+                const current = snapshot.data() as Paper;
+                const newTitle = data.title || current.title;
+                const newSubject = data.subject || current.subject;
+                const newYear = data.year || current.year;
+                updates.keywords = generateKeywords(newTitle, newSubject, newYear);
+            }
         }
 
         await updateDoc(docRef, updates);

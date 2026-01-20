@@ -153,7 +153,7 @@ export function AddPaperForm() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        <div className="space-y-8 min-w-0">
             {/* Header with Back Button */}
             <div className="flex items-center gap-4">
                 <Button
@@ -174,38 +174,45 @@ export function AddPaperForm() {
             </div>
 
             <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                <div className="lg:col-span-8 space-y-6">
-                    <Card className="p-8 space-y-8">
+                <div className="lg:col-span-8 space-y-6 min-w-0">
+                    <Card className="p-4 sm:p-8 space-y-8 overflow-hidden">
                         {/* Current Paper Info (Edit Mode) */}
                         {paperToEdit && (
-                            <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-6 space-y-3" role="status" aria-label="Editing existing paper">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <FileText className="text-primary" size={24} aria-hidden="true" />
+                            <div className="bg-primary/5 border-2 border-primary/20 rounded-3xl p-4 sm:p-6 space-y-4 shadow-inner" role="status" aria-label="Editing existing paper">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="p-2 bg-primary rounded-lg text-primary-foreground">
+                                        <FileText size={20} aria-hidden="true" />
+                                    </div>
                                     <div>
                                         <h3 className="font-bold text-lg text-secondary">Currently Editing</h3>
                                         <p className="text-xs font-medium text-muted-foreground">Original paper details loaded</p>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <span className="text-primary font-bold">Original Title:</span>
-                                        <p className="text-foreground font-medium">{paperToEdit.title}</p>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mt-2">
+                                    <div className="min-w-0">
+                                        <span className="text-primary font-bold block mb-1 uppercase tracking-wider text-[10px]">Original Title</span>
+                                        <p className="text-foreground font-medium break-words leading-tight">{paperToEdit.title}</p>
                                     </div>
-                                    <div>
-                                        <span className="text-primary font-bold">File:</span>
-                                        <p className="text-foreground font-medium">{paperToEdit.metadata?.originalName || 'N/A'}</p>
+                                    <div className="min-w-0">
+                                        <span className="text-primary font-bold block mb-1 uppercase tracking-wider text-[10px]">Reference File</span>
+                                        <p className="text-foreground font-medium truncate">{paperToEdit.metadata?.originalName || 'N/A'}</p>
                                     </div>
                                 </div>
 
                                 {/* Current PDF File Display */}
                                 {!changingFile && (
                                     <div className="mt-4 border-t border-primary/20 pt-4">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <FileText className="text-primary" size={18} />
-                                                <div>
-                                                    <p className="text-sm font-bold text-foreground">Current PDF</p>
-                                                    <p className="text-xs text-muted-foreground">{paperToEdit.metadata?.originalName}</p>
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <div className="flex items-center gap-4 min-w-0">
+                                                <div className="p-3 bg-white/50 rounded-xl border border-primary/10">
+                                                    <FileText className="text-primary" size={24} />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-bold text-foreground">Current Attachment</p>
+                                                    <p className="text-xs text-muted-foreground truncate max-w-[200px] sm:max-w-none">
+                                                        {paperToEdit.metadata?.originalName}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <Button
@@ -213,9 +220,9 @@ export function AddPaperForm() {
                                                 variant="secondary"
                                                 size="sm"
                                                 onClick={() => setChangingFile(true)}
-                                                className="font-bold"
+                                                className="font-bold whitespace-nowrap px-6 rounded-xl"
                                             >
-                                                Change File
+                                                Change PDF
                                             </Button>
                                         </div>
                                     </div>
@@ -223,21 +230,28 @@ export function AddPaperForm() {
 
                                 {changingFile && (
                                     <div className="mt-4 border-t border-primary/20 pt-4">
-                                        <p className="text-xs text-muted-foreground mb-3 italic">
-                                            ⚠️ Uploading a new file will replace the existing PDF.
-                                        </p>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => {
-                                                setChangingFile(false)
-                                                setFile(null)
-                                            }}
-                                            className="font-bold text-muted-foreground"
-                                        >
-                                            Cancel File Change
-                                        </Button>
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-amber-50 rounded-lg">
+                                                    <Upload size={18} className="text-amber-600" />
+                                                </div>
+                                                <p className="text-xs text-muted-foreground font-medium italic">
+                                                    ⚠️ Uploading a new file will replace the current PDF.
+                                                </p>
+                                            </div>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => {
+                                                    setChangingFile(false)
+                                                    setFile(null)
+                                                }}
+                                                className="font-bold text-muted-foreground hover:bg-muted/50 rounded-xl"
+                                            >
+                                                Cancel File Change
+                                            </Button>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -247,8 +261,8 @@ export function AddPaperForm() {
                         {(!paperToEdit || changingFile) && (
                             <div className="relative group">
                                 <div className={clsx(
-                                    "flex h-48 w-full flex-col items-center justify-center rounded-[2rem] border-4 border-dashed transition-all",
-                                    file ? "border-primary/40 bg-primary/5" : "border-muted bg-muted/5 group-hover:border-primary/40 group-hover:bg-primary/5"
+                                    "flex h-48 w-full flex-col items-center justify-center rounded-[2.5rem] border-4 border-dashed transition-all",
+                                    file ? "border-primary/40 bg-primary/5" : "border-muted/30 bg-muted/5 group-hover:border-primary/40 group-hover:bg-primary/5"
                                 )}>
                                     <input
                                         type="file"
@@ -258,23 +272,35 @@ export function AddPaperForm() {
                                         required={!paperToEdit}
                                     />
                                     {file ? (
-                                        <div className="flex flex-col items-center gap-4 text-primary text-center px-6">
-                                            <div className="p-3 bg-primary rounded-full text-white shadow-xl shadow-primary/20">
-                                                <FileText size={32} />
+                                        <div className="flex flex-col items-center gap-4 text-primary text-center px-6 w-full">
+                                            <div className="p-4 bg-primary rounded-2xl text-white shadow-xl shadow-primary/20">
+                                                <FileText size={36} />
                                             </div>
-                                            <div>
-                                                <span className="font-bold text-lg block truncate max-w-[400px]">{file.name}</span>
-                                                <span className="text-sm font-bold text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                                            <div className="min-w-0 max-w-full space-y-1">
+                                                <span className="font-bold text-lg block truncate">{file.name}</span>
+                                                <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
                                             </div>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setFile(null);
+                                                }}
+                                                className="text-destructive hover:bg-destructive/10 font-bold rounded-xl"
+                                            >
+                                                Discard Selection
+                                            </Button>
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center gap-4 text-muted-foreground group-hover:text-primary transition-colors text-center">
-                                            <div className="p-3 bg-card rounded-full shadow-xl border border-muted group-hover:border-primary/30 transition-all">
-                                                <Upload size={28} />
+                                            <div className="p-4 bg-card rounded-2xl shadow-xl border border-muted group-hover:border-primary/30 transition-all">
+                                                <Upload size={32} />
                                             </div>
                                             <div className="space-y-1">
-                                                <span className="font-bold text-lg block">Click to upload PDF</span>
-                                                <span className="font-bold text-xs text-muted-foreground/60 italic uppercase tracking-widest">Max 50MB</span>
+                                                <span className="font-bold text-lg block">Click or Drag PDF to Upload</span>
+                                                <span className="font-bold text-xs text-muted-foreground/60 italic uppercase tracking-widest">Maximum File Size: 50MB</span>
                                             </div>
                                         </div>
                                     )}
@@ -294,7 +320,7 @@ export function AddPaperForm() {
                             <div className="space-y-2">
                                 <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 px-1">{t('addPaper.form.subject')}</label>
                                 <select
-                                    className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                    className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none cursor-pointer"
                                     value={subject}
                                     onChange={(e) => setSubject(e.target.value)}
                                     required
@@ -309,8 +335,8 @@ export function AddPaperForm() {
                     </Card>
                 </div>
 
-                <div className="lg:col-span-4 space-y-6">
-                    <Card className="p-8 space-y-6">
+                <div className="lg:col-span-4 space-y-6 min-w-0">
+                    <Card className="p-4 sm:p-8 space-y-6">
                         <div className="space-y-2">
                             <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{t('addPaper.form.year')}</label>
                             <select
@@ -329,7 +355,7 @@ export function AddPaperForm() {
                         <div className="space-y-2">
                             <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{t('addPaper.form.category')}</label>
                             <select
-                                className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
                                 value={examType}
                                 onChange={(e) => setExamType(e.target.value)}
                                 required
@@ -363,7 +389,7 @@ export function AddPaperForm() {
                         <div className="space-y-2">
                             <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Language</label>
                             <select
-                                className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
                                 value={language}
                                 onChange={(e) => setLanguage(e.target.value)}
                                 required

@@ -11,7 +11,20 @@ export function About() {
 
     useEffect(() => {
         statsApi.getStats().then(setStats)
-        statsApi.incrementVisitors()
+
+        // Smart Visitor Tracking
+        const trackVisit = async () => {
+            const lastVisit = localStorage.getItem('last_visit_date')
+            const today = new Date().toDateString()
+
+            // Deduplicate: Only increment if they haven't visited today
+            if (lastVisit !== today) {
+                await statsApi.incrementVisitors()
+                localStorage.setItem('last_visit_date', today)
+            }
+        }
+
+        trackVisit()
     }, [])
 
     const featureIcons = [BookOpen, Zap, Shield, Users]

@@ -4,21 +4,24 @@ import { papersApi } from '../../lib/firebase/papers'
 import { Paper } from '../../lib/firebase/schema'
 import { PaperCard } from '../papers/PaperCard'
 import { Button } from '../ui/Button'
-import { ShieldCheck, Plus, Settings, X } from 'lucide-react'
+import { ShieldCheck, Plus, Settings, X, BookOpen } from 'lucide-react'
 import { AuthForm } from '../auth/AuthForm'
-import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material'
+import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, useMediaQuery, useTheme } from '@mui/material'
 import { useAuth } from '../../context/AuthContext'
 import { HighAdminControls } from '../admin/HighAdminControls'
 
 export function AdminDashboard() {
     const navigate = useNavigate()
     const { user, isAdmin, isSuperAdmin, loading: authLoading } = useAuth()
+    const theme = useTheme()
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
     const [papers, setPapers] = useState<Paper[]>([])
     const [loading, setLoading] = useState(true)
     const [stats, setStats] = useState({ added: 0, edited: 0 })
     const [showHighAdmin, setShowHighAdmin] = useState(false)
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [paperToDelete, setPaperToDelete] = useState<Paper | null>(null)
+    const [selectedPaper, setSelectedPaper] = useState<Paper | null>(null)
 
     useEffect(() => {
         if (!authLoading && user && isAdmin) {
@@ -178,6 +181,7 @@ export function AdminDashboard() {
                                     key={paper.id}
                                     paper={paper}
                                     isAdmin
+                                    onView={(p) => setSelectedPaper(p)}
                                     onEdit={() => navigate('/add-paper', { state: { paperToEdit: paper } })}
                                     onDelete={(p: Paper) => {
                                         setPaperToDelete(p)
@@ -195,15 +199,20 @@ export function AdminDashboard() {
                     onClose={() => setShowHighAdmin(false)}
                     maxWidth="md"
                     fullWidth
+                    fullScreen={isMobile}
                     PaperProps={{
-                        sx: { borderRadius: '2.5rem', overflow: 'hidden' }
+                        sx: {
+                            borderRadius: isMobile ? 0 : '2.5rem',
+                            overflow: 'hidden',
+                            m: isMobile ? 0 : 2
+                        }
                     }}
                 >
                     <DialogTitle sx={{ p: 0 }}>
-                        <div className="p-6 bg-secondary text-white flex items-center justify-between">
+                        <div className="p-4 sm:p-6 bg-secondary text-white flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <Settings className="animate-pulse-slow" />
-                                <span className="font-bold text-xl">System Controls</span>
+                                <Settings className="animate-pulse-slow w-5 h-5 sm:w-6 sm:h-6" />
+                                <span className="font-bold text-lg sm:text-xl">System Controls</span>
                             </div>
                             <IconButton onClick={() => setShowHighAdmin(false)} sx={{ color: 'white' }}>
                                 <X />
@@ -246,8 +255,51 @@ export function AdminDashboard() {
                         </Button>
                     </DialogActions>
                 </Dialog>
-            </div>
 
+                {/* PDF Viewer Dialog */}
+                <Dialog
+                    open={!!selectedPaper}
+                    onClose={() => setSelectedPaper(null)}
+                    maxWidth="lg"
+                    fullWidth
+                    PaperProps={{
+                        sx: {
+                            borderRadius: '2rem',
+                            bgcolor: 'var(--color-card)',
+                            boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.1)'
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        p: 3,
+                        pb: 1,
+                        fontWeight: 700
+                    }}>
+                        <span className="flex items-center gap-2">
+                            <BookOpen className="h-5 w-5 text-primary" />
+                            Viewing: {selectedPaper?.title}
+                        </span>
+                        <IconButton
+                            onClick={() => setSelectedPaper(null)}
+                            size="small"
+                        >
+                            <X size={20} />
+                        </IconButton>
+                    </DialogTitle>
+                    <DialogContent sx={{ p: '0 24px 24px 24px', height: '80vh' }}>
+                        {selectedPaper && (
+                            <iframe
+                                src={selectedPaper.fileUrl}
+                                className="h-full w-full rounded-2xl border border-muted shadow-inner"
+                                title="PDF Viewer"
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
+            </div>
         </div>
     )
 }

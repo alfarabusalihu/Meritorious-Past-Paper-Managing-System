@@ -135,7 +135,7 @@ export function PaperGrid() {
                 <DialogContent sx={{ p: '0 24px 24px 24px', height: '80vh' }}>
                     {selectedPaper && (
                         <iframe
-                            src={`${selectedPaper.fileUrl}#toolbar=0`}
+                            src={selectedPaper.fileUrl}
                             className="h-full w-full rounded-2xl border border-muted shadow-inner"
                             title="PDF Viewer"
                         />

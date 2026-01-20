@@ -35,10 +35,12 @@ export function Hero() {
                         className="space-y-4 px-2"
                     >
                         <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-secondary leading-tight md:leading-[1.1]">
-                            {t('hero.title.main')} <span className="text-primary italic relative whitespace-nowrap">
+                            {t('hero.title.main')}{' '}
+                            <span className="text-primary italic relative inline-block">
                                 {t('hero.title.highlight')}
-                                <div className="absolute -bottom-2 left-0 w-full h-1 bg-primary/20 rounded-full" />
-                            </span><br className="hidden md:block" />
+                                <div className="absolute -bottom-1 sm:-bottom-2 left-0 w-full h-1 bg-primary/20 rounded-full" />
+                            </span>{' '}
+                            <br className="hidden md:block" />
                             {t('hero.title.sub')}
                         </h1>
                         <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
@@ -60,7 +62,7 @@ export function Hero() {
                             <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                         </button>
                         <Link
-                            to="/add-paper"
+                            to="/contribute"
                             className="w-full sm:w-auto px-8 py-4 bg-secondary text-secondary-foreground rounded-2xl font-bold shadow-lg hover:shadow-secondary/20 hover:scale-105 transition-all flex items-center justify-center gap-2"
                         >
                             <BookOpen className="h-5 w-5" />

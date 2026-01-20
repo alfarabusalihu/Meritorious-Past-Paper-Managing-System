@@ -47,7 +47,7 @@ export function Footer() {
                                     )}
                                 </>
                             ) : (
-                                <Loader2 className="h-5 w-5 animate-spin text-primary/30" />
+                                <Loader2 className="h-5 w-5 animate-spin text-white/30" />
                             )}
                         </div>
 

@@ -19,8 +19,11 @@ export const statsApi = {
         return defaults
     },
 
-    async incrementVisitors() {
+    async incrementVisitors(visitorId?: string) {
         const docRef = doc(db, 'stats', 'global')
+
+        // Simple deduplication using localStorage is done in the component.
+        // This function just performs the increment.
         await updateDoc(docRef, {
             visitors: increment(1)
         })
@@ -37,6 +40,13 @@ export const statsApi = {
         const docRef = doc(db, 'stats', 'global')
         await updateDoc(docRef, {
             contributors: increment(1)
+        })
+    },
+
+    async resetVisitors() {
+        const docRef = doc(db, 'stats', 'global')
+        await updateDoc(docRef, {
+            visitors: 0
         })
     }
 }
