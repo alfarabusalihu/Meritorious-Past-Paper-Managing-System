@@ -3,6 +3,7 @@ import { papersApi } from '../../lib/firebase/papers'
 import { Paper } from '../../lib/firebase/schema'
 import { PaperCard } from './PaperCard'
 import { FilterBar } from './FilterBar'
+import { Pagination } from '../ui/Pagination'
 import { useLanguage } from '../../context/LanguageContext'
 import { BookOpen, X, Download } from 'lucide-react'
 import { Dialog, DialogTitle, DialogContent, IconButton } from '@mui/material'
@@ -12,6 +13,9 @@ export function PaperGrid() {
     const [papers, setPapers] = useState<Paper[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedPaper, setSelectedPaper] = useState<Paper | null>(null)
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 10
+
     const [filters, setFilters] = useState({
         subject: '',
         year: '',
@@ -32,7 +36,14 @@ export function PaperGrid() {
                 language: filters.language,
                 searchQuery: filters.searchQuery
             })
-            setPapers(data)
+            // Sort by creation date descending
+            const sorted = data.sort((a, b) => {
+                const dateA = a.createdAt?.toDate?.() || new Date(a.createdAt)
+                const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt)
+                return dateB - dateA
+            })
+            setPapers(sorted)
+            setCurrentPage(1) // Reset to first page on filter change
         } catch (error) {
             console.error('Failed to fetch papers:', error)
         } finally {
@@ -44,6 +55,12 @@ export function PaperGrid() {
         fetchPapers()
     }, [filters])
 
+    // Pagination logic
+    const indexOfLastItem = currentPage * itemsPerPage
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage
+    const currentPapers = papers.slice(indexOfFirstItem, indexOfLastItem)
+    const totalPages = Math.ceil(papers.length / itemsPerPage)
+
     return (
         <div className="space-y-12">
             <FilterBar onFilterChange={setFilters} />
@@ -54,16 +71,24 @@ export function PaperGrid() {
                         <div key={i} className="h-[400px] animate-pulse rounded-[2.5rem] bg-muted/50" />
                     ))}
                 </div>
-            ) : papers.length > 0 ? (
-                <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
-                    {papers.map((paper) => (
-                        <PaperCard
-                            key={paper.id}
-                            paper={paper}
-                            onView={(p) => setSelectedPaper(p)}
-                        />
-                    ))}
-                </div>
+            ) : currentPapers.length > 0 ? (
+                <>
+                    <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+                        {currentPapers.map((paper) => (
+                            <PaperCard
+                                key={paper.id}
+                                paper={paper}
+                                onView={(p) => setSelectedPaper(p)}
+                            />
+                        ))}
+                    </div>
+
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </>
             ) : (
                 <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 bg-muted/10 rounded-3xl border-2 border-dashed border-muted/30">
                     <div className="p-4 bg-muted rounded-full">

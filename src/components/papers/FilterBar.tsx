@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Search, Filter, X, ChevronDown } from 'lucide-react'
-import { Button } from '../ui/Button'
 import { useLanguage } from '../../context/LanguageContext'
 import { useFilters } from '../../context/FilterContext'
 
@@ -19,9 +18,16 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
     const [language, setLanguage] = useState('')
     const [searchQuery, setSearchQuery] = useState('')
 
+    // Real-time filtering with debounce for search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onFilterChange({ searchQuery, subject, year, examType, part, language })
+        }, 300)
+        return () => clearTimeout(timer)
+    }, [searchQuery, subject, year, examType, part, language])
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault()
-        onFilterChange({ searchQuery, subject, year, examType, part, language })
     }
 
     const resetFilters = () => {
@@ -31,7 +37,6 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
         setExamType('')
         setPart('')
         setLanguage('')
-        onFilterChange({ searchQuery: '', subject: '', year: '', examType: '', part: '', language: '' })
     }
 
     return (
@@ -155,21 +160,16 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none group-focus-within:rotate-180 transition-transform" />
                     </div>
 
-                    <div className="flex items-center gap-2 lg:col-span-1">
-                        <Button
-                            type="submit"
-                            className="flex-1 h-12 rounded-xl font-bold text-sm px-4"
-                        >
-                            Apply
-                        </Button>
+                    <div className="flex items-center gap-2 lg:col-span-1 justify-end">
                         {(subject || year || examType || part || language || searchQuery) && (
                             <button
                                 onClick={resetFilters}
                                 type="button"
-                                className="h-12 w-12 flex items-center justify-center bg-destructive/5 text-destructive hover:bg-destructive/10 rounded-xl transition-all"
+                                className="h-12 px-6 flex items-center justify-center gap-2 bg-destructive/5 text-destructive hover:bg-destructive/10 rounded-xl transition-all font-bold text-sm"
                                 title={t('filters.reset')}
                             >
                                 <X className="h-5 w-5" />
+                                {t('filters.reset')}
                             </button>
                         )}
                     </div>

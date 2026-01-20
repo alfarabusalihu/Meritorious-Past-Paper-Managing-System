@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Upload, FileText, ArrowLeft, Save } from 'lucide-react'
-import { Button } from '../ui/Button'
-import { Input } from '../ui/Input'
-import { Card } from '../ui/Card'
 import { papersApi } from '../../lib/firebase/papers'
-import { auth } from '../../lib/firebase'
+import { Card } from '../ui/Card'
+import { Button } from '../ui/Button'
 import { useLanguage } from '../../context/LanguageContext'
 import { useFilters } from '../../context/FilterContext'
-import { clsx } from 'clsx'
-import { Snackbar, Alert } from '@mui/material'
+import { FileText, Save, ArrowLeft } from 'lucide-react'
 import { Paper } from '../../lib/firebase/schema'
+import { Snackbar, Alert } from '@mui/material'
+import { auth } from '../../lib/firebase'
+import { FileUploadSection } from './form/FileUploadSection'
+import { PaperFormFields } from './form/PaperFormFields'
 
 export function AddPaperForm() {
     const { t } = useLanguage()
@@ -23,46 +23,35 @@ export function AddPaperForm() {
     const [file, setFile] = useState<File | null>(null)
     const [title, setTitle] = useState(paperToEdit?.title || '')
     const [subject, setSubject] = useState(paperToEdit?.subject || '')
-    const [year, setYear] = useState(paperToEdit?.year || new Date().getFullYear())
+    const [year, setYear] = useState(paperToEdit?.year?.toString() || '')
     const [examType, setExamType] = useState(paperToEdit?.examType || '')
     const [part, setPart] = useState(paperToEdit?.part || '')
-    const [language, setLanguage] = useState(paperToEdit?.language || '')
+    const [language, setLanguage] = useState(paperToEdit?.language || 'English')
 
     const [loading, setLoading] = useState(false)
-    const [changingFile, setChangingFile] = useState(false) // Track if user wants to change PDF in edit mode
+    const [changingFile, setChangingFile] = useState(false)
     const [feedback, setFeedback] = useState<{ open: boolean, message: string, severity: 'success' | 'error' }>({
         open: false, message: '', severity: 'success'
     })
 
-    // Set defaults when filters load (only if not editing)
     useEffect(() => {
         if (dynamicFilters && !paperToEdit) {
             if (!language && dynamicFilters.languages?.length > 0) setLanguage(dynamicFilters.languages[0])
             if (!examType && dynamicFilters.categories?.length > 0) setExamType(dynamicFilters.categories[0])
             if (!part && dynamicFilters.parts?.length > 0) setPart(dynamicFilters.parts[0])
             if (year && dynamicFilters.years?.length > 0 && !dynamicFilters.years.includes(year.toString())) {
-                setYear(parseInt(dynamicFilters.years[0]))
+                setYear(dynamicFilters.years[0])
             }
         }
     }, [dynamicFilters, paperToEdit])
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files?.[0]) {
-            const selectedFile = e.target.files[0]
-
-            // Strict PDF Check
-            if (selectedFile.type !== 'application/pdf') {
-                setFeedback({ open: true, message: 'Only PDF files are allowed.', severity: 'error' })
-                return
-            }
-
-            setFile(selectedFile)
-
-            // Smart Feature: Auto-Title
-            // "2023_Science_Paper_1.pdf" -> "2023 Science Paper 1"
-            const smartTitle = selectedFile.name.replace(/\.pdf$/i, '').replace(/[_-]/g, ' ')
-            setTitle(smartTitle)
-        }
+    const handleAutoFill = (metadata: any) => {
+        if (metadata.title) setTitle(metadata.title)
+        if (metadata.subject) setSubject(metadata.subject)
+        if (metadata.year) setYear(metadata.year.toString())
+        if (metadata.examType) setExamType(metadata.examType)
+        if (metadata.part) setPart(metadata.part)
+        if (metadata.language) setLanguage(metadata.language)
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -72,46 +61,30 @@ export function AddPaperForm() {
             return
         }
 
-        const user = auth.currentUser
+        const currentUser = auth.currentUser
         const isSystemAdmin = localStorage.getItem('isSystemAdmin') === 'true'
 
-        // Anti-Zombie check
-        if (!user && !isSystemAdmin) {
+        if (!currentUser && !isSystemAdmin) {
             setFeedback({ open: true, message: 'You must be logged in.', severity: 'error' })
-            return
-        }
-        if (isSystemAdmin && !user) {
-            setFeedback({
-                open: true,
-                message: 'Admin session expired. Please logout and login again.',
-                severity: 'error'
-            })
             return
         }
 
         setLoading(true)
         try {
             if (paperToEdit) {
-                // EDIT mode
-                if (!title.trim()) {
-                    setFeedback({ open: true, message: 'Title is required', severity: 'error' })
-                    return
-                }
-
                 const updates: Partial<Paper> = {
                     title: title.trim(),
                     subject,
-                    year,
+                    year: parseInt(year),
                     examType,
                     part,
                     language
                 }
 
-                // If user is changing the file, upload new one
                 if (file && changingFile) {
                     const uploadResult = await papersApi.uploadFile(file, {
-                        uid: user?.uid || 'system-admin',
-                        displayName: user?.displayName || 'System Admin'
+                        uid: currentUser?.uid || 'system-admin',
+                        displayName: currentUser?.displayName || 'System Admin'
                     })
                     updates.fileUrl = uploadResult.url
                     updates.metadata = uploadResult.metadata
@@ -121,29 +94,26 @@ export function AddPaperForm() {
                 setFeedback({ open: true, message: 'Paper updated successfully!', severity: 'success' })
                 setTimeout(() => navigate('/admin'), 1500)
             } else {
-                // Create Mode
-                // 1. Duplicate Check
                 if (file) {
                     const exists = await papersApi.checkPaperExists(file.name)
                     if (exists) {
-                        setFeedback({ open: true, message: 'A file with this name already exists in the archive.', severity: 'error' })
+                        setFeedback({ open: true, message: 'A file with this name already exists.', severity: 'error' })
                         setLoading(false)
                         return
                     }
 
-                    // 2. Upload
                     await papersApi.uploadPaper(
                         file,
-                        { title, subject, year, examType, part, language },
+                        { title, subject, year: parseInt(year), examType, part, language },
                         {
-                            uid: user?.uid || 'system-admin',
-                            displayName: user?.displayName || 'System Admin'
+                            uid: currentUser?.uid || 'system-admin',
+                            displayName: currentUser?.displayName || 'System Admin'
                         }
                     )
                     setFeedback({ open: true, message: t('addPaper.form.alerts.saveSuccess'), severity: 'success' })
+                    setTimeout(() => navigate('/admin'), 1500)
                 }
             }
-            setTimeout(() => navigate('/admin'), 1500)
         } catch (err: any) {
             console.error(err)
             setFeedback({ open: true, message: err.message || 'Operation failed', severity: 'error' })
@@ -153,8 +123,8 @@ export function AddPaperForm() {
     }
 
     return (
-        <div className="space-y-8 min-w-0">
-            {/* Header with Back Button */}
+        <div className="space-y-8 min-w-0 pb-20">
+            {/* Header */}
             <div className="flex items-center gap-4">
                 <Button
                     variant="secondary"
@@ -173,244 +143,78 @@ export function AddPaperForm() {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                <div className="lg:col-span-8 space-y-6 min-w-0">
-                    <Card className="p-4 sm:p-8 space-y-8 overflow-hidden">
-                        {/* Current Paper Info (Edit Mode) */}
-                        {paperToEdit && (
-                            <div className="bg-primary/5 border-2 border-primary/20 rounded-3xl p-4 sm:p-6 space-y-4 shadow-inner" role="status" aria-label="Editing existing paper">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="p-2 bg-primary rounded-lg text-primary-foreground">
-                                        <FileText size={20} aria-hidden="true" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-lg text-secondary">Currently Editing</h3>
-                                        <p className="text-xs font-medium text-muted-foreground">Original paper details loaded</p>
-                                    </div>
+            <Card className="p-4 sm:p-8 overflow-hidden max-w-4xl mx-auto shadow-2xl">
+                <form onSubmit={handleSubmit} className="space-y-10">
+                    {/* Currently Editing Info */}
+                    {paperToEdit && (
+                        <div className="bg-primary/5 border-2 border-primary/20 rounded-3xl p-4 sm:p-6 space-y-4 shadow-inner">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-primary rounded-lg text-primary-foreground">
+                                    <FileText size={20} />
                                 </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mt-2">
+                                <h3 className="font-bold text-lg text-secondary">Currently Editing Reference</h3>
+                            </div>
+                            {!changingFile ? (
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
                                     <div className="min-w-0">
-                                        <span className="text-primary font-bold block mb-1 uppercase tracking-wider text-[10px]">Original Title</span>
-                                        <p className="text-foreground font-medium break-words leading-tight">{paperToEdit.title}</p>
+                                        <p className="text-sm font-bold text-foreground">Current File</p>
+                                        <p className="text-xs text-muted-foreground truncate">{paperToEdit.metadata?.originalName}</p>
                                     </div>
-                                    <div className="min-w-0">
-                                        <span className="text-primary font-bold block mb-1 uppercase tracking-wider text-[10px]">Reference File</span>
-                                        <p className="text-foreground font-medium truncate">{paperToEdit.metadata?.originalName || 'N/A'}</p>
-                                    </div>
-                                </div>
-
-                                {/* Current PDF File Display */}
-                                {!changingFile && (
-                                    <div className="mt-4 border-t border-primary/20 pt-4">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                            <div className="flex items-center gap-4 min-w-0">
-                                                <div className="p-3 bg-white/50 rounded-xl border border-primary/10">
-                                                    <FileText className="text-primary" size={24} />
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <p className="text-sm font-bold text-foreground">Current Attachment</p>
-                                                    <p className="text-xs text-muted-foreground truncate max-w-[200px] sm:max-w-none">
-                                                        {paperToEdit.metadata?.originalName}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <Button
-                                                type="button"
-                                                variant="secondary"
-                                                size="sm"
-                                                onClick={() => setChangingFile(true)}
-                                                className="font-bold whitespace-nowrap px-6 rounded-xl"
-                                            >
-                                                Change PDF
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {changingFile && (
-                                    <div className="mt-4 border-t border-primary/20 pt-4">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-amber-50 rounded-lg">
-                                                    <Upload size={18} className="text-amber-600" />
-                                                </div>
-                                                <p className="text-xs text-muted-foreground font-medium italic">
-                                                    ⚠️ Uploading a new file will replace the current PDF.
-                                                </p>
-                                            </div>
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => {
-                                                    setChangingFile(false)
-                                                    setFile(null)
-                                                }}
-                                                className="font-bold text-muted-foreground hover:bg-muted/50 rounded-xl"
-                                            >
-                                                Cancel File Change
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* File Upload Section */}
-                        {(!paperToEdit || changingFile) && (
-                            <div className="relative group">
-                                <div className={clsx(
-                                    "flex h-48 w-full flex-col items-center justify-center rounded-[2.5rem] border-4 border-dashed transition-all",
-                                    file ? "border-primary/40 bg-primary/5" : "border-muted/30 bg-muted/5 group-hover:border-primary/40 group-hover:bg-primary/5"
-                                )}>
-                                    <input
-                                        type="file"
-                                        accept=".pdf"
-                                        onChange={handleFileChange}
-                                        className="absolute inset-0 cursor-pointer opacity-0 z-10"
-                                        required={!paperToEdit}
-                                    />
-                                    {file ? (
-                                        <div className="flex flex-col items-center gap-4 text-primary text-center px-6 w-full">
-                                            <div className="p-4 bg-primary rounded-2xl text-white shadow-xl shadow-primary/20">
-                                                <FileText size={36} />
-                                            </div>
-                                            <div className="min-w-0 max-w-full space-y-1">
-                                                <span className="font-bold text-lg block truncate">{file.name}</span>
-                                                <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
-                                            </div>
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setFile(null);
-                                                }}
-                                                className="text-destructive hover:bg-destructive/10 font-bold rounded-xl"
-                                            >
-                                                Discard Selection
-                                            </Button>
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col items-center gap-4 text-muted-foreground group-hover:text-primary transition-colors text-center">
-                                            <div className="p-4 bg-card rounded-2xl shadow-xl border border-muted group-hover:border-primary/30 transition-all">
-                                                <Upload size={32} />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <span className="font-bold text-lg block">Click or Drag PDF to Upload</span>
-                                                <span className="font-bold text-xs text-muted-foreground/60 italic uppercase tracking-widest">Maximum File Size: 50MB</span>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="space-y-6">
-                            <Input
-                                label={t('addPaper.form.name')}
-                                placeholder={t('addPaper.form.placeholder.name')}
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                required
-                            />
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 px-1">{t('addPaper.form.subject')}</label>
-                                <select
-                                    className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none cursor-pointer"
-                                    value={subject}
-                                    onChange={(e) => setSubject(e.target.value)}
-                                    required
-                                >
-                                    <option value="">{t('addPaper.form.placeholder.subject')}</option>
-                                    {((dynamicFilters?.subjects as string[]) || []).slice().sort().map(s => (
-                                        <option key={s} value={s}>{s}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-
-                <div className="lg:col-span-4 space-y-6 min-w-0">
-                    <Card className="p-4 sm:p-8 space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{t('addPaper.form.year')}</label>
-                            <select
-                                className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
-                                value={year}
-                                onChange={(e) => setYear(parseInt(e.target.value))}
-                                required
-                            >
-                                <option value="" disabled>Select Year</option>
-                                {((dynamicFilters?.years as string[]) || []).map(y => (
-                                    <option key={y} value={y}>{y}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{t('addPaper.form.category')}</label>
-                            <select
-                                className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
-                                value={examType}
-                                onChange={(e) => setExamType(e.target.value)}
-                                required
-                            >
-                                <option value="">Select Category</option>
-                                {((dynamicFilters?.categories as string[]) || []).map(c => (
-                                    <option key={c} value={c}>{c}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Part / Component</label>
-                            <div className="grid grid-cols-2 gap-2">
-                                {((dynamicFilters?.parts as string[]) || []).map(p => (
-                                    <button
-                                        key={p}
+                                    <Button
                                         type="button"
-                                        onClick={() => setPart(p)}
-                                        className={clsx(
-                                            "py-3 px-2 rounded-xl text-xs font-bold transition-all border-2",
-                                            part === p ? "bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20" : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted/50"
-                                        )}
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => setChangingFile(true)}
+                                        className="font-bold px-6 rounded-xl"
                                     >
-                                        {p}
-                                    </button>
-                                ))}
-                            </div>
+                                        Change PDF
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+                                    <p className="text-xs text-amber-600 font-bold italic">⚠️ Choose a replacement PDF below</p>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => { setChangingFile(false); setFile(null); }}
+                                        className="font-bold text-muted-foreground rounded-xl"
+                                    >
+                                        Cancel
+                                    </Button>
+                                </div>
+                            )}
                         </div>
+                    )}
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Language</label>
-                            <select
-                                className="h-12 w-full rounded-2xl border-none bg-muted/30 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
-                                value={language}
-                                onChange={(e) => setLanguage(e.target.value)}
-                                required
-                            >
-                                <option value="">Select Language</option>
-                                {((dynamicFilters?.languages as string[]) || []).map(l => (
-                                    <option key={l} value={l}>{l}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </Card>
-                </div>
+                    {/* File Upload Section */}
+                    {(!paperToEdit || changingFile) && (
+                        <FileUploadSection
+                            file={file}
+                            onFileChange={setFile}
+                            onAutoFill={handleAutoFill}
+                            onSnackbar={(message, severity) => setFeedback({ open: true, message, severity })}
+                            required={!paperToEdit}
+                        />
+                    )}
 
-                {/* Submit Button at Bottom Right */}
-                <div className="lg:col-span-12 flex justify-end">
-                    <Button type="submit" className="w-full sm:w-auto px-12 h-16 rounded-[2rem] font-bold text-xl shadow-2xl shadow-primary/20 hover:-translate-y-1 transition-all" isLoading={loading}>
+                    <PaperFormFields
+                        title={title} setTitle={setTitle}
+                        subject={subject} setSubject={setSubject}
+                        year={year} setYear={setYear}
+                        examType={examType} setExamType={setExamType}
+                        part={part} setPart={setPart}
+                        language={language} setLanguage={setLanguage}
+                        dynamicFilters={dynamicFilters}
+                        t={t}
+                    />
+
+                    <Button type="submit" className="w-full h-16 rounded-2xl font-bold text-lg shadow-2xl shadow-primary/20 hover:-translate-y-1 transition-all" isLoading={loading}>
                         <Save className="mr-3" />
-                        {paperToEdit ? 'Update Paper Details' : t('addPaper.form.submit.publish')}
+                        {paperToEdit ? 'Update Paper' : 'Publish Paper'}
                     </Button>
-                </div>
-            </form>
+                </form>
+            </Card>
 
             <Snackbar
                 open={feedback.open}
