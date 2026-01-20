@@ -33,7 +33,7 @@ export const configsApi = {
     async getAdminAuth(): Promise<{ email?: string, password?: string }> {
         const docRef = doc(db, 'configs', 'admin_auth')
         const snap = await getDoc(docRef)
-        return snap.exists() ? snap.data() as any : {}
+        return snap.exists() ? snap.data() as { email?: string, password?: string } : {}
     },
 
     subscribeFilters(callback: (filters: FilterConfig) => void) {

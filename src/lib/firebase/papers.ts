@@ -99,7 +99,7 @@ export const papersApi = {
         const docRef = doc(db, PAPERS_COLLECTION, id);
 
         // Regenerate keywords if title/subject/year changed
-        let updates = { ...data };
+        const updates = { ...data };
         if (data.title || data.subject || data.year) {
             const snapshot = await getDoc(docRef);
             if (snapshot.exists()) {

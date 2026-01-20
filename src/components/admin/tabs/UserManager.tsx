@@ -5,12 +5,11 @@ import { Shield, People, SwapHoriz, LockOpen, Lock } from '@mui/icons-material'
 
 interface UserManagerProps {
     users: UserProfile[];
-    currentUserUid: string;
     onUserUpdate: (uid: string, blocked: boolean) => void;
     onTransferOwnership: (targetUid: string) => void;
 }
 
-export function UserManager({ users, currentUserUid, onUserUpdate, onTransferOwnership }: UserManagerProps) {
+export function UserManager({ users, onUserUpdate, onTransferOwnership }: UserManagerProps) {
     const handleToggleBlock = async (uid: string, blocked: boolean) => {
         await usersApi.toggleBlockUser(uid, blocked)
         onUserUpdate(uid, blocked)

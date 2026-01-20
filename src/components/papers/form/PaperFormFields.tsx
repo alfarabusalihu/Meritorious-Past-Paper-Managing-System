@@ -1,3 +1,4 @@
+import { FilterConfig } from '../../../lib/firebase/configs'
 import { Input } from '../../ui/Input'
 import { clsx } from 'clsx'
 
@@ -14,7 +15,7 @@ interface PaperFormFieldsProps {
     setPart: (val: string) => void;
     language: string;
     setLanguage: (val: string) => void;
-    dynamicFilters: any;
+    dynamicFilters: FilterConfig | null;
     t: (key: string) => string;
 }
 

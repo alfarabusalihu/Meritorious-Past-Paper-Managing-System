@@ -5,7 +5,7 @@ import { useLanguage } from '../../context/LanguageContext'
 import { useFilters } from '../../context/FilterContext'
 
 interface FilterBarProps {
-    onFilterChange: (filters: any) => void
+    onFilterChange: (filters: { searchQuery: string, subject: string, year: string, examType: string, part: string, language: string }) => void
 }
 
 export function FilterBar({ onFilterChange }: FilterBarProps) {
@@ -24,7 +24,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
             onFilterChange({ searchQuery, subject, year, examType, part, language })
         }, 300)
         return () => clearTimeout(timer)
-    }, [searchQuery, subject, year, examType, part, language])
+    }, [searchQuery, subject, year, examType, part, language, onFilterChange])
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault()

@@ -49,8 +49,10 @@ export function AdminDashboard() {
         try {
             const papers = await papersApi.getPapers()
             const sorted = papers.sort((a, b) => {
-                const dateA = a.createdAt?.toDate?.() || new Date(a.createdAt)
-                const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const dateA = (a.createdAt as any)?.toDate?.() || new Date(a.createdAt as any)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const dateB = (b.createdAt as any)?.toDate?.() || new Date(b.createdAt as any)
                 return dateB - dateA
             })
             setAllPapers(sorted)

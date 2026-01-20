@@ -6,6 +6,7 @@ type Language = 'en' | 'ta';
 interface LanguageContextType {
     language: Language;
     setLanguage: (lang: Language) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     t: (path: string) => any;
 }
 
@@ -24,6 +25,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
     const t = (path: string) => {
         const keys = path.split('.');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let current: any = translations[language];
 
         for (const key of keys) {

@@ -64,7 +64,9 @@ export const generateReceipt = (contribution: Contribution) => {
     };
 
     addLine("Receipt ID", contribution.receiptId || contribution.id || "N/A");
-    addLine("Date Paid", new Date(contribution.timestamp).toLocaleDateString());
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const date = (contribution.timestamp as any).toDate ? (contribution.timestamp as any).toDate() : new Date(contribution.timestamp as any);
+    addLine("Date Paid", date.toLocaleDateString());
     addLine("Payment Method", "Stripe Secure Payment");
     addLine("Coffee Count", `${contribution.coffeeCount} Cups`);
 

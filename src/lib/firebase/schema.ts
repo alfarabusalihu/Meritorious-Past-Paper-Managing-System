@@ -1,3 +1,5 @@
+import { Timestamp } from 'firebase/firestore'
+
 // Firestore Schema Definitions
 
 export interface Paper {
@@ -22,8 +24,8 @@ export interface Paper {
         originalName?: string;
     };
 
-    createdAt: any; // Firestore Timestamp
-    updatedAt?: any;
+    createdAt: Timestamp | Date; // Firestore Timestamp
+    updatedAt?: Timestamp | Date;
 }
 
 export interface UserProfile {
@@ -33,7 +35,7 @@ export interface UserProfile {
     role: 'admin' | 'user' | 'super-admin';
     blocked?: boolean;
     photoURL?: string;
-    createdAt: any;
+    createdAt: Timestamp | Date;
 }
 
 export interface Contribution {
@@ -45,7 +47,7 @@ export interface Contribution {
     status: 'succeeded' | 'pending' | 'failed';
     coffeeCount: number;
     message?: string;
-    timestamp: any;
+    timestamp: Timestamp | Date;
     receiptId?: string;
 }
 

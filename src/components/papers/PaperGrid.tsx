@@ -25,33 +25,34 @@ export function PaperGrid() {
         searchQuery: ''
     })
 
-    const fetchPapers = async () => {
-        setLoading(true)
-        try {
-            const data = await papersApi.getPapers({
-                subject: filters.subject,
-                year: filters.year ? parseInt(filters.year) : undefined,
-                examType: filters.examType,
-                part: filters.part,
-                language: filters.language,
-                searchQuery: filters.searchQuery
-            })
-            // Sort by creation date descending
-            const sorted = data.sort((a, b) => {
-                const dateA = a.createdAt?.toDate?.() || new Date(a.createdAt)
-                const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt)
-                return dateB - dateA
-            })
-            setPapers(sorted)
-            setCurrentPage(1) // Reset to first page on filter change
-        } catch (error) {
-            console.error('Failed to fetch papers:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     useEffect(() => {
+        const fetchPapers = async () => {
+            setLoading(true)
+            try {
+                const data = await papersApi.getPapers({
+                    subject: filters.subject,
+                    year: filters.year ? parseInt(filters.year) : undefined,
+                    examType: filters.examType,
+                    part: filters.part,
+                    language: filters.language,
+                    searchQuery: filters.searchQuery
+                })
+                // Sort by creation date descending
+                const sorted = data.sort((a, b) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const dateA = (a.createdAt as any)?.toDate?.() || new Date(a.createdAt as any)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const dateB = (b.createdAt as any)?.toDate?.() || new Date(b.createdAt as any)
+                    return dateB - dateA
+                })
+                setPapers(sorted)
+                setCurrentPage(1) // Reset to first page on filter change
+            } catch (error) {
+                console.error('Failed to fetch papers:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
         fetchPapers()
     }, [filters])
 

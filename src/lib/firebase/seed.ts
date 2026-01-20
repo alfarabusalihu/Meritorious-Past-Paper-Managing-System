@@ -1,5 +1,6 @@
 import { db } from '../firebase'
 import { doc, setDoc, getDoc } from 'firebase/firestore'
+import { FilterConfig } from './configs'
 
 export const seedData = async () => {
     // Initial Stats
@@ -16,7 +17,7 @@ export const seedData = async () => {
     // Initial Filters
     const filtersRef = doc(db, 'configs', 'filters')
     const filtersSnap = await getDoc(filtersRef)
-    const existingFilters = filtersSnap.exists() ? filtersSnap.data() as any : {}
+    const existingFilters = filtersSnap.exists() ? filtersSnap.data() as FilterConfig : {} as FilterConfig
 
     const coreFilters = {
         subjects: existingFilters.subjects || ['Mathematics', 'Science', 'History', 'Geography', 'Civics', 'English', 'Tamil'],

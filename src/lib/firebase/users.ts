@@ -32,7 +32,7 @@ export const usersApi = {
             email,
             displayName,
             role: (!hasSuperAdmin && email === envSuperAdminEmail) ? 'super-admin' : 'user',
-            createdAt: new Date().toISOString()
+            createdAt: new Date()
         };
         await setDoc(userRef, newUser);
         return newUser;

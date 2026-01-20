@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Facebook, Instagram, Twitter, Loader2 } from 'lucide-react'
-import { configsApi } from '../../lib/firebase/configs'
+import { configsApi, SocialConfig } from '../../lib/firebase/configs'
 
 export function Footer() {
-    const [socials, setSocials] = useState<any>(null)
+    const [socials, setSocials] = useState<SocialConfig | null>(null)
 
     useEffect(() => {
         const unsubscribe = configsApi.subscribeSocials(setSocials)

@@ -7,7 +7,7 @@ import { useState } from 'react'
 interface FileUploadSectionProps {
     file: File | null;
     onFileChange: (file: File | null) => void;
-    onAutoFill: (metadata: any) => void;
+    onAutoFill: (metadata: { title?: string, subject?: string, year?: number, examType?: string, part?: string, language?: string }) => void;
     onSnackbar: (message: string, severity: 'success' | 'error') => void;
     required?: boolean;
 }

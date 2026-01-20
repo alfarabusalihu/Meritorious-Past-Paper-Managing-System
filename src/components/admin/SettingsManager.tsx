@@ -42,7 +42,7 @@ export function SettingsManager() {
         try {
             await configsApi.updateFilters(configs)
             setFeedback({ open: true, message: 'Filters updated successfully!', severity: 'success' })
-        } catch (error) {
+        } catch {
             setFeedback({ open: true, message: 'Failed to update filters', severity: 'error' })
         }
         setIsSavingFilters(false)
@@ -54,7 +54,7 @@ export function SettingsManager() {
         try {
             await configsApi.updateSocials(socials)
             setFeedback({ open: true, message: 'Social links updated successfully!', severity: 'success' })
-        } catch (error) {
+        } catch {
             setFeedback({ open: true, message: 'Failed to update social links', severity: 'error' })
         }
         setIsSavingSocials(false)

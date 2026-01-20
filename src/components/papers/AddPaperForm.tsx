@@ -43,9 +43,9 @@ export function AddPaperForm() {
                 setYear(dynamicFilters.years[0])
             }
         }
-    }, [dynamicFilters, paperToEdit])
+    }, [dynamicFilters, paperToEdit, language, examType, part, year])
 
-    const handleAutoFill = (metadata: any) => {
+    const handleAutoFill = (metadata: { title?: string, subject?: string, year?: number, examType?: string, part?: string, language?: string }) => {
         if (metadata.title) setTitle(metadata.title)
         if (metadata.subject) setSubject(metadata.subject)
         if (metadata.year) setYear(metadata.year.toString())
@@ -114,9 +114,10 @@ export function AddPaperForm() {
                     setTimeout(() => navigate('/admin'), 1500)
                 }
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err)
-            setFeedback({ open: true, message: err.message || 'Operation failed', severity: 'error' })
+            const error = err as Error
+            setFeedback({ open: true, message: error.message || 'Operation failed', severity: 'error' })
         } finally {
             setLoading(false)
         }

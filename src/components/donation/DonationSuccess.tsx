@@ -2,9 +2,10 @@ import { motion } from 'framer-motion'
 import { CheckCircle, Download } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { generateReceipt } from '../../lib/receipts'
+import { Contribution } from '../../lib/firebase/schema'
 
 interface DonationSuccessProps {
-    successData: any;
+    successData: Contribution;
 }
 
 export function DonationSuccess({ successData }: DonationSuccessProps) {

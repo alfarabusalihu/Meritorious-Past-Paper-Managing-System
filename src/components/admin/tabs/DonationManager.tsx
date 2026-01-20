@@ -45,7 +45,8 @@ export function DonationManager({
                             ) : (
                                 donations.map(donation => (
                                     <tr key={donation.id} className="border-b border-muted hover:bg-muted/10 transition-colors">
-                                        <td className="p-4 font-medium">{new Date(donation.timestamp).toLocaleDateString()}</td>
+                                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                                        <td className="p-4 font-medium">{((donation.timestamp as any).toDate ? (donation.timestamp as any).toDate() : new Date(donation.timestamp as any)).toLocaleDateString()}</td>
                                         <td className="p-4 font-bold">{donation.donorName}</td>
                                         <td className="p-4 text-muted-foreground font-medium">{donation.email}</td>
                                         <td className="p-4 text-right font-bold">{donation.coffeeCount}</td>

@@ -80,14 +80,15 @@ export function AuthForm() {
                     localStorage.setItem('adminEmail', email)
                     navigate('/admin')
                     return
-                } catch (err: any) {
-                    console.error("Admin Login Error:", err)
-                    if (err.code === 'auth/operation-not-allowed') {
+                } catch (err) {
+                    const error = err as { code?: string; message: string }
+                    console.error("Admin Login Error:", error)
+                    if (error.code === 'auth/operation-not-allowed') {
                         setAuthError('Error: "Email/Password" sign-in is disabled in your Firebase Console. Please enable it in Authentication > Sign-in method.')
                         setLoading(false)
                         return
                     }
-                    if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
                         try {
                             // User doesn't exist in Auth but matches Master Key? Create it!
                             // Note: This requires 'Email/Password' to be enabled in Firebase Console
@@ -99,9 +100,10 @@ export function AuthForm() {
                             localStorage.setItem('adminEmail', email)
                             navigate('/admin')
                             return
-                        } catch (createErr: any) {
-                            console.error("Admin Creation Error:", createErr)
-                            if (createErr.code === 'auth/operation-not-allowed') {
+                        } catch (createErr) {
+                            const error = createErr as { code?: string; message: string }
+                            console.error("Admin Creation Error:", error)
+                            if (error.code === 'auth/operation-not-allowed') {
                                 setAuthError('Error: "Email/Password" sign-in is disabled in your Firebase Console. Please enable it in Authentication > Sign-in method.')
                                 setLoading(false)
                                 return
@@ -114,8 +116,8 @@ export function AuthForm() {
             }
 
             setAuthError('Invalid credentials. Please use Google Sign-in.')
-        } catch (err: any) {
-            setAuthError(err.message)
+        } catch (err) {
+            setAuthError((err as Error).message)
         } finally {
             setLoading(false)
         }

@@ -31,7 +31,7 @@ export function ConfigManager({
         try {
             await statsApi.resetVisitors()
             onSnackbar('Visitor count reset successfully!', 'success')
-        } catch (error) {
+        } catch {
             onSnackbar('Failed to reset visitor count', 'error')
         }
     }

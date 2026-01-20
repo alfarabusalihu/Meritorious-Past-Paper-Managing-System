@@ -4,11 +4,13 @@ import { CreditCard, ShieldCheck } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 import { donationsApi } from '../../lib/firebase/donations'
+import { Contribution } from '../../lib/firebase/schema'
+import { Timestamp } from 'firebase/firestore'
 
 interface CheckoutFormProps {
     amount: number;
     coffeeCount: number;
-    onSuccess: (details: any) => void;
+    onSuccess: (details: Contribution) => void;
 }
 
 export function CheckoutForm({ amount, coffeeCount, onSuccess }: CheckoutFormProps) {
@@ -55,7 +57,8 @@ export function CheckoutForm({ amount, coffeeCount, onSuccess }: CheckoutFormPro
                     currency: 'usd',
                     status: 'succeeded' as const,
                     coffeeCount: coffeeCount,
-                    receiptId: `RCPT-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
+                    receiptId: `RCPT-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+                    timestamp: Timestamp.now()
                 }
 
                 const id = await donationsApi.addContribution(contribution)

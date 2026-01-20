@@ -7,14 +7,15 @@ import { configsApi } from '../../lib/firebase/configs'
 import { CheckoutForm } from '../donation/CheckoutForm'
 import { DonationPitch } from '../donation/DonationPitch'
 import { DonationSuccess } from '../donation/DonationSuccess'
+import { Contribution } from '../../lib/firebase/schema'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_TYooMQauvdEDq54NiTphI7jx')
 
 export function Contribute() {
     const [coffeePrice, setCoffeePrice] = useState(5)
-    const [selectedDetail, setSelectedDetail] = useState(3) // Default 3 coffees
+    const [selectedDetail, setSelectedDetail] = useState(3)
     const [customAmount, setCustomAmount] = useState('')
-    const [successData, setSuccessData] = useState<any | null>(null)
+    const [successData, setSuccessData] = useState<Contribution | null>(null)
 
     useEffect(() => {
         const fetchDefaults = async () => {
@@ -24,7 +25,7 @@ export function Contribute() {
         fetchDefaults()
     }, [])
 
-    const handleSuccess = (data: any) => {
+    const handleSuccess = (data: Contribution) => {
         setSuccessData(data)
         generateReceipt(data)
     }

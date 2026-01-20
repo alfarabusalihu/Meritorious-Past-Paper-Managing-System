@@ -55,9 +55,10 @@ export function HighAdminControls() {
                 configsApi.getDonationSettings()
             ])
             setUsers(u)
-            const texts: any = {}
+            const texts: Record<string, string> = {}
             Object.keys(f).forEach(key => {
-                texts[key] = f[key as keyof FilterConfig].join(', ')
+                const k = key as keyof FilterConfig
+                if (f[k]) texts[key] = f[k].join(', ')
             })
             setFilterTexts(texts)
             setSocials(s)
@@ -79,7 +80,7 @@ export function HighAdminControls() {
             await usersApi.transferSuperAdmin(currentUser.uid, targetUid)
             setSnackbar({ open: true, message: 'Ownership transferred! Reloading...', severity: 'success' })
             setTimeout(() => window.location.reload(), 2000)
-        } catch (error) {
+        } catch {
             setSnackbar({ open: true, message: 'Transfer failed', severity: 'error' })
         } finally {
             setLoading(false)
@@ -90,13 +91,13 @@ export function HighAdminControls() {
         if (!filterTexts) return
         setLoading(true)
         try {
-            const newFilters: any = {}
+            const newFilters: Record<string, string[]> = {}
             Object.keys(filterTexts).forEach(key => {
                 newFilters[key] = filterTexts[key].split(',').map(s => s.trim()).filter(Boolean)
             })
-            await configsApi.updateFilters(newFilters as FilterConfig)
+            await configsApi.updateFilters(newFilters as unknown as FilterConfig)
             setSnackbar({ open: true, message: 'Filters updated successfully!', severity: 'success' })
-        } catch (error) {
+        } catch {
             setSnackbar({ open: true, message: 'Failed to update filters', severity: 'error' })
         } finally {
             setLoading(false)
@@ -109,7 +110,7 @@ export function HighAdminControls() {
         try {
             await configsApi.updateSocials(socials)
             setSnackbar({ open: true, message: 'Social links updated successfully!', severity: 'success' })
-        } catch (error) {
+        } catch {
             setSnackbar({ open: true, message: 'Failed to update social links', severity: 'error' })
         } finally {
             setLoading(false)
@@ -121,7 +122,7 @@ export function HighAdminControls() {
         try {
             await configsApi.updateDonationSettings(donationConfig)
             setSnackbar({ open: true, message: 'Donation settings updated successfully!', severity: 'success' })
-        } catch (error) {
+        } catch {
             setSnackbar({ open: true, message: 'Failed to update donation settings', severity: 'error' })
         } finally {
             setLoading(false)
@@ -155,7 +156,6 @@ export function HighAdminControls() {
             <TabPanel value={tabValue} index={0}>
                 <UserManager
                     users={users}
-                    currentUserUid={currentUser?.uid || ''}
                     onUserUpdate={(uid, blocked) => setUsers(users.map(u => u.uid === uid ? { ...u, blocked } : u))}
                     onTransferOwnership={handleTransferOwnership}
                 />

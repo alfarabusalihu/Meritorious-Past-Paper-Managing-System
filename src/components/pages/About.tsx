@@ -28,7 +28,7 @@ export function About() {
     }, [])
 
     const featureIcons = [BookOpen, Zap, Shield, Users]
-    const features = (t('about.features') || []).map((f: any, i: number) => ({
+    const features = ((t('about.features') as unknown as { title: string; description: string }[]) || []).map((f, i) => ({
         ...f,
         icon: featureIcons[i] || BookOpen
     }))
@@ -81,7 +81,7 @@ export function About() {
 
             {/* Features Grid */}
             <section className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                {features.map((feature: any, index: number) => (
+                {features.map((feature, index) => (
                     <motion.div
                         key={feature.title}
                         initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
