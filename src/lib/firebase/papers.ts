@@ -96,42 +96,21 @@ export const papersApi = {
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Paper));
     },
 
-<<<<<<< HEAD
     async deletePaper(id: string, deletedBy: string) {
         const docRef = doc(db, PAPERS_COLLECTION, id);
         await updateDoc(docRef, {
             deleted: true,
             deletedAt: Timestamp.now(),
             deletedBy
-=======
-    async getDeletedPapers() {
-        const q = query(collection(db, PAPERS_COLLECTION), where("deleted", "==", true));
-        const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Paper));
-    },
-
-    async deletePaper(id: string, user: { uid: string }) {
-        await updateDoc(doc(db, PAPERS_COLLECTION, id), {
-            deleted: true,
-            deletedAt: Timestamp.now(),
-            deletedBy: user.uid
->>>>>>> 3c4102b68afd1b5d7398d4527cefed125d09ad69
         });
     },
 
     async restorePaper(id: string) {
-<<<<<<< HEAD
         const docRef = doc(db, PAPERS_COLLECTION, id);
         await updateDoc(docRef, {
             deleted: false,
             deletedAt: null,
             deletedBy: null
-=======
-        await updateDoc(doc(db, PAPERS_COLLECTION, id), {
-            deleted: false,
-            deletedAt: FieldValue.delete(),
-            deletedBy: FieldValue.delete()
->>>>>>> 3c4102b68afd1b5d7398d4527cefed125d09ad69
         });
     },
 
