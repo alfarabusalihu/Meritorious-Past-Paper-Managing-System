@@ -109,13 +109,20 @@ export function Navigation() {
                             <button
                                 onClick={() => setIsUserOpen(!isUserOpen)}
                                 className={cn(
-                                    "flex h-10 w-10 items-center justify-center rounded-full transition-all shadow-sm",
+                                    "flex items-center gap-2 px-3 h-10 rounded-full transition-all shadow-sm",
                                     isSuperAdmin
                                         ? "bg-secondary text-secondary-foreground border-2 border-secondary-foreground/20 shadow-secondary/20"
-                                        : "bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20"
+                                        : isAdmin
+                                            ? "bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20"
+                                            : "bg-muted border border-muted text-foreground hover:bg-muted/80"
                                 )}
                             >
-                                {isSuperAdmin ? <Shield sx={{ fontSize: 20 }} /> : <Person sx={{ fontSize: 20 }} />}
+                                {isSuperAdmin ? <Shield sx={{ fontSize: 20 }} /> : isAdmin ? <Shield sx={{ fontSize: 20 }} /> : <Person sx={{ fontSize: 20 }} />}
+                                {isAdmin && !isSuperAdmin && (
+                                    <span className="text-sm font-bold hidden sm:inline max-w-[120px] truncate">
+                                        {user.displayName}
+                                    </span>
+                                )}
                             </button>
 
                             {isUserOpen && (
@@ -136,14 +143,6 @@ export function Navigation() {
                                             Admin Dashboard
                                         </Link>
                                     )}
-                                    <Link
-                                        to="/add-paper"
-                                        onClick={() => setIsUserOpen(false)}
-                                        className="flex items-center gap-3 px-4 py-2 text-sm font-bold text-muted-foreground hover:bg-primary/5 hover:text-primary transition-all"
-                                    >
-                                        <Dashboard sx={{ fontSize: 18 }} />
-                                        Upload Paper
-                                    </Link>
                                     <button
                                         onClick={async () => {
                                             localStorage.removeItem('isSystemAdmin')

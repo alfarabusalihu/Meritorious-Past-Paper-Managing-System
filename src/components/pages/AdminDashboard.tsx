@@ -11,6 +11,7 @@ import { Dialog, DialogTitle, DialogContent, IconButton, useMediaQuery, useTheme
 import { useAuth } from '../../context/AuthContext'
 import { HighAdminControls } from '../admin/HighAdminControls'
 import { AdminStats } from '../admin/AdminStats'
+import { ContributorStats } from '../admin/ContributorStats'
 import { DeletePaperDialog } from '../admin/DeletePaperDialog'
 
 export function AdminDashboard() {
@@ -98,7 +99,7 @@ export function AdminDashboard() {
         if (!paperToDelete?.id) return
         setLoading(true)
         try {
-            await papersApi.deletePaper(paperToDelete.id)
+            await papersApi.deletePaper(paperToDelete.id, user?.uid || 'unknown')
             setAllPapers(prev => prev.filter(p => p.id !== paperToDelete.id))
             setStats(prev => ({ ...prev, added: prev.added - 1 }))
             setDeleteDialogOpen(false)
@@ -115,7 +116,7 @@ export function AdminDashboard() {
     if (!user || !isAdmin) {
         return (
             <div className="min-h-screen py-32 bg-background flex items-center justify-center">
-                <div className="max-w-md w-full px-6">
+                <div className="max-w-3xl w-full px-6">
                     <AuthForm />
                 </div>
             </div>
@@ -135,12 +136,20 @@ export function AdminDashboard() {
                         </div>
                     </div>
 
-                    <div className="mt-12">
-                        <AdminStats
-                            totalPapers={stats.added}
-                            onAddPaper={() => navigate('/add-paper')}
-                            onManageSystem={() => setShowHighAdmin(true)}
-                        />
+                    <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className={isAdmin && !isSuperAdmin ? "lg:col-span-2" : "lg:col-span-3"}>
+                            <AdminStats
+                                totalPapers={stats.added}
+                                onManageSystem={() => setShowHighAdmin(true)}
+                                onRecycleBin={() => navigate('/admin/trash')}
+                                isSuperAdmin={isSuperAdmin}
+                            />
+                        </div>
+                        {isAdmin && !isSuperAdmin && (
+                            <div className="lg:col-span-1">
+                                <ContributorStats />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -152,7 +161,7 @@ export function AdminDashboard() {
                         <div className="h-1 w-20 bg-primary/20 rounded-full" />
                     </div>
 
-                    <FilterBar onFilterChange={setFilters} />
+                    <FilterBar onFilterChange={setFilters} showAddButton={true} />
 
                     {loading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

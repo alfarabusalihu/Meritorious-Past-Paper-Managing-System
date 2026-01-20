@@ -11,6 +11,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { seedData } from './lib/firebase/seed'
 import { useEffect, lazy, Suspense } from 'react'
 import { isAdminHost } from './lib/utils/hostname'
+import { ScrollToTop } from './components/layout/ScrollToTop'
 
 // Lazy Load Components for Performance
 const PaperGrid = lazy(() => import('./components/papers/PaperGrid').then(m => ({ default: m.PaperGrid })))
@@ -19,6 +20,7 @@ const Hero = lazy(() => import('./components/hero/Hero').then(m => ({ default: m
 const About = lazy(() => import('./components/pages/About').then(m => ({ default: m.About })))
 const AdminDashboard = lazy(() => import('./components/pages/AdminDashboard').then(m => ({ default: m.AdminDashboard })))
 const Contribute = lazy(() => import('./components/pages/Contribute').then(m => ({ default: m.Contribute })))
+const RecycleBin = lazy(() => import('./components/admin/RecycleBin').then(m => ({ default: m.RecycleBin })))
 
 function AppContent() {
     const { t } = useLanguage()
@@ -58,6 +60,11 @@ function AppContent() {
                             )}
 
                             <Route path="/admin" element={<AdminDashboard />} />
+                            <Route path="/admin/trash" element={
+                                <ProtectedRoute requireSuperAdmin>
+                                    <RecycleBin />
+                                </ProtectedRoute>
+                            } />
                             <Route path="/contribute" element={<Contribute />} />
                             <Route path="/add-paper" element={
                                 <ProtectedRoute>
@@ -81,6 +88,7 @@ function App() {
             <LanguageProvider>
                 <FilterProvider>
                     <BrowserRouter>
+                        <ScrollToTop />
                         <AppContent />
                     </BrowserRouter>
                 </FilterProvider>

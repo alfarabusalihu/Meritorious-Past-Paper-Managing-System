@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Search, Filter, X, ChevronDown } from 'lucide-react'
+import { Search, Filter, X, ChevronDown, Plus } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
 import { useFilters } from '../../context/FilterContext'
 
 interface FilterBarProps {
     onFilterChange: (filters: { searchQuery: string, subject: string, year: string, examType: string, part: string, language: string }) => void
+    showAddButton?: boolean
 }
 
-export function FilterBar({ onFilterChange }: FilterBarProps) {
+export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarProps) {
     const { t } = useLanguage()
     const { filters } = useFilters()
     const [subject, setSubject] = useState('')
@@ -50,16 +51,6 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                         </h2>
                     </div>
 
-                    <Link
-                        to="/add-paper"
-                        className="lg:hidden flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl font-bold text-xs shadow-lg shadow-primary/20"
-                    >
-                        <Plus size={14} />
-                        {t('addPaper.title.add')}
-                    </Link>
-                </div>
-
-                <div className="flex items-center gap-4 flex-1 max-w-2xl w-full">
                     <div className="relative group flex-1">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                         <input
@@ -70,15 +61,17 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
+                </div>
 
+                {showAddButton && (
                     <Link
                         to="/add-paper"
                         className="hidden lg:flex items-center gap-2 px-6 h-14 bg-primary text-primary-foreground rounded-2xl font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap"
                     >
                         <Plus size={18} />
-                        {t('addPaper.title.add')} {t('addPaper.title.highlight')}
+                        Add Paper
                     </Link>
-                </div>
+                )}
             </div>
 
             <div className="bg-card border border-muted rounded-[2rem] p-6 lg:p-8 shadow-xl shadow-black/5">

@@ -27,6 +27,9 @@ export interface Paper {
     createdAt: Timestamp | Date; // Firestore Timestamp
     updatedAt?: Timestamp | Date;
 
+    // Stats
+    downloadCount?: number; // Track downloads
+
     // Soft Delete Metadata
     deleted?: boolean;
     deletedAt?: Timestamp | Date;
@@ -40,6 +43,7 @@ export interface UserProfile {
     role: 'admin' | 'user' | 'super-admin';
     blocked?: boolean;
     photoURL?: string;
+    papersUploaded?: number; // Track contributor stats
     createdAt: Timestamp | Date;
 }
 

@@ -28,7 +28,7 @@ export function DeletePaperDialog({ open, paperTitle, loading, onClose, onConfir
             <DialogContent>
                 <p className="text-muted-foreground font-medium">
                     Are you sure you want to delete <strong className="text-foreground">"{paperTitle}"</strong>?
-                    This action is permanent and cannot be undone.
+                    This action will move the paper to the Recycle Bin. Super Admins can restore it later.
                 </p>
             </DialogContent>
             <DialogActions sx={{ p: 3, gap: 2 }}>

@@ -61,6 +61,7 @@ export const papersApi = {
             fileUrl: url,
             keywords: generateKeywords(data.title, data.subject, data.year),
             metadata,
+            downloadCount: 0, // Initialize download counter
             createdAt: Timestamp.now()
         };
 
@@ -79,10 +80,40 @@ export const papersApi = {
             q = query(q, where("keywords", "array-contains", filters.searchQuery.toLowerCase()));
         }
         const snapshot = await getDocs(q);
+        const papers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Paper));
+
+        // Client-side filtering for soft-deleted papers
+        return papers.filter(p => !p.deleted);
+    },
+
+    async getDeletedPapers() {
+        const q = query(
+            collection(db, PAPERS_COLLECTION),
+            where("deleted", "==", true)
+        );
+        const snapshot = await getDocs(q);
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Paper));
     },
 
-    async deletePaper(id: string) {
+    async deletePaper(id: string, deletedBy: string) {
+        const docRef = doc(db, PAPERS_COLLECTION, id);
+        await updateDoc(docRef, {
+            deleted: true,
+            deletedAt: Timestamp.now(),
+            deletedBy
+        });
+    },
+
+    async restorePaper(id: string) {
+        const docRef = doc(db, PAPERS_COLLECTION, id);
+        await updateDoc(docRef, {
+            deleted: false,
+            deletedAt: null,
+            deletedBy: null
+        });
+    },
+
+    async permanentDeletePaper(id: string) {
         await deleteDoc(doc(db, PAPERS_COLLECTION, id));
     },
 
@@ -112,5 +143,16 @@ export const papersApi = {
         }
 
         await updateDoc(docRef, updates);
+    },
+
+    async incrementDownloadCount(paperId: string) {
+        const docRef = doc(db, PAPERS_COLLECTION, paperId);
+        const snapshot = await getDoc(docRef);
+        if (snapshot.exists()) {
+            const current = snapshot.data() as Paper;
+            await updateDoc(docRef, {
+                downloadCount: (current.downloadCount || 0) + 1
+            });
+        }
     }
 };

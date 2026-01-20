@@ -1,6 +1,7 @@
 import { FileText, Download, Eye, Calendar, User, Pencil, Trash2 } from 'lucide-react'
 import { Badge } from '../ui/Badge'
 import { Paper } from '../../lib/firebase/schema'
+import { papersApi } from '../../lib/firebase/papers'
 
 interface PaperCardProps {
     paper: Paper
@@ -11,6 +12,20 @@ interface PaperCardProps {
 }
 
 export function PaperCard({ paper, onView, isAdmin, onEdit, onDelete }: PaperCardProps) {
+
+    const handleDownload = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        // Track download
+        if (paper.id) {
+            try {
+                await papersApi.incrementDownloadCount(paper.id);
+            } catch (error) {
+                console.error('Failed to track download:', error);
+            }
+        }
+        // Open download link
+        window.open(paper.fileUrl, '_blank');
+    };
 
     return (
         <div
@@ -84,16 +99,13 @@ export function PaperCard({ paper, onView, isAdmin, onEdit, onDelete }: PaperCar
                         <Eye size={20} />
                         View Paper
                     </div>
-                    <a
-                        href={paper.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
+                    <button
+                        onClick={handleDownload}
                         className="flex h-14 w-14 items-center justify-center rounded-2xl bg-secondary/10 text-secondary hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 flex-shrink-0"
                         title="Download PDF"
                     >
                         <Download size={24} />
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>

@@ -1,8 +1,8 @@
-import { Upload, FileText, Sparkles, Loader2 } from 'lucide-react'
+
+import { Upload, FileText, Sparkles } from 'lucide-react'
 import { Button } from '../../ui/Button'
 import { clsx } from 'clsx'
-import { extractTextFromPDF, analyzePaperWithAI } from '../../../lib/utils/ai-extractor'
-import { useState } from 'react'
+import { FilterConfig } from '../../../lib/firebase/configs'
 
 interface FileUploadSectionProps {
     file: File | null;
@@ -10,11 +10,10 @@ interface FileUploadSectionProps {
     onAutoFill: (metadata: { title?: string, subject?: string, year?: number, examType?: string, part?: string, language?: string }) => void;
     onSnackbar: (message: string, severity: 'success' | 'error') => void;
     required?: boolean;
+    dynamicFilters: FilterConfig | null;
 }
 
 export function FileUploadSection({ file, onFileChange, onAutoFill, onSnackbar, required }: FileUploadSectionProps) {
-    const [aiLoading, setAiLoading] = useState(false)
-
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files?.[0]) {
             const selectedFile = e.target.files[0]
@@ -26,20 +25,13 @@ export function FileUploadSection({ file, onFileChange, onAutoFill, onSnackbar, 
         }
     }
 
-    const handleAIAutoFill = async () => {
+    const handleAutoFill = () => {
         if (!file) return
-        setAiLoading(true)
-        try {
-            const text = await extractTextFromPDF(file)
-            const metadata = await analyzePaperWithAI(text)
-            onAutoFill(metadata)
-            onSnackbar('AI Analysis complete!', 'success')
-        } catch (err) {
-            console.error(err)
-            onSnackbar('AI failed to analyze this PDF. Manual entry required.', 'error')
-        } finally {
-            setAiLoading(false)
-        }
+
+        // Basic Filename Extraction
+        const filename = file.name.replace(/\.[^/.]+$/, "")
+        onAutoFill({ title: filename })
+        onSnackbar('Used filename as title.', 'success')
     }
 
     return (
@@ -65,17 +57,12 @@ export function FileUploadSection({ file, onFileChange, onAutoFill, onSnackbar, 
                             <div className="flex items-center justify-center gap-3 mt-2">
                                 <Button
                                     type="button"
-                                    onClick={handleAIAutoFill}
-                                    disabled={aiLoading}
+                                    onClick={handleAutoFill}
                                     className="bg-secondary text-secondary-foreground h-10 px-4 rounded-xl flex items-center gap-2 group transition-all"
                                 >
-                                    {aiLoading ? (
-                                        <Loader2 size={18} className="animate-spin" />
-                                    ) : (
-                                        <Sparkles size={18} className="group-hover:rotate-12 transition-transform" />
-                                    )}
+                                    <Sparkles size={18} className="group-hover:rotate-12 transition-transform" />
                                     <span className="font-bold text-xs uppercase tracking-widest">
-                                        {aiLoading ? 'Analyzing...' : 'Auto-fill with AI'}
+                                        Use Filename
                                     </span>
                                 </Button>
                                 <Button

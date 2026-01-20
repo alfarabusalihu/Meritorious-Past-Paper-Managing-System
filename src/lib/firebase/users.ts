@@ -31,7 +31,7 @@ export const usersApi = {
             uid,
             email,
             displayName,
-            role: (!hasSuperAdmin && email === envSuperAdminEmail) ? 'super-admin' : 'user',
+            role: (!hasSuperAdmin && email === envSuperAdminEmail) ? 'super-admin' : 'admin',
             createdAt: new Date()
         };
         await setDoc(userRef, newUser);
@@ -67,5 +67,14 @@ export const usersApi = {
     async toggleBlockUser(uid: string, blocked: boolean) {
         const userRef = doc(db, USERS_COLLECTION, uid);
         await setDoc(userRef, { blocked }, { merge: true });
+    },
+
+    async incrementPapersUploaded(uid: string) {
+        const userRef = doc(db, USERS_COLLECTION, uid);
+        const snapshot = await getDoc(userRef);
+        if (snapshot.exists()) {
+            const current = snapshot.data() as UserProfile;
+            await setDoc(userRef, { papersUploaded: (current.papersUploaded || 0) + 1 }, { merge: true });
+        }
     }
 };

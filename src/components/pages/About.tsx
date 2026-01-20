@@ -1,30 +1,43 @@
 import { motion } from 'framer-motion'
-import { BookOpen, Shield, Users, Zap, Eye, Heart, Download } from 'lucide-react'
+import { BookOpen, Shield, Users, Zap, FileText, Heart, Download } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
 import { useState, useEffect } from 'react'
-import { statsApi, SystemStats } from '../../lib/firebase/stats'
+import { papersApi } from '../../lib/firebase/papers'
+import { usersApi } from '../../lib/firebase/users'
 import { clsx } from 'clsx'
+
+interface SystemStats {
+    totalPapers: number
+    totalDownloads: number
+    activeContributors: number
+}
 
 export function About() {
     const { t } = useLanguage()
-    const [stats, setStats] = useState<SystemStats>({ visitors: 0, contributors: 0, papersEngagement: 0 })
+    const [stats, setStats] = useState<SystemStats>({ totalPapers: 0, totalDownloads: 0, activeContributors: 0 })
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        statsApi.getStats().then(setStats)
+        const fetchStats = async () => {
+            try {
+                const papers = await papersApi.getPapers()
+                const users = await usersApi.getAllUsers()
 
-        // Smart Visitor Tracking
-        const trackVisit = async () => {
-            const lastVisit = localStorage.getItem('last_visit_date')
-            const today = new Date().toDateString()
+                const totalDownloads = papers.reduce((sum, paper) => sum + (paper.downloadCount || 0), 0)
+                const activeContributors = users.filter(u => (u.papersUploaded || 0) > 0).length
 
-            // Deduplicate: Only increment if they haven't visited today
-            if (lastVisit !== today) {
-                await statsApi.incrementVisitors()
-                localStorage.setItem('last_visit_date', today)
+                setStats({
+                    totalPapers: papers.length,
+                    totalDownloads,
+                    activeContributors
+                })
+            } catch (error) {
+                console.error('Failed to fetch stats:', error)
+            } finally {
+                setLoading(false)
             }
         }
-
-        trackVisit()
+        fetchStats()
     }, [])
 
     const featureIcons = [BookOpen, Zap, Shield, Users]
@@ -34,9 +47,9 @@ export function About() {
     }))
 
     const statsConfig = [
-        { label: 'Visitors', value: stats.visitors, icon: Eye, color: 'text-primary', bg: 'bg-primary/10' },
-        { label: 'Contributors', value: stats.contributors, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-50' },
-        { label: 'Papers Engagement', value: stats.papersEngagement, icon: Download, color: 'text-amber-500', bg: 'bg-amber-50' },
+        { label: 'Papers Available', value: stats.totalPapers, icon: FileText, color: 'text-primary', bg: 'bg-primary/10' },
+        { label: 'Total Downloads', value: stats.totalDownloads, icon: Download, color: 'text-amber-500', bg: 'bg-amber-50' },
+        { label: 'Active Contributors', value: stats.activeContributors, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-50' },
     ]
 
     return (
@@ -72,7 +85,9 @@ export function About() {
                             <stat.icon className={clsx("h-8 w-8", stat.color)} />
                         </div>
                         <div className="space-y-1">
-                            <h4 className="text-4xl font-bold text-foreground">{stat.value.toLocaleString()}</h4>
+                            <h4 className="text-4xl font-bold text-foreground">
+                                {loading ? '...' : stat.value.toLocaleString()}
+                            </h4>
                             <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">{stat.label}</p>
                         </div>
                     </motion.div>

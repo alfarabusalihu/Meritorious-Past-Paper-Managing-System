@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { papersApi } from '../../lib/firebase/papers'
+import { usersApi } from '../../lib/firebase/users'
 import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { useLanguage } from '../../context/LanguageContext'
@@ -110,6 +111,12 @@ export function AddPaperForm() {
                             displayName: currentUser?.displayName || 'System Admin'
                         }
                     )
+
+                    // Increment contributor's upload counter
+                    if (currentUser?.uid) {
+                        await usersApi.incrementPapersUploaded(currentUser.uid)
+                    }
+
                     setFeedback({ open: true, message: t('addPaper.form.alerts.saveSuccess'), severity: 'success' })
                     setTimeout(() => navigate('/admin'), 1500)
                 }
@@ -196,6 +203,7 @@ export function AddPaperForm() {
                             onAutoFill={handleAutoFill}
                             onSnackbar={(message, severity) => setFeedback({ open: true, message, severity })}
                             required={!paperToEdit}
+                            dynamicFilters={dynamicFilters}
                         />
                     )}
 

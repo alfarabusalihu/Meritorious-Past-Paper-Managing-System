@@ -1,17 +1,18 @@
-import { ShieldCheck, Plus, Settings } from 'lucide-react'
+import { ShieldCheck, Settings, Trash2 } from 'lucide-react'
 import { Button } from '../ui/Button'
 
 interface AdminStatsProps {
     totalPapers: number;
     onManageSystem: () => void;
-    onAddPaper: () => void;
+    onRecycleBin?: () => void;
+    isSuperAdmin?: boolean;
 }
 
-export function AdminStats({ totalPapers, onManageSystem, onAddPaper }: AdminStatsProps) {
+export function AdminStats({ totalPapers, onManageSystem, onRecycleBin, isSuperAdmin }: AdminStatsProps) {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="col-span-1 sm:col-span-2 bg-gradient-to-br from-secondary to-secondary/90 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-secondary/20 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-white/10 transition-colors duration-700" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-white/10 transition-colors duration-700 pointer-events-none" />
                 <div className="relative z-10 space-y-4">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-white/10 rounded-xl backdrop-blur-md">
@@ -23,22 +24,29 @@ export function AdminStats({ totalPapers, onManageSystem, onAddPaper }: AdminSta
                         <p className="text-4xl font-black">{totalPapers}</p>
                         <p className="text-sm font-bold uppercase tracking-widest text-primary/80">Total Papers Indexed</p>
                     </div>
-                    <div className="flex gap-3 pt-2">
-                        <Button
-                            onClick={onAddPaper}
-                            className="bg-white text-secondary hover:bg-white/90 font-bold rounded-xl px-6"
-                        >
-                            <Plus size={18} className="mr-2" />
-                            Add New
-                        </Button>
-                        <Button
-                            variant="secondary"
-                            onClick={onManageSystem}
-                            className="bg-white/10 hover:bg-white/20 border-white/20 text-white font-bold rounded-xl px-6"
-                        >
-                            <Settings size={18} className="mr-2" />
-                            System
-                        </Button>
+                    <div className="flex flex-wrap gap-3 pt-2">
+                        {isSuperAdmin && (
+                            <>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={onManageSystem}
+                                    className="bg-white/10 hover:bg-white/20 border-white/20 text-white font-bold rounded-xl px-4"
+                                >
+                                    <Settings size={18} className="mr-2" />
+                                    System
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={onRecycleBin}
+                                    className="bg-destructive/20 hover:bg-destructive/30 border-destructive/20 text-white font-bold rounded-xl px-4"
+                                >
+                                    <Trash2 size={18} className="mr-2" />
+                                    Bin
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
