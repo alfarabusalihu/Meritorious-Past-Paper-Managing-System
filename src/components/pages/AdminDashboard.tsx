@@ -47,8 +47,9 @@ export function AdminDashboard() {
     const fetchAdminPapers = async () => {
         setLoading(true)
         try {
-            const papers = await papersApi.getPapers()
-            const sorted = papers.sort((a, b) => {
+            const papers = await papersApi.getPapers();
+            const activePapers = papers.filter(p => !p.deleted);
+            const sorted = activePapers.sort((a, b) => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const dateA = (a.createdAt as any)?.toDate?.() || new Date(a.createdAt as any)
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -95,10 +96,10 @@ export function AdminDashboard() {
     const totalPages = Math.ceil(filteredPapers.length / itemsPerPage)
 
     const handleDeleteConfirm = async () => {
-        if (!paperToDelete?.id) return
+        if (!paperToDelete?.id || !user?.uid) return
         setLoading(true)
         try {
-            await papersApi.deletePaper(paperToDelete.id)
+            await papersApi.deletePaper(paperToDelete.id, { uid: user.uid })
             setAllPapers(prev => prev.filter(p => p.id !== paperToDelete.id))
             setStats(prev => ({ ...prev, added: prev.added - 1 }))
             setDeleteDialogOpen(false)
@@ -140,6 +141,7 @@ export function AdminDashboard() {
                             totalPapers={stats.added}
                             onAddPaper={() => navigate('/add-paper')}
                             onManageSystem={() => setShowHighAdmin(true)}
+                            isSuperAdmin={isSuperAdmin}
                         />
                     </div>
                 </div>

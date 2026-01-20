@@ -1,13 +1,16 @@
-import { ShieldCheck, Plus, Settings } from 'lucide-react'
+import { ShieldCheck, Plus, Settings, Trash2 } from 'lucide-react'
 import { Button } from '../ui/Button'
+import { useNavigate } from 'react-router-dom'
 
 interface AdminStatsProps {
     totalPapers: number;
     onManageSystem: () => void;
     onAddPaper: () => void;
+    isSuperAdmin?: boolean;
 }
 
-export function AdminStats({ totalPapers, onManageSystem, onAddPaper }: AdminStatsProps) {
+export function AdminStats({ totalPapers, onManageSystem, onAddPaper, isSuperAdmin }: AdminStatsProps) {
+    const navigate = useNavigate();
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="col-span-1 sm:col-span-2 bg-gradient-to-br from-secondary to-secondary/90 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-secondary/20 relative overflow-hidden group">
@@ -23,7 +26,7 @@ export function AdminStats({ totalPapers, onManageSystem, onAddPaper }: AdminSta
                         <p className="text-4xl font-black">{totalPapers}</p>
                         <p className="text-sm font-bold uppercase tracking-widest text-primary/80">Total Papers Indexed</p>
                     </div>
-                    <div className="flex gap-3 pt-2">
+                    <div className="flex flex-wrap gap-3 pt-2">
                         <Button
                             onClick={onAddPaper}
                             className="bg-white text-secondary hover:bg-white/90 font-bold rounded-xl px-6"
@@ -39,6 +42,16 @@ export function AdminStats({ totalPapers, onManageSystem, onAddPaper }: AdminSta
                             <Settings size={18} className="mr-2" />
                             System
                         </Button>
+                        {isSuperAdmin && (
+                            <Button
+                                variant="secondary"
+                                onClick={() => navigate('/admin/trash')}
+                                className="bg-white/10 hover:bg-white/20 border-white/20 text-white font-bold rounded-xl px-6"
+                            >
+                                <Trash2 size={18} className="mr-2" />
+                                Recycle Bin
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>

@@ -19,6 +19,7 @@ const Hero = lazy(() => import('./components/hero/Hero').then(m => ({ default: m
 const About = lazy(() => import('./components/pages/About').then(m => ({ default: m.About })))
 const AdminDashboard = lazy(() => import('./components/pages/AdminDashboard').then(m => ({ default: m.AdminDashboard })))
 const Contribute = lazy(() => import('./components/pages/Contribute').then(m => ({ default: m.Contribute })))
+const RecycleBin = lazy(() => import('./components/admin/RecycleBin').then(m => ({ default: m.RecycleBin })))
 
 function AppContent() {
     const { t } = useLanguage()
@@ -58,6 +59,11 @@ function AppContent() {
                             )}
 
                             <Route path="/admin" element={<AdminDashboard />} />
+                            <Route path="/admin/trash" element={
+                                <ProtectedRoute requireSuperAdmin={true}>
+                                    <RecycleBin />
+                                </ProtectedRoute>
+                            } />
                             <Route path="/contribute" element={<Contribute />} />
                             <Route path="/add-paper" element={
                                 <ProtectedRoute>
