@@ -48,8 +48,9 @@ export function AdminDashboard() {
     const fetchAdminPapers = async () => {
         setLoading(true)
         try {
-            const papers = await papersApi.getPapers()
-            const sorted = papers.sort((a, b) => {
+            const papers = await papersApi.getPapers();
+            const activePapers = papers.filter(p => !p.deleted);
+            const sorted = activePapers.sort((a, b) => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const dateA = (a.createdAt as any)?.toDate?.() || new Date(a.createdAt as any)
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -96,10 +97,14 @@ export function AdminDashboard() {
     const totalPages = Math.ceil(filteredPapers.length / itemsPerPage)
 
     const handleDeleteConfirm = async () => {
-        if (!paperToDelete?.id) return
+        if (!paperToDelete?.id || !user?.uid) return
         setLoading(true)
         try {
+<<<<<<< HEAD
             await papersApi.deletePaper(paperToDelete.id, user?.uid || 'unknown')
+=======
+            await papersApi.deletePaper(paperToDelete.id, { uid: user.uid })
+>>>>>>> 3c4102b68afd1b5d7398d4527cefed125d09ad69
             setAllPapers(prev => prev.filter(p => p.id !== paperToDelete.id))
             setStats(prev => ({ ...prev, added: prev.added - 1 }))
             setDeleteDialogOpen(false)
@@ -136,6 +141,7 @@ export function AdminDashboard() {
                         </div>
                     </div>
 
+<<<<<<< HEAD
                     <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className={isAdmin && !isSuperAdmin ? "lg:col-span-2" : "lg:col-span-3"}>
                             <AdminStats
@@ -150,6 +156,15 @@ export function AdminDashboard() {
                                 <ContributorStats />
                             </div>
                         )}
+=======
+                    <div className="mt-12">
+                        <AdminStats
+                            totalPapers={stats.added}
+                            onAddPaper={() => navigate('/add-paper')}
+                            onManageSystem={() => setShowHighAdmin(true)}
+                            isSuperAdmin={isSuperAdmin}
+                        />
+>>>>>>> 3c4102b68afd1b5d7398d4527cefed125d09ad69
                     </div>
                 </div>
             </div>

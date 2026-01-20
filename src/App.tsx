@@ -61,7 +61,11 @@ function AppContent() {
 
                             <Route path="/admin" element={<AdminDashboard />} />
                             <Route path="/admin/trash" element={
+<<<<<<< HEAD
                                 <ProtectedRoute requireSuperAdmin>
+=======
+                                <ProtectedRoute requireSuperAdmin={true}>
+>>>>>>> 3c4102b68afd1b5d7398d4527cefed125d09ad69
                                     <RecycleBin />
                                 </ProtectedRoute>
                             } />
