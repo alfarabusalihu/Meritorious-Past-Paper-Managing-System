@@ -11,8 +11,7 @@ import {
     updateDoc,
     doc,
     deleteDoc,
-    getDoc,
-    FieldValue
+    getDoc
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Paper, FilterOptions } from "./schema";

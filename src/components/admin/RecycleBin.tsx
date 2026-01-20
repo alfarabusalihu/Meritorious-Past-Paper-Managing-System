@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useEffect, useState } from 'react'
 import { papersApi } from '../../lib/firebase/papers'
 import { Paper } from '../../lib/firebase/schema'
