@@ -1,59 +1,67 @@
-# Clean Code Architecture Assessment
+# MPPMS Architecture & System Map
 
-## ✅ Architecture Compliance
+> **AI Context Instructions:** Read this file first to understand the current state of the system, technical standards, and architectural patterns.
 
-### 1. **Separation of Concerns**
-- **✓ Components**: UI logic isolated in `src/components/`
-- **✓ Business Logic**: Firebase APIs in `src/lib/firebase/`
-- **✓ State Management**: Contexts in `src/context/`
-- **✓ Utilities**: Shared utilities in `src/lib/`
-- **✓ Types**: Centralized schema in `src/lib/firebase/schema.ts`
+## 1. Project Identity
+- **Name:** Meritorious Past Paper Management System (MPPMS) v2
+- **Core Stack:** React 18, Vite, TypeScript, Tailwind CSS v4
+- **Backend:** Firebase (Auth, Firestore, Storage)
+- **State Management:** React Context API (No Redux/Zustand)
+- **Deployment:** Docker (Nginx, Multi-stage build)
 
-### 2. **DRY (Don't Repeat Yourself)**
-- **✓ Reusable Components**: Button, Input, Card in `src/components/ui/`
-- **✓ Shared Hooks**: `useLanguage`, `useFilters` contexts
-- **✓ API Abstraction**: All Firebase operations in dedicated API files
-- **✓ CSS Variables**: Centralized theming in `index.css`
+## 2. Visual Standards (Strict)
+- **Font:** `Inter` (via Google Fonts & Tailwind `font-sans`)
+- **Radius:** `rounded-[2.5rem]` for Cards, `rounded-2xl` for Buttons
+- **Colors:** HSL variables in `index.css`. Glassmorphism used for Admin overlays.
+- **Icons:** `lucide-react`
+- **Animations:** `framer-motion` (Standard duration: 300ms)
 
-### 3. **Single Responsibility Principle**
-- **✓ Each component has one job**: PaperCard (display), PaperGrid (list), AddPaperForm (create/edit)
-- **✓ API modules**: `papers.ts`, `users.ts`, `configs.ts`, `donations.ts` - each handles one domain
-- **✓ Context isolation**: FilterContext, LanguageContext separated
+## 3. High-Level Architecture
 
-### 4. **Naming Conventions**
-- **✓ Components**: PascalCase (`AdminDashboard`, `HighAdminControls`)
-- **✓ Functions/Variables**: camelCase (`handleSubmit`, `fetchPapers`)
-- **✓ Types/Interfaces**: PascalCase (`Paper`, `UserProfile`, `Contribution`)
-- **✓ Files**: Match component names
-
-### 5. **Code Organization**
+### Directory Structure
 ```
 src/
-├── components/        # UI Components
-│   ├── admin/        # Admin-specific
-│   ├── auth/         # Authentication
-│   ├── hero/         # Landing
-│   ├── layout/       # Navigation, Footer
-│   ├── papers/       # Paper management
-│   ├── pages/        # Route pages
-│   └── ui/           # Reusable UI primitives
-├── context/          # Global state
-├── lib/              # Business logic
-│   └── firebase/     # Backend integration
-└── main.tsx          # Entry point
+├── components/          # Presentational & Container Components
+│   ├── admin/          # Admin Dashboard & Controls (RBAC protected)
+│   ├── papers/         # Paper Management (Grid, Cards, Forms)
+│   └── ui/             # Reusable Atoms (Button, Card, Badge)
+├── context/            # Global State (Auth, Language, Filter)
+├── lib/                # Logic Layer
+│   └── firebase/       # API Abstraction (papers.ts, users.ts)
+└── index.css           # Design Tokens & Tailwind @theme
 ```
 
-### 6. **Accessibility & Standards**
-- **✓ ARIA labels**: Screen reader support
-- **✓ Semantic HTML**: `<main>`, `<nav>`, proper headings
-- **✓ Keyboard navigation**: All interactive elements accessible
-- **✓ Color contrast**: WCAG AA compliant
+### Key patterns
+- **RBAC:** Controlled via `ProtectedRoute` and `isAdminHost()` utility.
+- **Routing:** Lazy-loaded routes in `App.tsx`.
+- **Data Flow:** `Firebase API (lib)` -> `Component/Context` -> `UI`.
+- **Localization:** `LanguageContext` (English/Tamil).
 
-### 7. **Error Handling**
-- **✓ Try-catch blocks**: All async operations
-- **✓ User feedback**: Snackbar notifications (MUI)
-- **✓ Form validation**: Client-side checks before submission
+## 4. Current Configuration
+- **Build System:** Vite with `esbuild` minification & manual chunking.
+- **Security:** Nginx CSP headers, strict Firestore rules.
+- **Docker:** Production-optimized Alpine image.
 
-## Overall Rating: **Excellent** ⭐⭐⭐⭐⭐
+## 5. Detailed Change Log
 
-The project follows clean architecture principles with clear separation of concerns, maintainable structure, and adherence to industry standards.
+### [2026-01-21] Production Docker & Security Finalization
+- **Goal:** Prepare system for production deployment with optimized security and performance.
+- **Key Files Modified:**
+  - `Dockerfile`: Implemented multi-stage build (Node 18 -> Nginx Alpine) to reduce image size.
+  - `nginx.conf`: Added strict **Content-Security-Policy (CSP)**, `X-Frame-Options`, and gzip compression.
+  - `vite.config.ts`: Configured manual chunking to split `vendor-react` and `vendor-firebase` for cache optimization.
+  - `DEPLOYMENT.md`: Comprehensive guide added for Docker commands and troubleshooting.
+
+### [2026-01-21] Visual Standards & Typography
+- **Goal:** Enforce premium "Inter" typeface across the application.
+- **Key Files Modified:**
+  - `src/index.css`: Updated `font-sans` token in Tailwind `@theme` to prioritize "Inter".
+  - `index.html`: Verified Google Fonts preconnect and stylesheet links.
+
+### [2026-01-21] Build System Optimization
+- **Goal:** Resolve large chunk warnings and improve build time.
+- **Key Files Modified:**
+  - `vite.config.ts`: switched minifier to `esbuild`, added `chunkSizeWarningLimit: 600`, and defined `manualChunks`.
+
+---
+*Maintained by Antigravity Agent. Update this file when making architectural changes.*

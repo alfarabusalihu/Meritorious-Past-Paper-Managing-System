@@ -55,12 +55,13 @@ export function AuthForm() {
         try {
             await signInWithPopup(auth, provider)
             navigate('/')
-        } catch (err: any) {
-            console.error('Login failed:', err)
-            if (err.code === 'auth/popup-closed-by-user') {
+        } catch (err) {
+            const error = err as { code?: string; message?: string }
+            console.error('Login failed:', error)
+            if (error.code === 'auth/popup-closed-by-user') {
                 setAuthError('Sign-in cancelled.')
             } else {
-                setAuthError(err.message || 'Failed to sign in with Google.')
+                setAuthError(error.message || 'Failed to sign in with Google.')
             }
         } finally {
             setLoading(false)

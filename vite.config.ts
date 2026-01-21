@@ -14,4 +14,21 @@ export default defineConfig({
             '@': path.resolve(__dirname, './src'),
         },
     },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+                    'vendor-firebase': ['firebase/app', 'firebase/firestore', 'firebase/auth', 'firebase/storage'],
+                    'vendor-ui': ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled'],
+                    'vendor-motion': ['framer-motion'],
+                    'vendor-stripe': ['@stripe/stripe-js', '@stripe/react-stripe-js']
+                }
+            }
+        },
+        chunkSizeWarningLimit: 600,
+        sourcemap: false,
+        minify: 'esbuild',
+        target: 'es2015'
+    }
 })
