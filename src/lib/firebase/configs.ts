@@ -3,8 +3,6 @@ import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore'
 
 export interface FilterConfig {
     subjects: string[]
-    categories: string[]
-    parts: string[]
     languages: string[]
     years: string[]
 }
@@ -27,7 +25,7 @@ export const configsApi = {
         if (snap.exists()) {
             return snap.data() as FilterConfig
         }
-        return { subjects: [], categories: [], parts: [], languages: [], years: [] }
+        return { subjects: [], languages: [], years: [] }
     },
 
     async getAdminAuth(): Promise<{ email?: string, password?: string }> {
@@ -41,7 +39,7 @@ export const configsApi = {
             if (snap.exists()) {
                 callback(snap.data() as FilterConfig)
             } else {
-                callback({ subjects: [], categories: [], parts: [], languages: [], years: [] })
+                callback({ subjects: [], languages: [], years: [] })
             }
         })
     },

@@ -15,16 +15,13 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const unsubscribe = configsApi.subscribeFilters((data) => {
             const currentYear = new Date().getFullYear()
-            // Legacy logic: All years since 2020, plus next year if it's near
             const generatedYears = Array.from(
-                { length: currentYear - 2020 + 2 },
-                (_, i) => (currentYear + 1 - i).toString()
+                { length: currentYear - 2019 },
+                (_, i) => (currentYear - i).toString()
             )
 
             setFilters({
                 subjects: data.subjects || [],
-                categories: data.categories || [],
-                parts: data.parts || [],
                 languages: data.languages || [],
                 // Merge DB years with generated ones, ensuring uniqueness
                 years: Array.from(new Set([...generatedYears, ...(data.years || [])]))

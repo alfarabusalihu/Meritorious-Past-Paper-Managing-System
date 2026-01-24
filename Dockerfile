@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for MPPMS
+# Multi-stage Dockerfile for Merit series
 # Stage 1: Build the application
 FROM node:18-alpine AS builder
 

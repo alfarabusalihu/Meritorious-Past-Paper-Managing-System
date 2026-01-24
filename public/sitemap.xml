@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://mppms.vercel.app/</loc>
-    <lastmod>2024-03-20</lastmod>
+    <loc>https://meritseries.com/</loc>
+    <lastmod>2026-01-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://mppms.vercel.app/about</loc>
-    <lastmod>2024-03-20</lastmod>
+    <loc>https://meritseries.com/about</loc>
+    <lastmod>2026-01-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://meritseries.com/contribute</loc>
+    <lastmod>2026-01-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

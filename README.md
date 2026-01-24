@@ -1,11 +1,12 @@
-# MPPMS - Meritorious Past Paper Management System
+# Merit Series - Meritorious Past Paper Management System
 
 > **A modern, accessible, and scalable platform for managing and distributing educational past papers.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![React](https://img.shields.io/badge/React-19.0-blue)](https://reactjs.org/)
+[![React](https://img.shields.io/badge/React-18.3-blue)](https://reactjs.org/)
 [![Firebase](https://img.shields.io/badge/Firebase-11.2-orange)](https://firebase.google.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-6.0-purple)](https://vitejs.dev/)
 
 ---
 
@@ -24,11 +25,11 @@
 
 ## 🎯 Overview
 
-**MPPMS** is a comprehensive web application designed to streamline the management, distribution, and accessibility of educational past papers. Built for educational institutions, students, and educators, it provides:
+**Merit Series** is a comprehensive web application designed to streamline the management, distribution, and accessibility of educational past papers. Built for educational institutions, students, and educators, it provides:
 
 - **Public Access**: Students can browse, search, and download past papers without authentication
 - **Admin Management**: Authorized staff can upload, edit, and manage the paper repository
-- **Contribution System**: Integrated Stripe donations to support platform operations
+- **Contribution System**: Integrated Stripe donations ("Buy Me a Coffee") to support platform operations
 - **Multi-language Support**: English and Tamil localization
 - **Accessibility First**: WCAG 2.1 AA compliant with full keyboard navigation and screen reader support
 
@@ -38,87 +39,80 @@
 
 ### For Students & Educators
 
-- 🔍 **Advanced Search & Filtering**: Filter by subject, year, exam type, part, and language
-- 📄 **PDF Preview**: In-browser PDF viewing before download
-- 📱 **Responsive Design**: Seamless experience across desktop, tablet, and mobile
-- 🌍 **Internationalization**: Switch between English and Tamil
-- ♿ **Accessibility**: Screen reader support, keyboard navigation, ARIA labels
+- 🔍 **Advanced Search & Filtering**: Filter by subject, year, and language with real-time results
+- 📄 **PDF Preview**: In-browser PDF viewing without needing to download files first
+- 📱 **Responsive Design**: Seamless experience across desktop, tablet, and mobile devices
+- 🌍 **Internationalization**: One-click switch between English and Tamil interfaces
+- ♿ **Accessibility**: ARIA labels, semantic HTML, and keyboard navigation support
 
 ### For Administrators
 
-- 🔐 **Secure Authentication**: Email/password and Google OAuth via Firebase
+- 🔐 **Secure Authentication**: Role-based access control (Admin/Super Admin)
 - 📝 **Smart Paper Management**:
   - Auto-title generation from filenames
-  - Duplicate file detection
-  - Unified Add/Edit interface
-- 👥 **User Management**: Block/unblock users (High Admin only)
+  - Multi-file upload support (Part 1, Part 2, Marking Scheme)
+  - Unified Add/Edit interface with custom validations
+- 👥 **User Management**: System administrators can manage access controls
 - ⚙️ **System Configuration**: 
-  - Global filter options
-  - Social media links
-  - Donation settings
-- 📊 **Analytics Dashboard**: Track uploads, contributions, and user activity
+  - Dynamic filter options ( Subjects, Years, Languages)
+  - Social media link management
+- 📊 **Analytics Dashboard**: Visitor tracking and contribution monitoring
 
 ### Contribution System
 
-- 💳 **Stripe Integration**: Secure payment processing
-- ☕ **"Buy Me a Coffee"**: Support platform with customizable donation amounts
-- 🧾 **PDF Receipts**: Auto-generated professional receipts
-- 📈 **Donor Dashboard**: High Admins can view donation history and total raised
+- 💳 **Stripe Integration**: Secure payment processing for donations
+- ☕ **Support Platform**: Users can support the platform with customizable donation amounts
+- 🧾 **Auto-Receipts**: Professional PDF receipts generated instantly via jsPDF
+- 📈 **Transparency**: Public progress bars for fundraising goals
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 19** with TypeScript
-- **Vite** for blazing-fast development
-- **Tailwind CSS 4** for utility-first styling
-- **Material UI** for consistent components
-- **Framer Motion** for smooth animations
-- **React Router 7** for client-side routing
+- **React 18** with TypeScript
+- **Vite** for optimized build performance
+- **Tailwind CSS 4** for styling
+- **Lucide React** for consistent iconography
+- **Framer Motion** for smooth UI transitions
+- **React Router 6** for navigation
 
 ### Backend & Infrastructure
 - **Firebase**:
   - Authentication (Email/Password, Google OAuth)
   - Firestore (NoSQL database)
-  - Storage (PDF file hosting)
-- **Stripe** for payment processing
-- **jsPDF** for receipt generation
-
-### Developer Experience
-- **TypeScript** for type safety
-- **ESLint** for code quality
-- **Vite** for hot module replacement
-- **Clean Architecture** with separation of concerns
+  - Storage (Secure file hosting)
+- **Stripe** for payments
+- **Docker** for containerized deployment
+- **Nginx** for production serving and caching
 
 ---
 
 ## 📁 Project Structure
 
 ```
-MPPMS/
+Merit-Series/
 ├── src/
 │   ├── components/          # React components
-│   │   ├── admin/          # Admin-specific components
-│   │   ├── auth/           # Authentication UI
-│   │   ├── hero/           # Landing page hero
+│   │   ├── admin/          # Admin-specific panels
+│   │   ├── auth/           # Authentication forms
+│   │   ├── hero/           # Landing page components
 │   │   ├── layout/         # Navigation, Footer
-│   │   ├── papers/         # Paper management
-│   │   ├── pages/          # Route pages
-│   │   └── ui/             # Reusable UI primitives
-│   ├── context/            # React Context providers
-│   ├── lib/                # Business logic
-│   │   ├── firebase/       # Firebase API abstractions
-│   │   └── receipts.ts     # PDF receipt generator
-│   ├── App.tsx             # Main app component
-│   ├── main.tsx            # Entry point
-│   └── index.css           # Global styles & CSS variables
-├── public/                 # Static assets
-├── .env                    # Environment variables
-├── firebase.json           # Firebase configuration
-├── firestore.rules         # Security rules
-├── package.json            # Dependencies
-└── README.md              # This file
+│   │   ├── papers/         # Paper grid, cards, forms
+│   │   ├── pages/          # Route page wrappers
+│   │   └── ui/             # Reusable UI primitives (Input, Button, Modal)
+│   ├── context/            # Global state (Auth, Language, Filters)
+│   ├── hooks/              # Custom hooks (pagination, viewer)
+│   ├── lib/                # Utilities & API layers
+│   │   ├── firebase/       # Firebase service abstraction
+│   │   └── utils/          # Helper functions
+│   ├── App.tsx             # Main application router
+│   └── main.tsx            # Entry point
+├── public/                 # Static assets & SEO files
+├── nginx.conf              # Production server config
+├── Dockerfile              # Container definition
+├── docker-compose.yml      # Orchestration config
+└── README.md               # Project documentation
 ```
 
 ---
@@ -128,15 +122,15 @@ MPPMS/
 ### Prerequisites
 
 - **Node.js** 18+ and npm
-- **Firebase Project** (with Firestore, Auth, and Storage enabled)
-- **Stripe Account** (for donation system)
+- **Firebase Project** setup
+- **Stripe Account** (optional, for donations)
 
-### Installation
+### Local Development
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/mppms.git
-   cd mppms
+   git clone https://github.com/yourusername/merit-series.git
+   cd merit-series
    ```
 
 2. **Install dependencies**
@@ -145,116 +139,73 @@ MPPMS/
    ```
 
 3. **Configure environment variables**
-   
    Create a `.env` file in the root directory:
    ```env
-   # Admin Credentials
-   ADMIN_EMAIL=admin@gmail.com
-   ADMIN_PASSWORD=yourSecurePassword
-   
-   # Firebase Config
-   VITE_FIREBASE_API_KEY=your_firebase_api_key
-   VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-   VITE_FIREBASE_PROJECT_ID=your-project-id
-   VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+   VITE_FIREBASE_API_KEY=your_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_bucket
    VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
    VITE_FIREBASE_APP_ID=your_app_id
-   
-   # Stripe (for donations)
-   VITE_STRIPE_PUBLIC_KEY=pk_test_your_stripe_key
+   VITE_STRIPE_PUBLIC_KEY=pk_test_your_key
    ```
 
-4. **Set up Firestore security rules**
-   ```bash
-   firebase deploy --only firestore:rules
-   ```
-
-5. **Start development server**
+4. **Start development server**
    ```bash
    npm run dev
    ```
-
-6. **Access the application**
-   - Public view: `http://localhost:5173`
-   - Admin panel: `http://localhost:5173/admin`
+   Access at `http://localhost:5173`
 
 ---
 
 ## ⚙️ Configuration
 
-### Firebase Setup
-
-1. **Enable Authentication**:
-   - Go to Firebase Console → Authentication → Sign-in method
-   - Enable Email/Password and Google providers
-
-2. **Create Firestore Database**:
-   - Collections: `papers`, `users`, `configs`, `contributions`
-
-3. **Set up Firebase Storage**:
-   - Create a bucket for PDF uploads
-   - Configure CORS if needed
-
-### Firestore Security Rules
-
-Deploy the included `firestore.rules` file:
+### Firebase Security Rules
+Deploy the included `firestore.rules` to secure your database:
 ```bash
 firebase deploy --only firestore:rules
 ```
-
-Key rules:
-- **Public read** on papers
-- **Authenticated write** on papers (admin role required)
-- **Admin-only** access to user management
+Crucial rules:
+- Public read access for papers
+- Admin-only write access
+- User-specific data protection
 
 ---
 
 ## 🐳 Deployment
 
-### Production Build
+### Docker (Recommended)
+
+Build and run the containerized application:
+
+```bash
+# Build
+docker build -t merit-series-app .
+
+# Run
+docker run -p 80:80 merit-series-app
+```
+
+The Docker image includes Nginx optimized with security headers and caching policies.
+
+### Manual Build
 
 ```bash
 npm run build
-```
-
-Output will be in the `dist/` directory.
-
-### Docker Deployment
-
-```bash
-# Build image
-docker build -t mppms:latest .
-
-# Run container
-docker run -p 80:80 mppms:latest
-```
-
-### Firebase Hosting (Recommended)
-
-```bash
-npm run build
-firebase deploy --only hosting
+# Serve the /dist folder using any static host
 ```
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these guidelines:
+Contributions are welcome! Please fork the repository and submit a Pull Request. ensure all new components are accessible (ARIA labels, keyboard support) and responsive.
 
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
-3. **Commit your changes**: `git commit -m 'Add amazing feature'`
-4. **Push to the branch**: `git push origin feature/amazing-feature`
-5. **Open a Pull Request**
-
-### Code Standards
-
-- Follow existing code style (ESLint configured)
-- Use TypeScript for type safety
-- Add comments for complex logic
-- Ensure accessibility (ARIA labels, semantic HTML)
-- Test on multiple browsers
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
 
@@ -264,22 +215,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 🙏 Acknowledgments
-
-- Built with ❤️ for educational institutions
-- Icons by [Material UI Icons](https://mui.com/material-ui/material-icons/)
-- Styling by [Tailwind CSS](https://tailwindcss.com/)
-- Powered by [Firebase](https://firebase.google.com/) & [Stripe](https://stripe.com/)
-
----
-
-## 📞 Support
-
-For questions or support:
-- 📧 Email: support@mppms.app
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/mppms/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/yourusername/mppms/discussions)
-
----
-
-**Made with 💙 by the MPPMS Team**
+**Made with 💙 by the Merit Series Team**

@@ -31,7 +31,7 @@ export const usersApi = {
             uid,
             email,
             displayName,
-            role: (!hasSuperAdmin && email === envSuperAdminEmail) ? 'super-admin' : 'admin',
+            role: (!hasSuperAdmin && email === envSuperAdminEmail) ? 'super-admin' : 'user',
             createdAt: new Date()
         };
         await setDoc(userRef, newUser);
@@ -49,32 +49,8 @@ export const usersApi = {
         await setDoc(userRef, { role }, { merge: true });
     },
 
-    async transferSuperAdmin(currentUid: string, targetUid: string) {
-        // This is a sensitive operation - ideally should be a Cloud Function, 
-        // but for now we do it client-side as requested for simplicity in this stage.
-        const currentRef = doc(db, USERS_COLLECTION, currentUid);
-        const targetRef = doc(db, USERS_COLLECTION, targetUid);
-
-        await setDoc(currentRef, { role: 'admin' }, { merge: true });
-        await setDoc(targetRef, { role: 'super-admin' }, { merge: true });
-    },
-
     async getAllUsers(): Promise<UserProfile[]> {
         const snapshot = await getDocs(collection(db, USERS_COLLECTION));
         return snapshot.docs.map(doc => doc.data() as UserProfile);
-    },
-
-    async toggleBlockUser(uid: string, blocked: boolean) {
-        const userRef = doc(db, USERS_COLLECTION, uid);
-        await setDoc(userRef, { blocked }, { merge: true });
-    },
-
-    async incrementPapersUploaded(uid: string) {
-        const userRef = doc(db, USERS_COLLECTION, uid);
-        const snapshot = await getDoc(userRef);
-        if (snapshot.exists()) {
-            const current = snapshot.data() as UserProfile;
-            await setDoc(userRef, { papersUploaded: (current.papersUploaded || 0) + 1 }, { merge: true });
-        }
     }
 };

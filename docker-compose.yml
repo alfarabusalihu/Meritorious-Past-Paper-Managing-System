@@ -1,20 +1,20 @@
 version: '3.8'
 
 services:
-  mppms-web:
+  merit-series-web:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: mppms-production
+    container_name: merit-series-production
     ports:
       - "80:80"
     environment:
       - NODE_ENV=production
     restart: unless-stopped
     networks:
-      - mppms-network
+      - merit-series-network
     labels:
-      - "com.mppms.description=MPPMS Production Web Server"
+      - "com.merit-series.description=Merit series Production Web Server"
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
       interval: 30s
@@ -23,6 +23,5 @@ services:
       start_period: 40s
 
 networks:
-  mppms-network:
+  merit-series-network:
     driver: bridge
-

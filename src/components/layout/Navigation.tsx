@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { School, Language, ExpandMore, Person, Shield, Dashboard, Settings, LocalCafe, LogoutRounded, Menu, Close } from '@mui/icons-material'
+import { Link, useNavigate } from 'react-router-dom'
+import { GraduationCap, Languages, ChevronDown, User, Shield, LayoutDashboard, LogOut, Menu, X } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAuth } from '../../context/AuthContext'
 import { useState, useRef, useEffect } from 'react'
@@ -15,12 +15,13 @@ function cn(...inputs: ClassValue[]) {
 
 export function Navigation() {
     const { language, setLanguage, t } = useLanguage()
-    const { user, isAdmin, isSuperAdmin } = useAuth()
+    const { user, isSuperAdmin } = useAuth()
     const [isLangOpen, setIsLangOpen] = useState(false)
     const [isUserOpen, setIsUserOpen] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const langRef = useRef<HTMLDivElement>(null)
     const userRef = useRef<HTMLDivElement>(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -35,35 +36,46 @@ export function Navigation() {
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [])
 
+    const handlePapersClick = () => {
+        if (window.location.pathname === '/') {
+            document.getElementById('papers-section')?.scrollIntoView({ behavior: 'smooth' })
+        } else {
+            navigate('/#papers-section')
+        }
+    }
+
     return (
         <header className="sticky top-0 z-50 w-full border-b border-muted bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
             <div className="section-container flex h-20 items-center justify-between">
                 <div className="flex items-center gap-3">
                     <Link to="/" className="flex items-center gap-2 group">
                         <div className="p-1.5 bg-primary rounded-lg text-primary-foreground transform transition-transform group-hover:scale-110 shadow-lg shadow-primary/20">
-                            <School sx={{ fontSize: 24 }} />
+                            <GraduationCap size={24} />
                         </div>
                         <span className="font-bold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-                            MPPMS
+                            Merit Series
                         </span>
                     </Link>
                 </div>
 
                 <nav className="hidden md:flex items-center gap-8 text-sm font-bold uppercase tracking-widest text-secondary/70">
-                    <Link to="/" className="transition-all hover:text-primary border-b-2 border-transparent hover:border-primary py-1">
+                    <Link to="/" className="transition-all hover:text-primary border-b-2 border-transparent hover:border-primary py-1 uppercase">
+                        {t('nav.home')}
+                    </Link>
+                    <button
+                        onClick={handlePapersClick}
+                        className="transition-all hover:text-primary border-b-2 border-transparent hover:border-primary py-1 uppercase"
+                    >
                         {t('nav.papers')}
-                    </Link>
-                    <Link to="/about" className="transition-all hover:text-primary border-b-2 border-transparent hover:border-primary py-1">
-                        {t('nav.about')}
-                    </Link>
-                    <Link to="/contribute" className="transition-all hover:text-primary border-b-2 border-transparent hover:border-primary py-1 flex items-center gap-2">
-                        <LocalCafe sx={{ fontSize: 16 }} />
-                        Donate
-                    </Link>
-                    {isAdmin && (
-                        <Link to="/admin" className="text-primary hover:text-primary/80 transition-all flex items-center gap-2 font-bold border-b-2 border-transparent hover:border-primary py-1">
-                            <Shield sx={{ fontSize: 16 }} />
-                            Admin Panel
+                    </button>
+                    {isSuperAdmin && (
+                        <Link
+                            to="/admin"
+                            onMouseEnter={() => import('../pages/AdminDashboard')}
+                            className="text-primary hover:text-primary/80 transition-all flex items-center gap-2 font-bold border-b-2 border-transparent hover:border-primary py-1"
+                        >
+                            <Shield size={16} />
+                            {t('nav.admin')}
                         </Link>
                     )}
                 </nav>
@@ -74,20 +86,24 @@ export function Navigation() {
                         <button
                             onClick={() => setIsLangOpen(!isLangOpen)}
                             className="flex items-center gap-2 px-3 py-2 bg-muted hover:bg-muted/60 rounded-xl font-bold text-xs transition-all border border-transparent hover:border-primary/20"
+                            aria-label="Switch Language"
+                            aria-expanded={isLangOpen}
+                            aria-haspopup="true"
                         >
-                            <Language sx={{ fontSize: 16 }} className="text-primary" />
+                            <Languages size={16} className="text-primary" />
                             <span className="uppercase">{language}</span>
-                            <ExpandMore className={cn("h-3 w-3 transition-transform opacity-80", isLangOpen && "rotate-180")} />
+                            <ChevronDown className={cn("h-3 w-3 transition-transform opacity-80", isLangOpen && "rotate-180")} />
                         </button>
 
                         {isLangOpen && (
-                            <div className="absolute right-0 mt-2 w-32 bg-background border border-muted rounded-xl shadow-xl py-1 z-[100] animate-in fade-in slide-in-from-top-1 duration-200">
+                            <div className="absolute right-0 mt-2 w-32 bg-background border border-muted rounded-xl shadow-xl py-1 z-[100] animate-in fade-in slide-in-from-top-1 duration-200" role="menu">
                                 <button
                                     onClick={() => { setLanguage('en'); setIsLangOpen(false); }}
                                     className={cn(
                                         "w-full text-left px-4 py-2 text-sm font-bold hover:bg-muted transition-colors",
                                         language === 'en' && "text-primary bg-primary/5"
                                     )}
+                                    role="menuitem"
                                 >
                                     English
                                 </button>
@@ -97,6 +113,7 @@ export function Navigation() {
                                         "w-full text-left px-4 py-2 text-sm font-bold hover:bg-muted transition-colors",
                                         language === 'ta' && "text-primary bg-primary/5"
                                     )}
+                                    role="menuitem"
                                 >
                                     தமிழ்
                                 </button>
@@ -112,47 +129,26 @@ export function Navigation() {
                                     "flex items-center gap-2 px-3 h-10 rounded-full transition-all shadow-sm",
                                     isSuperAdmin
                                         ? "bg-secondary text-secondary-foreground border-2 border-secondary-foreground/20 shadow-secondary/20"
-                                        : isAdmin
-                                            ? "bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20"
-                                            : "bg-muted border border-muted text-foreground hover:bg-muted/80"
+                                        : "bg-muted border border-muted text-foreground hover:bg-muted/80"
                                 )}
+                                aria-label="User Menu"
+                                aria-expanded={isUserOpen}
+                                aria-haspopup="true"
                             >
-                                {isSuperAdmin ? <Shield sx={{ fontSize: 20 }} /> : isAdmin ? <Shield sx={{ fontSize: 20 }} /> : <Person sx={{ fontSize: 20 }} />}
-                                {isAdmin && !isSuperAdmin && (
-                                    <span className="text-sm font-bold hidden sm:inline max-w-[120px] truncate">
-                                        {user.displayName}
-                                    </span>
-                                )}
+                                {isSuperAdmin ? <Shield size={20} /> : <User size={20} />}
                             </button>
 
                             {isUserOpen && (
-                                <div className="absolute right-0 mt-3 w-48 bg-background border border-muted rounded-2xl shadow-2xl py-2 z-[100] animate-in fade-in slide-in-from-top-1 duration-200 overflow-hidden">
-                                    <div className="px-4 py-2 bg-muted/30 border-b border-muted mb-2">
-                                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">User Session</p>
-                                        <p className="text-sm font-bold text-foreground truncate">
-                                            {user?.displayName || 'User'}
-                                        </p>
-                                    </div>
-                                    {isAdmin && (
-                                        <Link
-                                            to="/admin"
-                                            onClick={() => setIsUserOpen(false)}
-                                            className="flex items-center gap-3 px-4 py-2 text-sm font-bold text-foreground hover:bg-muted/50 transition-all"
-                                        >
-                                            <Settings sx={{ fontSize: 18 }} />
-                                            Admin Dashboard
-                                        </Link>
-                                    )}
+                                <div className="absolute right-0 mt-3 w-48 bg-background border border-muted rounded-2xl shadow-2xl py-2 z-[100] animate-in fade-in slide-in-from-top-1 duration-200 overflow-hidden" role="menu">
                                     <button
                                         onClick={async () => {
-                                            localStorage.removeItem('isSystemAdmin')
-                                            localStorage.removeItem('adminEmail')
                                             await firebaseSignOut(auth)
                                             window.location.reload()
                                         }}
                                         className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-destructive hover:bg-destructive/5 transition-colors"
+                                        role="menuitem"
                                     >
-                                        <LogoutRounded className="h-4 w-4" />
+                                        <LogOut size={16} />
                                         {t('nav.logout')}
                                     </button>
                                 </div>
@@ -164,8 +160,10 @@ export function Navigation() {
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         className="p-2 md:hidden text-secondary hover:bg-muted rounded-xl transition-colors"
+                        aria-label={isMobileMenuOpen ? "Close Menu" : "Open Menu"}
+                        aria-expanded={isMobileMenuOpen}
                     >
-                        {isMobileMenuOpen ? <Close /> : <Menu />}
+                        {isMobileMenuOpen ? <X /> : <Menu />}
                     </button>
                 </div>
             </div>
@@ -180,23 +178,34 @@ export function Navigation() {
                         className="absolute top-[80px] left-0 w-full bg-background border-b border-muted shadow-2xl md:hidden z-40 overflow-hidden"
                     >
                         <div className="flex flex-col p-6 space-y-6">
-                            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3">
-                                <Dashboard sx={{ fontSize: 20 }} className="text-primary/60" />
+                            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3 uppercase tracking-widest">
+                                <LayoutDashboard size={20} className="text-primary/60" />
+                                {t('nav.home')}
+                            </Link>
+                            <button
+                                onClick={() => {
+                                    setIsMobileMenuOpen(false);
+                                    if (window.location.pathname === '/') {
+                                        document.getElementById('papers-section')?.scrollIntoView({ behavior: 'smooth' })
+                                    } else {
+                                        window.location.href = '/#papers-section'
+                                    }
+                                }}
+                                className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3 text-left w-full uppercase tracking-widest"
+                            >
+                                <User size={20} className="text-primary/60" />
                                 {t('nav.papers')}
-                            </Link>
-                            <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3">
-                                <Person sx={{ fontSize: 20 }} className="text-primary/60" />
-                                {t('nav.about')}
-                            </Link>
-                            <Link to="/contribute" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3">
-                                <LocalCafe sx={{ fontSize: 20 }} className="text-primary/60" />
-                                Donate
-                            </Link>
+                            </button>
 
-                            {isAdmin && (
-                                <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-primary flex items-center gap-3 py-4 border-t border-muted">
-                                    <Shield sx={{ fontSize: 20 }} />
-                                    Admin Panel
+                            {isSuperAdmin && (
+                                <Link
+                                    to="/admin"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    onMouseEnter={() => import('../pages/AdminDashboard')}
+                                    className="text-lg font-bold text-primary flex items-center gap-3 py-4 border-t border-muted"
+                                >
+                                    <Shield size={20} />
+                                    {t('nav.admin')}
                                 </Link>
                             )}
 

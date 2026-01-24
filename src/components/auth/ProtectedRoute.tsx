@@ -3,11 +3,10 @@ import { useAuth } from '../../context/AuthContext';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
-    requireSuperAdmin?: boolean;
 }
 
-export function ProtectedRoute({ children, requireSuperAdmin = false }: ProtectedRouteProps) {
-    const { user, loading, isAdmin, isSuperAdmin } = useAuth();
+export function ProtectedRoute({ children }: ProtectedRouteProps) {
+    const { user, loading, isSuperAdmin } = useAuth();
     const location = useLocation();
 
     if (loading) {
@@ -22,11 +21,7 @@ export function ProtectedRoute({ children, requireSuperAdmin = false }: Protecte
         return <Navigate to="/" state={{ from: location }} replace />;
     }
 
-    if (requireSuperAdmin && !isSuperAdmin) {
-        return <Navigate to="/admin" replace />;
-    }
-
-    if (!isAdmin) {
+    if (!isSuperAdmin) {
         return <Navigate to="/" replace />;
     }
 

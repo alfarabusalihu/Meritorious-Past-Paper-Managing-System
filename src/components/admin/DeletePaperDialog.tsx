@@ -1,6 +1,6 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
+import { Modal } from '../ui/Modal'
+import { AlertTriangle, Trash2 } from 'lucide-react'
 import { Button } from '../ui/Button'
-import { AlertTriangle } from 'lucide-react'
 
 interface DeletePaperDialogProps {
     open: boolean;
@@ -12,42 +12,47 @@ interface DeletePaperDialogProps {
 
 export function DeletePaperDialog({ open, paperTitle, loading, onClose, onConfirm }: DeletePaperDialogProps) {
     return (
-        <Dialog
-            open={open}
+        <Modal
+            isOpen={open}
             onClose={onClose}
-            PaperProps={{
-                sx: { borderRadius: '2rem', p: 2 }
-            }}
+            title="Delete Paper"
+            maxWidth="sm"
         >
-            <DialogTitle sx={{ fontWeight: 900, display: 'flex', itemsCenter: 'center', gap: 2 }}>
-                <div className="p-2 bg-destructive/10 text-destructive rounded-xl">
-                    <AlertTriangle size={24} />
+            <div className="p-6 space-y-6">
+                <div className="flex items-center gap-4 p-4 bg-rose-50 rounded-2xl text-rose-800">
+                    <div className="p-2 bg-rose-100 rounded-xl">
+                        <AlertTriangle className="h-6 w-6 text-rose-600" />
+                    </div>
+                    <div>
+                        <h4 className="font-bold">Confirm Deletion</h4>
+                        <p className="text-sm opacity-80">This action cannot be undone.</p>
+                    </div>
                 </div>
-                Confirm Deletion
-            </DialogTitle>
-            <DialogContent>
+
                 <p className="text-muted-foreground font-medium">
-                    Are you sure you want to delete <strong className="text-foreground">"{paperTitle}"</strong>?
-                    This action will move the paper to the Recycle Bin. Super Admins can restore it later.
+                    Are you sure you want to delete <span className="text-foreground font-bold">"{paperTitle}"</span>?
                 </p>
-            </DialogContent>
-            <DialogActions sx={{ p: 3, gap: 2 }}>
-                <Button
-                    variant="ghost"
-                    onClick={onClose}
-                    className="flex-1 font-bold rounded-xl"
-                >
-                    Cancel
-                </Button>
-                <Button
-                    variant="danger"
-                    onClick={onConfirm}
-                    isLoading={loading}
-                    className="flex-1 font-bold rounded-xl h-12"
-                >
-                    Delete Paper
-                </Button>
-            </DialogActions>
-        </Dialog>
-    )
+
+                <div className="flex gap-4">
+                    <Button
+                        variant="secondary"
+                        onClick={onClose}
+                        className="flex-1 h-12 rounded-xl font-bold"
+                        disabled={loading}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="danger"
+                        onClick={onConfirm}
+                        className="flex-1 h-12 rounded-xl font-bold"
+                        disabled={loading}
+                    >
+                        {loading ? 'Deleting...' : 'Delete Paper'}
+                        {!loading && <Trash2 className="ml-2 h-4 w-4" />}
+                    </Button>
+                </div>
+            </div>
+        </Modal>
+    );
 }

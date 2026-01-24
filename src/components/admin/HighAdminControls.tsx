@@ -1,43 +1,20 @@
 import { useState, useEffect } from 'react'
-import { usersApi } from '../../lib/firebase/users'
-import { configsApi, FilterConfig, SocialConfig, DonationConfig } from '../../lib/firebase/configs'
-import { donationsApi } from '../../lib/firebase/donations'
-import { UserProfile, Contribution } from '../../lib/firebase/schema'
-import { Tabs, Tab, Box, Snackbar, Alert } from '@mui/material'
-import { People, Settings, LocalCafe } from '@mui/icons-material'
-import { useAuth } from '../../context/AuthContext'
-import { UserManager } from './tabs/UserManager'
+import { configsApi, FilterConfig, SocialConfig } from '../../lib/firebase/configs'
+import { Alert } from '../ui/Alert'
 import { ConfigManager } from './tabs/ConfigManager'
-import { DonationManager } from './tabs/DonationManager'
-
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
-    value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-    const { children, value, index, ...other } = props;
-    return (
-        <div role="tabpanel" hidden={value !== index} {...other}>
-            {value === index && (
-                <Box sx={{ p: { xs: 2, sm: 3 } }}>
-                    {children}
-                </Box>
-            )}
-        </div>
-    );
-}
+import { useLanguage } from '../../context/LanguageContext'
 
 export function HighAdminControls() {
-    const { user: currentUser } = useAuth()
-    const [tabValue, setTabValue] = useState(0)
-    const [users, setUsers] = useState<UserProfile[]>([])
+    const { t } = useLanguage()
     const [socials, setSocials] = useState<SocialConfig | null>(null)
-    const [donations, setDonations] = useState<Contribution[]>([])
-    const [donationConfig, setDonationConfig] = useState<DonationConfig>({ coffeePrice: 5, enabled: true })
-    const [filterTexts, setFilterTexts] = useState<Record<string, string>>({})
+    const [filterTexts, setFilterTexts] = useState<Record<string, string>>({
+        subjects: '',
+        languages: '',
+        years: ''
+    })
     const [loading, setLoading] = useState(false)
+    const [savingFilters, setSavingFilters] = useState(false)
+    const [savingSocials, setSavingSocials] = useState(false)
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' })
 
     useEffect(() => {
@@ -47,23 +24,16 @@ export function HighAdminControls() {
     const loadData = async () => {
         setLoading(true)
         try {
-            const [u, f, s, d, dc] = await Promise.all([
-                usersApi.getAllUsers(),
+            const [f, s] = await Promise.all([
                 configsApi.getFilters(),
-                configsApi.getSocials(),
-                donationsApi.getContributions(),
-                configsApi.getDonationSettings()
+                configsApi.getSocials()
             ])
-            setUsers(u)
-            const texts: Record<string, string> = {}
-            Object.keys(f).forEach(key => {
-                const k = key as keyof FilterConfig
-                if (f[k]) texts[key] = f[k].join(', ')
+            setFilterTexts({
+                subjects: f.subjects.join(', '),
+                languages: f.languages.join(', '),
+                years: f.years.join(', ')
             })
-            setFilterTexts(texts)
             setSocials(s)
-            setDonations(d)
-            setDonationConfig(dc)
         } catch (error) {
             console.error(error)
         } finally {
@@ -71,133 +41,77 @@ export function HighAdminControls() {
         }
     }
 
-    const handleTransferOwnership = async (targetUid: string) => {
-        if (!currentUser) return
-        if (!window.confirm("Are you sure? You will lose Super Admin status.")) return
-
-        setLoading(true)
-        try {
-            await usersApi.transferSuperAdmin(currentUser.uid, targetUid)
-            setSnackbar({ open: true, message: 'Ownership transferred! Reloading...', severity: 'success' })
-            setTimeout(() => window.location.reload(), 2000)
-        } catch {
-            setSnackbar({ open: true, message: 'Transfer failed', severity: 'error' })
-        } finally {
-            setLoading(false)
-        }
+    const handleUpdateFilterList = (key: string, value: string) => {
+        setFilterTexts(prev => ({ ...prev, [key]: value }))
     }
 
     const handleSaveFilters = async () => {
-        if (!filterTexts) return
-        setLoading(true)
+        setSavingFilters(true)
         try {
-            const newFilters: Record<string, string[]> = {}
-            Object.keys(filterTexts).forEach(key => {
-                newFilters[key] = filterTexts[key].split(',').map(s => s.trim()).filter(Boolean)
-            })
-            await configsApi.updateFilters(newFilters as unknown as FilterConfig)
-            setSnackbar({ open: true, message: 'Filters updated successfully!', severity: 'success' })
+            const updatedFilters: FilterConfig = {
+                subjects: filterTexts.subjects.split(',').map(s => s.trim()).filter(Boolean),
+                languages: filterTexts.languages.split(',').map(s => s.trim()).filter(Boolean),
+                years: filterTexts.years.split(',').map(s => s.trim()).filter(Boolean)
+            }
+            await configsApi.updateFilters(updatedFilters)
+            setSnackbar({ open: true, message: t('admin.controls.success.filters'), severity: 'success' })
         } catch {
-            setSnackbar({ open: true, message: 'Failed to update filters', severity: 'error' })
+            setSnackbar({ open: true, message: t('admin.controls.error.filters'), severity: 'error' })
         } finally {
-            setLoading(false)
+            setSavingFilters(false)
         }
     }
 
     const handleSaveSocials = async () => {
         if (!socials) return
-        setLoading(true)
+        setSavingSocials(true)
         try {
             await configsApi.updateSocials(socials)
-            setSnackbar({ open: true, message: 'Social links updated successfully!', severity: 'success' })
+            setSnackbar({ open: true, message: t('admin.controls.success.socials'), severity: 'success' })
         } catch {
-            setSnackbar({ open: true, message: 'Failed to update social links', severity: 'error' })
+            setSnackbar({ open: true, message: t('admin.controls.error.socials'), severity: 'error' })
         } finally {
-            setLoading(false)
+            setSavingSocials(false)
         }
     }
 
-    const handleSaveDonationConfig = async () => {
-        setLoading(true)
-        try {
-            await configsApi.updateDonationSettings(donationConfig)
-            setSnackbar({ open: true, message: 'Donation settings updated successfully!', severity: 'success' })
-        } catch {
-            setSnackbar({ open: true, message: 'Failed to update donation settings', severity: 'error' })
-        } finally {
-            setLoading(false)
-        }
+    // Removed handleSaveDonationConfig
+
+    if (loading) {
+        return (
+            <div className="p-20 text-center">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                <p className="mt-4 font-bold text-muted-foreground">{t('admin.controls.loading')}</p>
+            </div>
+        )
     }
 
     return (
         <div className="bg-white min-h-[500px]">
-            <div className="border-b border-muted bg-muted/10 sticky top-0 z-30">
-                <Tabs
-                    value={tabValue}
-                    onChange={(_, v) => setTabValue(v)}
-                    variant="scrollable"
-                    scrollButtons="auto"
-                    allowScrollButtonsMobile
-                    sx={{
-                        '& .MuiTab-root': {
-                            minHeight: 64,
-                            textTransform: 'none',
-                            fontWeight: 700,
-                            fontSize: '0.9rem'
-                        }
-                    }}
-                >
-                    <Tab icon={<People />} label="Users" iconPosition="start" />
-                    <Tab icon={<Settings />} label="Config" iconPosition="start" />
-                    <Tab icon={<LocalCafe />} label="Donations" iconPosition="start" />
-                </Tabs>
-            </div>
-
-            <TabPanel value={tabValue} index={0}>
-                <UserManager
-                    users={users}
-                    onUserUpdate={(uid, blocked) => setUsers(users.map(u => u.uid === uid ? { ...u, blocked } : u))}
-                    onTransferOwnership={handleTransferOwnership}
-                />
-            </TabPanel>
-
-            <TabPanel value={tabValue} index={1}>
+            <div className="p-6">
                 <ConfigManager
                     filterTexts={filterTexts}
                     socials={socials}
-                    loading={loading}
-                    onUpdateFilterList={(key, value) => setFilterTexts(prev => ({ ...prev, [key]: value }))}
+                    savingFilters={savingFilters}
+                    savingSocials={savingSocials}
+                    onUpdateFilterList={handleUpdateFilterList}
                     onUpdateSocials={setSocials}
                     onSaveFilters={handleSaveFilters}
                     onSaveSocials={handleSaveSocials}
-                    onSnackbar={(message, severity) => setSnackbar({ open: true, message, severity })}
+                    onSnackbar={(m, s) => setSnackbar({ open: true, message: m, severity: s })}
                 />
-            </TabPanel>
+            </div>
 
-            <TabPanel value={tabValue} index={2}>
-                <DonationManager
-                    donations={donations}
-                    donationConfig={donationConfig}
-                    loading={loading}
-                    onUpdateDonationConfig={setDonationConfig}
-                    onSaveDonationConfig={handleSaveDonationConfig}
-                />
-            </TabPanel>
-
-            <Snackbar
-                open={snackbar.open}
-                autoHideDuration={4000}
-                onClose={() => setSnackbar({ ...snackbar, open: false })}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
-                <Alert
-                    onClose={() => setSnackbar({ ...snackbar, open: false })}
-                    severity={snackbar.severity}
-                    sx={{ borderRadius: '1rem', fontWeight: 700 }}
-                >
-                    {snackbar.message}
-                </Alert>
-            </Snackbar>
+            {snackbar.open && (
+                <div className="fixed bottom-8 right-8 z-[110] w-full max-w-md px-4 animate-in slide-in-from-bottom-4">
+                    <Alert
+                        severity={snackbar.severity}
+                        onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    >
+                        {snackbar.message}
+                    </Alert>
+                </div>
+            )}
         </div>
     )
 }

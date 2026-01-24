@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { onAuthStateChanged, User, signOut } from 'firebase/auth';
+import { onAuthStateChanged, User, signOut, setPersistence, browserSessionPersistence } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { usersApi } from '../lib/firebase/users';
 import { UserProfile } from '../lib/firebase/schema';
@@ -9,7 +9,6 @@ interface AuthContextType {
     user: User | null;
     profile: UserProfile | null;
     loading: boolean;
-    isAdmin: boolean;
     isSuperAdmin: boolean;
 }
 
@@ -23,8 +22,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const handleLogout = useCallback(async () => {
         try {
             await signOut(auth);
-            // Optional: You could redirect here or show a toast "Logged out due to inactivity"
-            // but the state change will handle the UI update mostly.
+            window.location.href = '/';
         } catch (error) {
             console.error('Auto-logout failed:', error);
         }
@@ -35,6 +33,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useInactivity(handleLogout, 900000, !!user);
 
     useEffect(() => {
+        // Enforce Session Persistence (Logout on Tab Close)
+        setPersistence(auth, browserSessionPersistence).catch(console.error);
+
         const unsubscribe = onAuthStateChanged(auth, async (u) => {
             setUser(u);
             if (u) {
@@ -57,7 +58,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         profile,
         loading,
-        isAdmin: !!user, // Treat any logged-in user as an admin as per requirements
         isSuperAdmin: profile?.role === 'super-admin'
     };
 

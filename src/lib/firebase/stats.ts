@@ -3,50 +3,66 @@ import { doc, getDoc, updateDoc, increment, setDoc } from 'firebase/firestore'
 
 export interface SystemStats {
     visitors: number
-    contributors: number
     papersEngagement: number
 }
 
 export const statsApi = {
     async getStats(): Promise<SystemStats> {
-        const docRef = doc(db, 'stats', 'global')
-        const snap = await getDoc(docRef)
-        if (snap.exists()) {
-            return snap.data() as SystemStats
+        try {
+            const docRef = doc(db, 'stats', 'global')
+            const snap = await getDoc(docRef)
+            if (snap.exists()) {
+                return snap.data() as SystemStats
+            }
+            const defaults = { visitors: 0, papersEngagement: 0 }
+            await setDoc(docRef, defaults)
+            return defaults
+        } catch (error) {
+            console.error('Failed to get stats:', error)
+            return { visitors: 0, papersEngagement: 0 }
         }
-        const defaults = { visitors: 0, contributors: 0, papersEngagement: 0 }
-        await setDoc(docRef, defaults)
-        return defaults
     },
 
     async incrementVisitors() {
         const docRef = doc(db, 'stats', 'global')
-
-        // Simple deduplication using localStorage is done in the component.
-        // This function just performs the increment.
-        await updateDoc(docRef, {
-            visitors: increment(1)
-        })
+        try {
+            const snap = await getDoc(docRef)
+            if (!snap.exists()) {
+                await setDoc(docRef, { visitors: 1, papersEngagement: 0 })
+            } else {
+                await updateDoc(docRef, {
+                    visitors: increment(1)
+                })
+            }
+        } catch (error) {
+            console.error('Failed to increment visitors:', error)
+        }
     },
 
     async incrementEngagement() {
         const docRef = doc(db, 'stats', 'global')
-        await updateDoc(docRef, {
-            papersEngagement: increment(1)
-        })
-    },
-
-    async incrementContributors() {
-        const docRef = doc(db, 'stats', 'global')
-        await updateDoc(docRef, {
-            contributors: increment(1)
-        })
+        try {
+            const snap = await getDoc(docRef)
+            if (!snap.exists()) {
+                await setDoc(docRef, { visitors: 0, papersEngagement: 1 })
+            } else {
+                await updateDoc(docRef, {
+                    papersEngagement: increment(1)
+                })
+            }
+        } catch (error) {
+            console.error('Failed to increment engagement:', error)
+        }
     },
 
     async resetVisitors() {
         const docRef = doc(db, 'stats', 'global')
-        await updateDoc(docRef, {
-            visitors: 0
-        })
+        try {
+            await updateDoc(docRef, {
+                visitors: 0
+            })
+        } catch (error) {
+            console.error('Failed to reset visitors:', error)
+        }
     }
 }

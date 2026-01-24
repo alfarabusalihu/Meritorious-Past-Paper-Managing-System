@@ -21,7 +21,7 @@ export const generateReceipt = (contribution: Contribution) => {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont("helvetica", "bold");
-    doc.text("MPPMS Donation Receipt", 20, 25);
+    doc.text("Merit series Donation Receipt", 20, 25);
 
     // Organization Info (Right aligned)
     doc.setFontSize(10);
@@ -88,8 +88,8 @@ export const generateReceipt = (contribution: Contribution) => {
     doc.setFontSize(9);
     doc.setTextColor(150, 150, 150);
     doc.text("This receipt is automatically generated and is valid for your records.", 105, 280, { align: 'center' });
-    doc.text("MPPMS - Meritorious Past Paper Management System", 105, 285, { align: 'center' });
+    doc.text("Merit series - Meritorious Past Paper Management System", 105, 285, { align: 'center' });
 
     // Save
-    doc.save(`MPPMS_Receipt_${contribution.receiptId || 'Donation'}.pdf`);
+    doc.save(`Merit_series_Receipt_${contribution.receiptId || 'Donation'}.pdf`);
 };

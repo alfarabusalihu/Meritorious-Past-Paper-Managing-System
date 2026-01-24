@@ -7,10 +7,17 @@ export interface Paper {
     title: string;
     subject: string;
     year: number;
-    examType: string; // 'Final', 'Midterm', etc.
-    part: string;
     language: string;
-    fileUrl: string;
+
+    // Soft Delete Status
+    status: 'active' | 'deleted';
+
+    // Multi-part file support
+    files: {
+        part1?: string;
+        part2?: string;
+        scheme?: string;
+    };
 
     // Search Optimization
     keywords: string[]; // ['m', 'ma', 'math', '2023']
@@ -27,20 +34,14 @@ export interface Paper {
     createdAt: Timestamp | Date; // Firestore Timestamp
     updatedAt?: Timestamp | Date;
 
-    // Stats
     downloadCount?: number; // Track downloads
-
-    // Soft Delete Metadata
-    deleted?: boolean;
-    deletedAt?: Timestamp | Date;
-    deletedBy?: string;
 }
 
 export interface UserProfile {
     uid: string;
     email: string;
     displayName: string;
-    role: 'admin' | 'user' | 'super-admin';
+    role: 'super-admin' | 'user';
     blocked?: boolean;
     photoURL?: string;
     papersUploaded?: number; // Track contributor stats
@@ -63,8 +64,6 @@ export interface Contribution {
 export interface FilterOptions {
     subject?: string;
     year?: number;
-    examType?: string;
-    part?: string;
     language?: string;
     searchQuery?: string;
 }

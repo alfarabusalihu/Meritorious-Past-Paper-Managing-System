@@ -1,86 +1,83 @@
-import React, { useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { useEffect } from 'react'
+import { clsx } from 'clsx'
 
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs))
-}
-
-export interface ModalProps {
+interface ModalProps {
     isOpen: boolean
     onClose: () => void
     title?: string
     children: React.ReactNode
-    className?: string
+    maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+    showCloseButton?: boolean
 }
 
-export const Modal = ({ isOpen, onClose, title, children, className }: ModalProps) => {
-    const dialogRef = useRef<HTMLDialogElement>(null)
-
+export function Modal({
+    isOpen,
+    onClose,
+    title,
+    children,
+    maxWidth = 'md',
+    showCloseButton = true
+}: ModalProps) {
     useEffect(() => {
-        const dialog = dialogRef.current
-        if (!dialog) return
-
         if (isOpen) {
-            if (!dialog.open) dialog.showModal()
+            document.body.style.overflow = 'hidden'
         } else {
-            if (dialog.open) dialog.close()
+            document.body.style.overflow = 'unset'
+        }
+        return () => {
+            document.body.style.overflow = 'unset'
         }
     }, [isOpen])
 
-    // Handle escape key and backdrop click
-    useEffect(() => {
-        const dialog = dialogRef.current
-        if (!dialog) return
-
-        const handleCancel = (e: Event) => {
-            e.preventDefault()
-            onClose()
-        }
-
-        const handleClick = (e: MouseEvent) => {
-            const rect = dialog.getBoundingClientRect()
-            if (
-                e.clientX < rect.left ||
-                e.clientX > rect.right ||
-                e.clientY < rect.top ||
-                e.clientY > rect.bottom
-            ) {
-                onClose()
-            }
-        }
-
-        dialog.addEventListener('cancel', handleCancel)
-        dialog.addEventListener('click', handleClick)
-        return () => {
-            dialog.removeEventListener('cancel', handleCancel)
-            dialog.removeEventListener('click', handleClick)
-        }
-    }, [onClose])
+    const maxWidthClasses = {
+        sm: 'max-w-sm max-h-[90vh]',
+        md: 'max-w-md max-h-[90vh]',
+        lg: 'max-w-lg max-h-[90vh]',
+        xl: 'max-w-5xl max-h-[90vh]',
+        full: 'max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-4rem)] h-[calc(100vh-2rem)] sm:h-[calc(100vh-4rem)]'
+    }
 
     return (
-        <dialog
-            ref={dialogRef}
-            className={cn(
-                "fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm transition-all duration-300 pointer-events-none group-data-[open]:pointer-events-auto",
-                className
-            )}
-            onClick={(e) => e.target === e.currentTarget && onClose()}
-        >
-            <div className="bg-card w-full max-w-5xl max-h-[90vh] rounded-[2rem] shadow-2xl overflow-hidden border border-muted relative group-data-[open]:animate-in group-data-[open]:zoom-in-95 group-data-[open]:duration-300">
-                <div className="flex items-center justify-between p-4 border-b border-muted">
-                    {title && <h3 className="text-lg font-bold text-foreground px-2">{title}</h3>}
-                    <button
+        <AnimatePresence>
+            {isOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground"
-                        aria-label="Close modal"
+                        className="absolute inset-0 bg-secondary/40 backdrop-blur-sm"
+                    />
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        className={clsx(
+                            "relative w-full bg-card rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col",
+                            maxWidthClasses[maxWidth]
+                        )}
                     >
-                        <X className="h-5 w-5" />
-                    </button>
+                        {(title || showCloseButton) && (
+                            <div className="flex items-center justify-between p-6 border-b border-muted shrink-0">
+                                {title && <h3 className="text-xl font-bold text-foreground">{title}</h3>}
+                                {showCloseButton && (
+                                    <button
+                                        onClick={onClose}
+                                        className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                        <div className="overflow-y-auto flex-1">
+                            {children}
+                        </div>
+                    </motion.div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-6">{children}</div>
-            </div>
-        </dialog>
+            )}
+        </AnimatePresence>
     )
 }

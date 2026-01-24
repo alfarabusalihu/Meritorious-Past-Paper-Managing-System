@@ -8,10 +8,12 @@ import { CheckoutForm } from '../donation/CheckoutForm'
 import { DonationPitch } from '../donation/DonationPitch'
 import { DonationSuccess } from '../donation/DonationSuccess'
 import { Contribution } from '../../lib/firebase/schema'
+import { useLanguage } from '../../context/LanguageContext'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_TYooMQauvdEDq54NiTphI7jx')
 
 export function Contribute() {
+    const { t } = useLanguage()
     const [coffeePrice, setCoffeePrice] = useState(5)
     const [selectedDetail, setSelectedDetail] = useState(3)
     const [customAmount, setCustomAmount] = useState('')
@@ -54,10 +56,10 @@ export function Contribute() {
                     <div className="mb-8 flex items-center justify-between">
                         <h3 className="text-2xl font-bold text-secondary flex items-center gap-3">
                             <CreditCard className="text-primary" />
-                            Payment Details
+                            {t('contribute.payment.title')}
                         </h3>
                         <div className="text-right">
-                            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Total to pay</p>
+                            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('contribute.payment.total')}</p>
                             <p className="text-2xl font-bold text-secondary">${currentAmount.toFixed(2)}</p>
                         </div>
                     </div>

@@ -19,7 +19,7 @@ export function Footer() {
                             <div className="p-2 bg-primary rounded-xl text-primary-foreground shadow-lg shadow-primary/20">
                                 <span className="font-bold text-xl px-1">M</span>
                             </div>
-                            <span className="font-bold text-2xl tracking-tighter text-white">MPPMS</span>
+                            <span className="font-bold text-2xl tracking-tighter text-white">Merit series</span>
                         </div>
                         <p className="text-secondary-foreground/60 text-sm font-medium max-w-sm leading-relaxed">
                             The ultimate Meritorious Past Paper Management System for students and educators. Designed for excellence and academic success.
@@ -53,7 +53,7 @@ export function Footer() {
 
                         <div className="flex flex-col items-center md:items-end gap-2">
                             <p className="text-[10px] text-secondary-foreground/40 font-bold uppercase tracking-[0.3em]">
-                                © {new Date().getFullYear()} MPPMS Archive • Sri Lanka
+                                © Since 2020 Merit series Archive • Sri Lanka
                             </p>
                             <div className="h-1 w-12 bg-primary rounded-full" />
                         </div>

@@ -1,20 +1,22 @@
 export const translations: Record<string, unknown> = {
     en: {
         nav: {
+            home: "Home",
             papers: "Papers",
             about: "About",
+            admin: "Admin Panel",
             signIn: "Sign In",
             logout: "Logout",
             profile: "User Profile"
         },
         hero: {
-            eyebrow: "Meritorious Past Paper Management System",
+            eyebrow: "Meritorious",
             title: {
-                main: "Master Your",
-                highlight: "Exams",
-                sub: "with Ease"
+                main: "Merit",
+                highlight: "Series",
+                sub: ""
             },
-            description: "Access a comprehensive database of past papers, categorized and filtered for your academic success. All in one place.",
+            description: "Master your exams with ease. Access a comprehensive database of past papers, categorized and filtered for your academic success.",
             cta: {
                 primary: "See Papers",
                 secondary: "Contribute"
@@ -25,10 +27,9 @@ export const translations: Record<string, unknown> = {
             search: "Search papers...",
             reset: "Reset Filters",
             placeholders: {
-                subject: "All Subjects",
-                year: "All Years",
-                category: "All Categories",
-                part: "All Parts"
+                subject: "Subjects",
+                year: "Years",
+                language: "Languages"
             }
         },
         papers: {
@@ -53,7 +54,7 @@ export const translations: Record<string, unknown> = {
             hero: {
                 title: "Empowering Students Through",
                 highlight: "Organized Knowledge",
-                description: "MPPMS is a modern document management system designed to make past paper accessibility seamless, fast, and reliable for students and educators worldwide."
+                description: "Merit series is a modern document management system designed to make past paper accessibility seamless, fast, and reliable for students and educators worldwide."
             },
             features: [
                 {
@@ -87,9 +88,7 @@ export const translations: Record<string, unknown> = {
             },
             form: {
                 year: "Publication Year",
-                category: "Resource Type",
                 language: "Language",
-                part: "Academic Part",
                 name: "Display Name",
                 subject: "Academic Subject",
                 placeholder: {
@@ -109,12 +108,48 @@ export const translations: Record<string, unknown> = {
                     saveError: "Failed to save paper"
                 }
             }
+        },
+        admin: {
+            dashboard: {
+                title: "Admin Controls",
+                subtitle: "Manage and organize your paper database.",
+                systemConfig: "System Config",
+                managedPapers: "Managed Papers"
+            },
+            controls: {
+                title: "System Controls",
+                loading: "Loading system controls...",
+                success: {
+                    filters: "Filters updated successfully!",
+                    socials: "Social links updated successfully!"
+                },
+                error: {
+                    filters: "Failed to update filters",
+                    socials: "Failed to update social links"
+                }
+            }
+        },
+        contribute: {
+            title: "Support The Project",
+            pitch: {
+                main: "Buy us a coffee,",
+                highlight: "fuel the mission.",
+                description: "Merit series is free and open-source. Your contributions help cover server costs and encourage further development of educational tools."
+            },
+            or: "Or custom amount",
+            customPlaceholder: "Enter custom amount",
+            payment: {
+                title: "Payment Details",
+                total: "Total to pay"
+            }
         }
     },
     ta: {
         nav: {
+            home: "முகப்பு",
             papers: "வினாத்தாள்கள்",
             about: "பற்றி",
+            admin: "நிர்வாக குழு",
             signIn: "உள்நுழைய",
             logout: "வெளியேறு",
             profile: "பயனர் விவரம்"
@@ -137,10 +172,9 @@ export const translations: Record<string, unknown> = {
             search: "தேடுக...",
             reset: "வடிப்பான்களை மீட்டமை",
             placeholders: {
-                subject: "அனைத்து பாடங்களும்",
-                year: "அனைத்து ஆண்டுகளும்",
-                category: "அனைத்து வகைகளும்",
-                part: "அனைத்து பிரிவுகளும்"
+                subject: "பாடங்கள்",
+                year: "ஆண்டுகள்",
+                language: "மொழிகள்"
             }
         },
         papers: {
@@ -165,7 +199,7 @@ export const translations: Record<string, unknown> = {
             hero: {
                 title: "மாணவர்களை மேம்படுத்துதல்",
                 highlight: "ஒழுங்கமைக்கப்பட்ட அறிவு",
-                description: "MPPMS என்பது வினாத்தாள் அணுகலை எளிமையாகவும், வேகமாகவும் மற்றும் நம்பகமானதாகவும் மாற்ற வடிவமைக்கப்பட்ட ஒரு நவீன ஆவண மேலாண்மை அமைப்பாகும்."
+                description: "Merit series என்பது வினாத்தாள் அணுகலை எளிமையாகவும், வேகமாகவும் மற்றும் நம்பகமானதாகவும் மாற்ற வடிவமைக்கப்பட்ட ஒரு நவீன ஆவண மேலாண்மை அமைப்பாகும்."
             },
             features: [
                 {
@@ -199,9 +233,7 @@ export const translations: Record<string, unknown> = {
             },
             form: {
                 year: "வெளியிடப்பட்ட ஆண்டு",
-                category: "ஆதார வகை",
                 language: "மொழி",
-                part: "பகுதி",
                 name: "பெயர்",
                 subject: "பாடம்",
                 placeholder: {
@@ -220,6 +252,40 @@ export const translations: Record<string, unknown> = {
                     saveSuccess: "வினாத்தாள் வெற்றிகரமாக சேமிக்கப்பட்டது",
                     saveError: "வினாத்தாளை சேமிக்க முடியவில்லை"
                 }
+            }
+        },
+        admin: {
+            dashboard: {
+                title: "நிர்வாகக் கட்டுப்பாடுகள்",
+                subtitle: "உங்கள் வினாத்தாள் தரவுத்தளத்தை நிர்வகிக்கவும் மற்றும் ஒழுங்கமைக்கவும்.",
+                systemConfig: "கணினி கட்டமைப்பு",
+                managedPapers: "நிர்வகிக்கப்படும் தாள்கள்"
+            },
+            controls: {
+                title: "கணினி கட்டுப்பாடுகள்",
+                loading: "கணினி கட்டுப்பாடுகள் ஏற்றப்படுகின்றன...",
+                success: {
+                    filters: "வடிப்பான்கள் வெற்றிகரமாக புதுப்பிக்கப்பட்டன!",
+                    socials: "சமூக இணைப்புகள் வெற்றிகரமாக புதுப்பிக்கப்பட்டன!"
+                },
+                error: {
+                    filters: "வடிப்பான்களைப் புதுப்பிக்க முடியவில்லை",
+                    socials: "சமூக இணைப்புகளைப் புதுப்பிக்க முடியவில்லை"
+                }
+            }
+        },
+        contribute: {
+            title: "திட்டத்தை ஆதரிக்கவும்",
+            pitch: {
+                main: "எங்களுக்கு ஒரு காபி வாங்கித் தாருங்கள்,",
+                highlight: "பணியை ஊக்கப்படுத்துங்கள்.",
+                description: "Merit series இலவசம் மற்றும் திறந்த மூலமாகும். உங்கள் பங்களிப்புகள் சேவையக செலவுகளை ஈடுகட்டவும், கல்வி கருவிகளின் மேம்பாட்டை ஊக்குவிக்கவும் உதவுகின்றன."
+            },
+            or: "அல்லது தனிப்பயன் தொகை",
+            customPlaceholder: "தொகையை உள்ளிடவும்",
+            payment: {
+                title: "கட்டண விவரங்கள்",
+                total: "செலுத்த வேண்டிய மொத்தம்"
             }
         }
     }

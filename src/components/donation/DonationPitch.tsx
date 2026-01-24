@@ -1,4 +1,5 @@
 import { Coffee, CheckCircle } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 
 interface DonationPitchProps {
     coffeePrice: number;
@@ -15,20 +16,22 @@ export function DonationPitch({
     customAmount,
     setCustomAmount
 }: DonationPitchProps) {
+    const { t } = useLanguage()
+
     return (
         <div className="space-y-8 lg:sticky lg:top-32">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100/50 text-yellow-700 rounded-full font-bold text-xs uppercase tracking-widest">
                 <Coffee size={14} strokeWidth={3} />
-                Support The Project
+                {t('contribute.title')}
             </div>
 
             <div className="space-y-4">
                 <h1 className="text-5xl font-bold text-secondary leading-[1.1] tracking-tight">
-                    Buy us a coffee,<br />
-                    <span className="text-primary transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">fuel the mission.</span>
+                    {t('contribute.pitch.main')}<br />
+                    <span className="text-primary transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">{t('contribute.pitch.highlight')}</span>
                 </h1>
                 <p className="text-lg text-muted-foreground font-medium leading-relaxed max-w-lg">
-                    MPPMS is free and open-source. Your contributions help cover server costs and encourage further development of educational tools.
+                    {t('contribute.pitch.description')}
                 </p>
             </div>
 
@@ -55,14 +58,14 @@ export function DonationPitch({
 
             <div className="relative">
                 <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-muted"></span></div>
-                <div className="relative flex justify-center text-xs uppercase"><span className="bg-muted/5 px-2 text-muted-foreground font-bold">Or custom amount</span></div>
+                <div className="relative flex justify-center text-xs uppercase"><span className="bg-muted/5 px-2 text-muted-foreground font-bold">{t('contribute.or')}</span></div>
             </div>
 
             <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground">$</span>
                 <input
                     type="number"
-                    placeholder="Enter custom amount"
+                    placeholder={t('contribute.customPlaceholder')}
                     value={customAmount}
                     onChange={(e) => { setCustomAmount(e.target.value); setSelectedDetail(0); }}
                     className="w-full h-16 pl-10 pr-6 rounded-2xl border-2 border-muted bg-white text-xl font-bold focus:border-primary focus:ring-0 outline-none transition-all"
