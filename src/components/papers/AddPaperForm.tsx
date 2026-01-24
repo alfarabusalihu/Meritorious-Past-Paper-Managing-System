@@ -140,8 +140,6 @@ export function AddPaperForm() {
             filesToUpload.sort((a, b) => a.file.size - b.file.size);
 
             // 3. Sequential Upload (Strictly 1 at a time)
-            const totalFiles = filesToUpload.length;
-            let completedFiles = 0;
 
             for (const item of filesToUpload) {
                 // Update local progress to show WHICH file is currently uploading
@@ -155,7 +153,6 @@ export function AddPaperForm() {
                 });
 
                 activeFiles[item.key as keyof typeof activeFiles] = res.url;
-                completedFiles++;
             }
 
             // Ensure 100% at the end
