@@ -69,7 +69,6 @@ export function AddPaperForm() {
         }
     }
 
-    const [totalProgress, setTotalProgress] = useState(0)
 
     const validateForm = () => {
         const errors: { [key: string]: string } = {}
@@ -120,7 +119,6 @@ export function AddPaperForm() {
         }
 
         setLoading(true)
-        setTotalProgress(0)
         setProgress({})
 
         try {
@@ -150,10 +148,7 @@ export function AddPaperForm() {
                 setProgress(prev => ({ ...prev, [item.key]: 0 }));
 
                 const res = await papersApi.uploadFile(item.file, uploadConfig, (percentage) => {
-                    // Calculate Global Progress:
                     // (Completed Files + Current File Percentage) / Total Files
-                    const overall = ((completedFiles * 100) + percentage) / totalFiles;
-                    setTotalProgress(Math.round(overall));
 
                     // Keep local progress for the UI checkmarks
                     setProgress(prev => ({ ...prev, [item.key]: percentage }));
@@ -164,7 +159,6 @@ export function AddPaperForm() {
             }
 
             // Ensure 100% at the end
-            setTotalProgress(100);
 
             const paperData: any = {
                 title: title.trim(),

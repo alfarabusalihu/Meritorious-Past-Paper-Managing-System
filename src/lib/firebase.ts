@@ -12,14 +12,6 @@ const firebaseConfig = {
     appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// Helper to strip gs:// and paths from bucket URLs
-const getBucketName = (url?: string) => {
-    if (!url) return undefined;
-    // Remove gs:// prefix if present
-    const cleaned = url.replace('gs://', '');
-    // Return just the bucket name (before any /)
-    return cleaned.split('/')[0];
-};
 
 // Initialize Firebase (Singleton pattern)
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();

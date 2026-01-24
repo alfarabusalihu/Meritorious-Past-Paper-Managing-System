@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowRight, BookOpen, Sparkles } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
 
 export function Hero() {
