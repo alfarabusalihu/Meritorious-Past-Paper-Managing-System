@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { configsApi, FilterConfig, SocialConfig } from '../../lib/firebase/configs'
 import { Alert } from '../ui/Alert'
 import { ConfigManager } from './tabs/ConfigManager'
+import { DonationsTable } from './tabs/DonationsTable'
 import { useLanguage } from '../../context/LanguageContext'
 
 export function HighAdminControls() {
@@ -77,6 +78,8 @@ export function HighAdminControls() {
 
     // Removed handleSaveDonationConfig
 
+    const [activeTab, setActiveTab] = useState<'config' | 'donations'>('config')
+
     if (loading) {
         return (
             <div className="p-20 text-center">
@@ -87,19 +90,39 @@ export function HighAdminControls() {
     }
 
     return (
-        <div className="bg-white min-h-[500px]">
-            <div className="p-6">
-                <ConfigManager
-                    filterTexts={filterTexts}
-                    socials={socials}
-                    savingFilters={savingFilters}
-                    savingSocials={savingSocials}
-                    onUpdateFilterList={handleUpdateFilterList}
-                    onUpdateSocials={setSocials}
-                    onSaveFilters={handleSaveFilters}
-                    onSaveSocials={handleSaveSocials}
-                    onSnackbar={(m, s) => setSnackbar({ open: true, message: m, severity: s })}
-                />
+        <div className="bg-white min-h-[550px] flex flex-col">
+            {/* Tab Header */}
+            <div className="flex border-b border-muted px-6 bg-muted/5">
+                <button
+                    onClick={() => setActiveTab('config')}
+                    className={`px-6 py-4 text-sm font-bold transition-all border-b-2 ${activeTab === 'config' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-secondary'}`}
+                >
+                    System Configuration
+                </button>
+                <button
+                    onClick={() => setActiveTab('donations')}
+                    className={`px-6 py-4 text-sm font-bold transition-all border-b-2 ${activeTab === 'donations' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-secondary'}`}
+                >
+                    Donors & Contributions
+                </button>
+            </div>
+
+            <div className="p-6 flex-1">
+                {activeTab === 'config' ? (
+                    <ConfigManager
+                        filterTexts={filterTexts}
+                        socials={socials}
+                        savingFilters={savingFilters}
+                        savingSocials={savingSocials}
+                        onUpdateFilterList={handleUpdateFilterList}
+                        onUpdateSocials={setSocials}
+                        onSaveFilters={handleSaveFilters}
+                        onSaveSocials={handleSaveSocials}
+                        onSnackbar={(m, s) => setSnackbar({ open: true, message: m, severity: s })}
+                    />
+                ) : (
+                    <DonationsTable onSnackbar={(m, s) => setSnackbar({ open: true, message: m, severity: s })} />
+                )}
             </div>
 
             {snackbar.open && (

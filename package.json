@@ -8,7 +8,7 @@
     },
     "scripts": {
         "postinstall": "npm rebuild || true",
-        "dev": "vite",
+        "dev": "vite --host",
         "build": "tsc && vite build",
         "lint": "eslint .",
         "preview": "vite preview",

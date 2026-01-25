@@ -1,5 +1,5 @@
 import { db } from "../firebase";
-import { collection, addDoc, getDocs, orderBy, query, limit } from "firebase/firestore";
+import { collection, addDoc, getDocs, orderBy, query, limit, Timestamp } from "firebase/firestore";
 import { Contribution } from "./schema";
 
 const DONATIONS_COLLECTION = "contributions";
@@ -8,7 +8,7 @@ export const donationsApi = {
     async addContribution(contribution: Omit<Contribution, 'id' | 'timestamp'>): Promise<string> {
         const docRef = await addDoc(collection(db, DONATIONS_COLLECTION), {
             ...contribution,
-            timestamp: new Date().toISOString()
+            timestamp: Timestamp.now()
         });
         return docRef.id;
     },

@@ -49,7 +49,7 @@ export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarPr
                             <select
                                 value={subject}
                                 onChange={(e) => setSubject(e.target.value)}
-                                className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
+                                className="w-full h-10 pl-4 pr-10 bg-background border border-input rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
                             >
                                 <option value="">{t('filters.placeholders.subject')}</option>
                                 {(filters?.subjects || []).slice().sort().map(s => (
@@ -64,7 +64,7 @@ export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarPr
                             <select
                                 value={year}
                                 onChange={(e) => setYear(e.target.value)}
-                                className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
+                                className="w-full h-10 pl-4 pr-10 bg-background border border-input rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
                             >
                                 <option value="">{t('filters.placeholders.year')}</option>
                                 {(filters?.years || []).slice().sort((a, b) => parseInt(b) - parseInt(a)).map((y) => (
@@ -81,7 +81,7 @@ export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarPr
                             <select
                                 value={language}
                                 onChange={(e) => setLanguage(e.target.value)}
-                                className="w-full h-12 pl-4 pr-10 bg-muted/50 border border-transparent rounded-xl focus:bg-white focus:border-primary/30 outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
+                                className="w-full h-10 pl-4 pr-10 bg-background border border-input rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
                             >
                                 <option value="">Languages</option>
                                 {(filters?.languages || []).map(l => (

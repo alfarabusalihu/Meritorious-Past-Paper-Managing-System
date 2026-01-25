@@ -7,8 +7,10 @@ import { AuthForm } from '../auth/AuthForm'
 import { Modal } from '../ui/Modal'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
-import { HighAdminControls } from '../admin/HighAdminControls'
-import { DeletePaperDialog } from '../admin/DeletePaperDialog'
+import { lazy, Suspense } from 'react'
+
+const HighAdminControls = lazy(() => import('../admin/HighAdminControls').then(m => ({ default: m.HighAdminControls })))
+const DeletePaperDialog = lazy(() => import('../admin/DeletePaperDialog').then(m => ({ default: m.DeletePaperDialog })))
 import { PaperListView } from '../papers/PaperListView'
 export function AdminDashboard() {
     const navigate = useNavigate()
@@ -111,16 +113,20 @@ export function AdminDashboard() {
                     title={t('admin.controls.title')}
                     maxWidth="xl"
                 >
-                    <HighAdminControls />
+                    <Suspense fallback={<div className="p-12 text-center text-muted-foreground">Loading system controls...</div>}>
+                        <HighAdminControls />
+                    </Suspense>
                 </Modal>
 
-                <DeletePaperDialog
-                    open={deleteDialogOpen}
-                    paperTitle={paperToDelete?.title}
-                    loading={false}
-                    onClose={() => setDeleteDialogOpen(false)}
-                    onConfirm={handleDeleteConfirm}
-                />
+                <Suspense fallback={null}>
+                    <DeletePaperDialog
+                        open={deleteDialogOpen}
+                        paperTitle={paperToDelete?.title}
+                        loading={false}
+                        onClose={() => setDeleteDialogOpen(false)}
+                        onConfirm={handleDeleteConfirm}
+                    />
+                </Suspense>
             </div>
         </div>
     )

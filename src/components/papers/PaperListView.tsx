@@ -156,12 +156,18 @@ export function PaperListView({
                 onClose={handleClose}
                 title={selectedPaper?.title}
                 maxWidth="full"
+                downloadUrl={selectedUrl || undefined}
+                downloadFileName={`${selectedPaper?.title || 'paper'}.pdf`}
             >
                 <div className="flex-1 w-full bg-muted/20 flex flex-col overflow-hidden">
                     {selectedUrl && (
                         <iframe
-                            src={selectedUrl}
-                            className="w-full h-full border-none"
+                            src={
+                                typeof window !== 'undefined' && window.innerWidth < 1024
+                                    ? `https://docs.google.com/viewer?url=${encodeURIComponent(selectedUrl)}&embedded=true`
+                                    : selectedUrl
+                            }
+                            className="w-full h-full border-none shadow-inner"
                             title="PDF Viewer"
                             allow="autoplay"
                         />

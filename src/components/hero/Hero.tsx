@@ -7,7 +7,7 @@ export function Hero() {
 
     return (
         <section
-            className="relative min-h-[90vh] md:min-h-screen flex items-center py-24 md:py-0 overflow-hidden"
+            className="relative min-h-[60vh] md:min-h-screen flex items-center pt-4 pb-12 md:py-0 overflow-hidden"
             style={{
                 background: 'linear-gradient(to bottom, var(--hero-1) 0%, var(--hero-2) 15%, var(--hero-3) 35%, var(--hero-4) 50%, var(--hero-5) 75%, #F1F5F9 95%, hsl(var(--background)) 100%)'
             }}
@@ -20,7 +20,7 @@ export function Hero() {
             <div className="absolute bottom-[20%] right-[-10%] w-[600px] h-[600px] bg-blue-600/10 blur-[150px] rounded-full -z-10" />
 
             <div className="section-container relative z-10">
-                <div className="max-w-4xl mx-auto text-center space-y-8">
+                <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
