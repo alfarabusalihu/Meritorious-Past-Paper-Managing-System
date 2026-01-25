@@ -157,12 +157,13 @@ export function PaperListView({
                 title={selectedPaper?.title}
                 maxWidth="full"
             >
-                <div className="h-full flex flex-col bg-muted/20">
+                <div className="flex-1 w-full bg-muted/20 flex flex-col overflow-hidden">
                     {selectedUrl && (
                         <iframe
                             src={selectedUrl}
-                            className="flex-1 w-full border-none shadow-inner"
+                            className="w-full h-full border-none"
                             title="PDF Viewer"
+                            allow="autoplay"
                         />
                     )}
                 </div>

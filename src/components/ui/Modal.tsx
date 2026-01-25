@@ -72,7 +72,7 @@ export function Modal({
                                 )}
                             </div>
                         )}
-                        <div className="overflow-y-auto flex-1">
+                        <div className={clsx("flex-1", maxWidth === 'full' ? "overflow-hidden flex flex-col" : "overflow-y-auto")}>
                             {children}
                         </div>
                     </motion.div>
