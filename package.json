@@ -4,10 +4,9 @@
     "version": "0.0.0",
     "type": "module",
     "engines": {
-        "node": ">=20.x"
+        "node": "20.20.0"
     },
     "scripts": {
-        "postinstall": "npm rebuild || true",
         "dev": "vite --host",
         "build": "tsc && vite build",
         "lint": "eslint .",
