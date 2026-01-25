@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Users, FileText, Download } from 'lucide-react'
+import { Users, FileText, Download, Star } from 'lucide-react'
 import { statsApi } from '../../lib/firebase/stats'
 import { papersApi } from '../../lib/firebase/papers'
+import { useLanguage } from '../../context/LanguageContext'
 import { clsx } from 'clsx'
 
 export function VisitorStats() {
+    const { t, language } = useLanguage();
+    const currentYear = new Date().getFullYear();
+    const excellenceYears = Math.max(0, currentYear - 2020);
+
     const [stats, setStats] = useState({
         visitors: 0,
         papers: 0,
@@ -16,8 +21,6 @@ export function VisitorStats() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                // Optimize: Fetch global stats and papers list (just for length)
-                // In a true large-scale app, we'd also have a 'totalPapers' counter.
                 const [globalStats, papers] = await Promise.all([
                     statsApi.getStats(),
                     papersApi.getPapers()
@@ -38,29 +41,42 @@ export function VisitorStats() {
     }, [])
 
     const statsConfig = [
-        { label: 'Total Visitors', value: stats.visitors, icon: Users, color: 'text-primary', bg: 'bg-primary/10' },
-        { label: 'Papers Available', value: stats.papers, icon: FileText, color: 'text-amber-500', bg: 'bg-amber-50' },
-        { label: 'Total Downloads', value: stats.downloads, icon: Download, color: 'text-rose-500', bg: 'bg-rose-50' },
+        { label: t('hero.stats.visitors') || 'Total Visitors', value: stats.visitors, icon: Users, color: 'text-primary', bg: 'bg-primary/10', hover: 'hover:border-primary/40 hover:shadow-primary/10 hover:bg-primary/5' },
+        { label: t('hero.stats.papers') || 'Papers Available', value: stats.papers, icon: FileText, color: 'text-primary', bg: 'bg-primary/10', hover: 'hover:border-primary/40 hover:shadow-primary/10 hover:bg-primary/5' },
+        { label: t('hero.stats.downloads') || 'Total Downloads', value: stats.downloads, icon: Download, color: 'text-primary', bg: 'bg-primary/10', hover: 'hover:border-primary/40 hover:shadow-primary/10 hover:bg-primary/5' },
+        { label: `${excellenceYears} ${t('hero.stats.excellence') || 'Years of excellence'}`, value: excellenceYears, icon: Star, color: 'text-primary', bg: 'bg-primary/10', isStatic: true, hover: 'hover:border-primary/40 hover:shadow-primary/10 hover:bg-primary/5' },
     ]
 
     return (
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
             {statsConfig.map((stat, index) => (
                 <motion.div
                     key={stat.label}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-card border-none shadow-xl shadow-black/5 rounded-[2.5rem] p-8 text-center space-y-4 hover:scale-[1.02] transition-transform"
+                    className={clsx(
+                        "bg-primary-foreground border border-muted shadow-xl rounded-3xl sm:rounded-[2.5rem] p-4 sm:p-8 text-center space-y-3 sm:space-y-4 hover:scale-[1.05] transition-all duration-300 group cursor-default",
+                        stat.hover
+                    )}
                 >
-                    <div className={clsx("mx-auto p-4 rounded-2xl w-fit", stat.bg)}>
-                        <stat.icon className={clsx("h-8 w-8", stat.color)} />
+                    <div className={clsx(
+                        "mx-auto p-3 sm:p-4 rounded-xl sm:rounded-2xl w-fit transition-all duration-300 group-hover:scale-110",
+                        stat.bg,
+                        "group-hover:bg-white/40"
+                    )}>
+                        <stat.icon className={clsx("h-6 w-6 sm:h-8 sm:w-8", stat.color)} />
                     </div>
                     <div className="space-y-1">
-                        <h4 className="text-4xl font-bold text-foreground">
-                            {loading ? '...' : stat.value.toLocaleString()}
+                        <h4 className="text-2xl sm:text-4xl font-black text-secondary">
+                            {loading && !stat.isStatic ? '...' : stat.value.toLocaleString()}
                         </h4>
-                        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">{stat.label}</p>
+                        <p className={clsx(
+                            "text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-secondary/40 group-hover:text-secondary/70 transition-colors text-balance",
+                            language === 'ta' && "text-[7px] sm:text-[9px]"
+                        )}>
+                            {stat.label}
+                        </p>
                     </div>
                 </motion.div>
             ))}

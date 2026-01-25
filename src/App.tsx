@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Navigation } from './components/layout/Navigation'
 import { Footer } from './components/layout/Footer'
-import { LanguageProvider } from './context/LanguageContext'
+import { LanguageProvider, useLanguage } from './context/LanguageContext'
 import { FilterProvider } from './context/FilterContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
@@ -25,6 +25,7 @@ const Contribute = lazy(() => import('./components/pages/Contribute').then(m => 
 
 function AppContent() {
     const isSpecialAdminPortal = isAdminHost()
+    const { t } = useLanguage()
     useVisitorTracker()
 
 
@@ -53,9 +54,9 @@ function AppContent() {
                                                 <MissionSection />
                                             </div>
                                             <div id="papers-section" className="section-container section-spacing space-y-12 scroll-mt-24">
-                                                <div className="space-y-4 text-center md:text-left">
-                                                    <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-secondary">
-                                                        Available Papers
+                                                <div className="space-y-4 text-center md:text-left flex flex-col items-center md:items-start">
+                                                    <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-secondary text-balance">
+                                                        {t('papers.title')}
                                                     </h2>
                                                     <div className="h-1.5 w-20 bg-primary/20 rounded-full" />
                                                 </div>

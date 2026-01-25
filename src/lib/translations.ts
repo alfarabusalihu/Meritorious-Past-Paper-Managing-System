@@ -9,17 +9,27 @@ export const translations: Record<string, unknown> = {
             logout: "Logout",
             profile: "User Profile"
         },
+        footer: {
+            description: "The Meritorious Past Paper Management System for students and educators. Designed for excellence and academic success.",
+            rights: "All Rights Reserved"
+        },
         hero: {
             eyebrow: "Meritorious",
             title: {
                 main: "Merit",
-                highlight: "Series",
+                highlight: "O/L Series",
                 sub: ""
             },
             description: "Master your exams with ease. Access a comprehensive database of past papers, categorized and filtered for your academic success.",
             cta: {
                 primary: "See Papers",
                 secondary: "Contribute"
+            },
+            stats: {
+                visitors: "Total Visitors",
+                papers: "Papers Available",
+                downloads: "Total Downloads",
+                excellence: "Years of excellence"
             }
         },
         filters: {
@@ -54,7 +64,7 @@ export const translations: Record<string, unknown> = {
             hero: {
                 title: "Empowering Students Through",
                 highlight: "Organized Knowledge",
-                description: "Merit series is a modern document management system designed to make past paper accessibility seamless, fast, and reliable for students and educators worldwide."
+                description: "Merit O/L series is a modern document management system designed to make past paper accessibility seamless, fast, and reliable for students and educators worldwide."
             },
             features: [
                 {
@@ -106,6 +116,15 @@ export const translations: Record<string, unknown> = {
                     selectPdf: "Please select a PDF file",
                     saveSuccess: "Paper saved successfully",
                     saveError: "Failed to save paper"
+                },
+                parts: {
+                    p1: "Part 1 (Question)",
+                    p2: "Part 2 (Question)",
+                    scheme: "Marking Scheme"
+                },
+                help: {
+                    edit: "Update existing paper details",
+                    add: "Upload and catalogue a new past paper"
                 }
             }
         },
@@ -134,7 +153,7 @@ export const translations: Record<string, unknown> = {
             pitch: {
                 main: "Buy us a coffee,",
                 highlight: "fuel the mission.",
-                description: "Merit series is free and open-source. Your contributions help cover server costs and encourage further development of educational tools."
+                description: "Merit O/L series is free and open-source. Your contributions help cover server costs and encourage further development of educational tools."
             },
             or: "Or custom amount",
             customPlaceholder: "Enter custom amount",
@@ -154,17 +173,27 @@ export const translations: Record<string, unknown> = {
             logout: "வெளியேறு",
             profile: "பயனர் விவரம்"
         },
+        footer: {
+            description: "மாணவர்கள் மற்றும் கல்வியாளர்களுக்கான மெரிடோரியஸ் வினாத்தாள் மேலாண்மை அமைப்பு. சிறந்து விளங்க மற்றும் கல்வி வெற்றிக்காக வடிவமைக்கப்பட்டது.",
+            rights: "அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை"
+        },
         hero: {
             eyebrow: "மெரிடோரியஸ் வினாத்தாள் மேலாண்மை அமைப்பு",
             title: {
-                main: "உங்கள்",
-                highlight: "தேர்வுகளில்",
-                sub: "வெற்றி பெறுங்கள்"
+                main: "Merit",
+                highlight: "O/L",
+                sub: "Series"
             },
             description: "உங்கள் கல்வி வெற்றிக்குத் தேவையான வினாத்தாள்களின் விரிவான தரவுத்தளத்தை ஒரே இடத்தில் அணுகுங்கள்.",
             cta: {
                 primary: "வினாத்தாள்களைக் காண்க",
                 secondary: "பங்களிக்கவும்"
+            },
+            stats: {
+                visitors: "மொத்த பார்வையாளர்கள்",
+                papers: "கிடைக்கக்கூடிய வினாத்தாள்கள்",
+                downloads: "மொத்த பதிவிறக்கங்கள்",
+                excellence: "ஆண்டுகள் அனுபவம்"
             }
         },
         filters: {
@@ -199,7 +228,7 @@ export const translations: Record<string, unknown> = {
             hero: {
                 title: "மாணவர்களை மேம்படுத்துதல்",
                 highlight: "ஒழுங்கமைக்கப்பட்ட அறிவு",
-                description: "Merit series என்பது வினாத்தாள் அணுகலை எளிமையாகவும், வேகமாகவும் மற்றும் நம்பகமானதாகவும் மாற்ற வடிவமைக்கப்பட்ட ஒரு நவீன ஆவண மேலாண்மை அமைப்பாகும்."
+                description: "Merit O/L series என்பது வினாத்தாள் அணுகலை எளிமையாகவும், வேகமாகவும் மற்றும் நம்பகமானதாகவும் மாற்ற வடிவமைக்கப்பட்ட ஒரு நவீன ஆவண மேலாண்மை அமைப்பாகும்."
             },
             features: [
                 {
@@ -251,6 +280,15 @@ export const translations: Record<string, unknown> = {
                     selectPdf: "தயவுசெய்து ஒரு PDF கோப்பைத் தேர்ந்தெடுக்கவும்",
                     saveSuccess: "வினாத்தாள் வெற்றிகரமாக சேமிக்கப்பட்டது",
                     saveError: "வினாத்தாளை சேமிக்க முடியவில்லை"
+                },
+                parts: {
+                    p1: "பகுதி 1 (வினா)",
+                    p2: "பகுதி 2 (வினா)",
+                    scheme: "புள்ளித்திட்டம்"
+                },
+                help: {
+                    edit: "ஏற்கனவே உள்ள வினாத்தாள் விவரங்களைப் புதுப்பிக்கவும்",
+                    add: "புதிய வினாத்தாளைப் பதிவேற்றவும்"
                 }
             }
         },
@@ -279,7 +317,7 @@ export const translations: Record<string, unknown> = {
             pitch: {
                 main: "எங்களுக்கு ஒரு காபி வாங்கித் தாருங்கள்,",
                 highlight: "பணியை ஊக்கப்படுத்துங்கள்.",
-                description: "Merit series இலவசம் மற்றும் திறந்த மூலமாகும். உங்கள் பங்களிப்புகள் சேவையக செலவுகளை ஈடுகட்டவும், கல்வி கருவிகளின் மேம்பாட்டை ஊக்குவிக்கவும் உதவுகின்றன."
+                description: "Merit O/L series இலவசம் மற்றும் திறந்த மூலமாகும். உங்கள் பங்களிப்புகள் சேவையக செலவுகளை ஈடுகட்டவும், கல்வி கருவிகளின் மேம்பாட்டை ஊக்குவிக்கவும் உதவுகின்றன."
             },
             or: "அல்லது தனிப்பயன் தொகை",
             customPlaceholder: "தொகையை உள்ளிடவும்",

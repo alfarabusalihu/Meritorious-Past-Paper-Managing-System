@@ -43,12 +43,12 @@ export function ConfigManager({
             <section>
                 <h3 className="text-xl font-bold text-secondary mb-2">Global Filters</h3>
                 <p className="text-sm text-muted-foreground mb-6 font-medium">Manage the available options for subjects, languages, and years.</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-6">
                     {filterTexts && Object.keys(filterTexts).map((key) => (
-                        <div key={key} className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1 block">{key}</label>
+                        <div key={key} className="grid grid-cols-1 sm:grid-cols-[160px_1fr] items-start gap-4">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground pt-5">{key}</label>
                             <textarea
-                                className="w-full rounded-2xl border-muted bg-muted/10 p-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 min-h-[120px] transition-all outline-none focus:bg-white"
+                                className="w-full rounded-2xl border border-muted-foreground/20 bg-muted/50 p-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary/50 min-h-[100px] transition-all outline-none focus:bg-white resize-none"
                                 value={filterTexts[key]}
                                 onChange={(e) => onUpdateFilterList(key, e.target.value)}
                                 placeholder={`Enter ${key} separated by commas...`}
@@ -58,21 +58,30 @@ export function ConfigManager({
                 </div>
                 <div className="flex justify-end mt-8">
                     <Button onClick={onSaveFilters} className="w-full sm:w-auto font-bold px-12 h-14 rounded-2xl shadow-xl shadow-primary/20" isLoading={savingFilters}>
-                        <Save className="mr-2 h-5 w-5" /> Save Filter Config
+                        <Save className="mr-2 h-5 w-5" /> Save
                     </Button>
                 </div>
             </section>
 
             <section className="border-t border-muted pt-12">
                 <h3 className="text-xl font-bold text-secondary mb-6">Social Links</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Input label="Facebook" value={socials?.facebook || ''} onChange={e => onUpdateSocials({ ...socials!, facebook: e.target.value })} className="bg-muted/10 border-none h-14 rounded-2xl" />
-                    <Input label="Twitter" value={socials?.twitter || ''} onChange={e => onUpdateSocials({ ...socials!, twitter: e.target.value })} className="bg-muted/10 border-none h-14 rounded-2xl" />
-                    <Input label="Instagram" value={socials?.instagram || ''} onChange={e => onUpdateSocials({ ...socials!, instagram: e.target.value })} className="bg-muted/10 border-none h-14 rounded-2xl" />
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] items-start gap-4">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground pt-5">Facebook</label>
+                        <Input value={socials?.facebook || ''} onChange={e => onUpdateSocials({ ...socials!, facebook: e.target.value })} className="h-14" />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] items-start gap-4">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground pt-5">Twitter</label>
+                        <Input value={socials?.twitter || ''} onChange={e => onUpdateSocials({ ...socials!, twitter: e.target.value })} className="h-14" />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] items-start gap-4">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground pt-5">Instagram</label>
+                        <Input value={socials?.instagram || ''} onChange={e => onUpdateSocials({ ...socials!, instagram: e.target.value })} className="h-14" />
+                    </div>
                 </div>
                 <div className="flex justify-end mt-8">
                     <Button onClick={onSaveSocials} className="w-full sm:w-auto font-bold px-12 h-14 rounded-2xl shadow-xl shadow-primary/20" isLoading={savingSocials}>
-                        <Save className="mr-2 h-5 w-5" /> Save Socials
+                        <Save className="mr-2 h-5 w-5" /> Save
                     </Button>
                 </div>
             </section>

@@ -26,8 +26,8 @@ export function FeaturesGrid() {
                         </div>
                     </div>
                     <div className="space-y-3">
-                        <h3 className="text-2xl font-bold text-foreground">{feature.title}</h3>
-                        <p className="text-muted-foreground leading-relaxed font-medium">
+                        <h3 className="text-xl sm:text-2xl font-bold text-foreground text-balance">{feature.title}</h3>
+                        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-medium text-balance">
                             {feature.description}
                         </p>
                     </div>

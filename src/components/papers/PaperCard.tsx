@@ -1,5 +1,7 @@
 import { FileText, Pencil, Trash2 } from 'lucide-react'
 import { Paper } from '../../lib/firebase/schema'
+import { useLanguage } from '../../context/LanguageContext'
+import { clsx } from 'clsx'
 
 interface PaperCardProps {
     paper: Paper
@@ -10,6 +12,7 @@ interface PaperCardProps {
 }
 
 export function PaperCard({ paper, onView, isSuperAdmin, onEdit, onDelete }: PaperCardProps) {
+    const { language: currentLanguage } = useLanguage()
 
     // Helper to get file URL from new files object
     const getFileUrl = (key: 'part1' | 'part2' | 'scheme') => {
@@ -25,7 +28,7 @@ export function PaperCard({ paper, onView, isSuperAdmin, onEdit, onDelete }: Pap
     return (
         <div
             onClick={() => defaultUrl && onView?.(paper, defaultUrl)}
-            className="group bg-card rounded-[2.5rem] border border-muted p-8 shadow-xl shadow-black/5 hover:shadow-2xl hover:shadow-primary/5 hover:border-primary/20 hover:-translate-y-2 transition-all duration-300 relative overflow-hidden flex flex-col min-h-[320px] cursor-pointer"
+            className="group bg-primary-foreground rounded-[2.5rem] border border-muted-foreground/10 p-8 shadow-xl shadow-black/5 hover:shadow-2xl hover:shadow-primary/5 hover:border-primary/20 hover:-translate-y-2 transition-all duration-300 relative overflow-hidden flex flex-col min-h-[320px] cursor-pointer"
         >
             {/* Admin Floating Controls (Top Right) */}
             {isSuperAdmin && (
@@ -97,13 +100,19 @@ export function PaperCard({ paper, onView, isSuperAdmin, onEdit, onDelete }: Pap
                                 e.stopPropagation();
                                 onView?.(paper, getFileUrl('part1')!);
                             }}
-                            className="flex items-center justify-center h-10 rounded-xl bg-secondary/5 text-secondary font-bold hover:bg-primary hover:text-white transition-all shadow-sm hover:shadow-md border border-secondary/10 hover:border-transparent text-xs uppercase tracking-wider"
+                            className={clsx(
+                                "flex items-center justify-center h-10 rounded-xl bg-secondary/5 text-secondary font-bold hover:bg-primary hover:text-white transition-all shadow-sm hover:shadow-md border border-secondary/10 hover:border-transparent uppercase tracking-wider",
+                                currentLanguage === 'ta' ? 'text-[9px]' : 'text-[10px]'
+                            )}
                             aria-label={`View Part 1 of ${paper.title}`}
                         >
                             Part 1
                         </button>
                     ) : (
-                        <div className="flex items-center justify-center h-10 rounded-xl bg-muted/20 text-muted-foreground/40 cursor-not-allowed border border-dashed border-muted text-[10px] font-bold uppercase tracking-wider" aria-hidden="true">
+                        <div className={clsx(
+                            "flex items-center justify-center h-10 rounded-xl bg-muted/20 text-muted-foreground/40 cursor-not-allowed border border-dashed border-muted font-bold uppercase tracking-wider",
+                            currentLanguage === 'ta' ? 'text-[9px]' : 'text-[10px]'
+                        )} aria-hidden="true">
                             Part 1
                         </div>
                     )}
@@ -114,13 +123,19 @@ export function PaperCard({ paper, onView, isSuperAdmin, onEdit, onDelete }: Pap
                                 e.stopPropagation();
                                 onView?.(paper, getFileUrl('part2')!);
                             }}
-                            className="flex items-center justify-center h-10 rounded-xl bg-secondary/5 text-secondary font-bold hover:bg-primary hover:text-white transition-all shadow-sm hover:shadow-md border border-secondary/10 hover:border-transparent text-xs uppercase tracking-wider"
+                            className={clsx(
+                                "flex items-center justify-center h-10 rounded-xl bg-secondary/5 text-secondary font-bold hover:bg-primary hover:text-white transition-all shadow-sm hover:shadow-md border border-secondary/10 hover:border-transparent uppercase tracking-wider",
+                                currentLanguage === 'ta' ? 'text-[9px]' : 'text-[10px]'
+                            )}
                             aria-label={`View Part 2 of ${paper.title}`}
                         >
                             Part 2
                         </button>
                     ) : (
-                        <div className="flex items-center justify-center h-10 rounded-xl bg-muted/20 text-muted-foreground/40 cursor-not-allowed border border-dashed border-muted text-[10px] font-bold uppercase tracking-wider" aria-hidden="true">
+                        <div className={clsx(
+                            "flex items-center justify-center h-10 rounded-xl bg-muted/20 text-muted-foreground/40 cursor-not-allowed border border-dashed border-muted font-bold uppercase tracking-wider",
+                            currentLanguage === 'ta' ? 'text-[9px]' : 'text-[10px]'
+                        )} aria-hidden="true">
                             Part 2
                         </div>
                     )}
@@ -131,13 +146,19 @@ export function PaperCard({ paper, onView, isSuperAdmin, onEdit, onDelete }: Pap
                                 e.stopPropagation();
                                 onView?.(paper, getFileUrl('scheme')!);
                             }}
-                            className="flex items-center justify-center h-10 rounded-xl bg-primary/10 text-primary font-bold hover:bg-secondary hover:text-white transition-all shadow-sm hover:shadow-md border border-primary/10 hover:border-transparent text-xs uppercase tracking-wider"
+                            className={clsx(
+                                "flex items-center justify-center h-10 rounded-xl bg-primary/10 text-primary font-bold hover:bg-secondary hover:text-white transition-all shadow-sm hover:shadow-md border border-primary/10 hover:border-transparent uppercase tracking-wider",
+                                currentLanguage === 'ta' ? 'text-[9px]' : 'text-[10px]'
+                            )}
                             aria-label={`View Marking Scheme of ${paper.title}`}
                         >
                             Scheme
                         </button>
                     ) : (
-                        <div className="flex items-center justify-center h-10 rounded-xl bg-muted/20 text-muted-foreground/40 cursor-not-allowed border border-dashed border-muted text-[10px] font-bold uppercase tracking-wider" aria-hidden="true">
+                        <div className={clsx(
+                            "flex items-center justify-center h-10 rounded-xl bg-muted/20 text-muted-foreground/40 cursor-not-allowed border border-dashed border-muted font-bold uppercase tracking-wider",
+                            currentLanguage === 'ta' ? 'text-[9px]' : 'text-[10px]'
+                        )} aria-hidden="true">
                             Scheme
                         </div>
                     )}

@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Facebook, Instagram, Twitter, Loader2 } from 'lucide-react'
 import { configsApi, SocialConfig } from '../../lib/firebase/configs'
+import { useLanguage } from '../../context/LanguageContext'
+import { clsx } from 'clsx'
 
 export function Footer() {
+    const { t, language } = useLanguage()
     const [socials, setSocials] = useState<SocialConfig | null>(null)
 
     useEffect(() => {
@@ -16,13 +19,18 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <div className="space-y-6 text-center md:text-left">
                         <div className="flex items-center justify-center md:justify-start gap-3">
-                            <div className="p-2 bg-primary rounded-xl text-primary-foreground shadow-lg shadow-primary/20">
-                                <span className="font-bold text-xl px-1">M</span>
+                            <div className="h-10 w-10 bg-white/5 rounded-xl overflow-hidden border border-white/10 shadow-lg shadow-black/20">
+                                <img src="/logo.jpeg" alt="Merit O/L Series Logo" className="w-full h-full object-cover" />
                             </div>
-                            <span className="font-bold text-2xl tracking-tighter text-white">Merit series</span>
+                            <span className="font-extrabold text-lg tracking-[0.22em] uppercase text-white leading-none">
+                                Merit <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">O/L</span> Series
+                            </span>
                         </div>
-                        <p className="text-secondary-foreground/60 text-sm font-medium max-w-sm leading-relaxed">
-                            The ultimate Meritorious Past Paper Management System for students and educators. Designed for excellence and academic success.
+                        <p className={clsx(
+                            "text-secondary-foreground/60 text-sm font-medium max-w-sm leading-relaxed",
+                            language === 'ta' && "text-[0.92em]"
+                        )}>
+                            {t('footer.description') || "The Meritorious Past Paper Management System for students and educators. Designed for excellence and academic success."}
                         </p>
                     </div>
 
@@ -51,11 +59,12 @@ export function Footer() {
                             )}
                         </div>
 
-                        <div className="flex flex-col items-center md:items-end gap-2">
-                            <p className="text-[10px] text-secondary-foreground/40 font-bold uppercase tracking-[0.3em]">
-                                © Since 2020 Merit series Archive • Sri Lanka
+                        <div className="flex flex-col items-center md:items-end gap-2 text-center md:text-right">
+                            <p className="text-[10px] text-secondary-foreground/40 font-black uppercase tracking-[0.3em] flex items-center justify-center md:justify-end gap-2">
+                                <span className="text-base leading-none">©</span>
+                                <span>2020-{new Date().getFullYear()} Merit O/L Series • {t('footer.rights') || "All Rights Reserved"}</span>
                             </p>
-                            <div className="h-1 w-12 bg-primary rounded-full" />
+                            <div className="h-1 w-12 bg-primary rounded-full mt-1" />
                         </div>
                     </div>
                 </div>

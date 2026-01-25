@@ -21,7 +21,7 @@ export const generateReceipt = (contribution: Contribution) => {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont("helvetica", "bold");
-    doc.text("Merit series Donation Receipt", 20, 25);
+    doc.text("Merit O/L Series Donation Receipt", 20, 25);
 
     // Organization Info (Right aligned)
     doc.setFontSize(10);
@@ -111,8 +111,8 @@ export const generateReceipt = (contribution: Contribution) => {
     doc.setFontSize(9);
     doc.setTextColor(150, 150, 150);
     doc.text("This is an electronically generated receipt. No signature is required.", 105, 280, { align: 'center' });
-    doc.text("Merit Series Team - Empowering Future Success", 105, 285, { align: 'center' });
+    doc.text("Merit O/L Series Team - Empowering Future Success", 105, 285, { align: 'center' });
 
     // Save
-    doc.save(`MeritSeries_Receipt_${contribution.receiptId || 'Contribution'}.pdf`);
+    doc.save(`MeritOLSeries_Receipt_${contribution.receiptId || 'Contribution'}.pdf`);
 };

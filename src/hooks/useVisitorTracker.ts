@@ -10,10 +10,6 @@ export function useVisitorTracker() {
 
         if (!isProduction) return
 
-        const hasVisited = localStorage.getItem('has_visited_merit_series')
-        if (!hasVisited) {
-            statsApi.incrementVisitors()
-            localStorage.setItem('has_visited_merit_series', 'true')
-        }
+        statsApi.trackVisitor()
     }, [])
 }

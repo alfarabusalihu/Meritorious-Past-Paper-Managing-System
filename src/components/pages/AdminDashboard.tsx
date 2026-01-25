@@ -56,17 +56,13 @@ export function AdminDashboard() {
     return (
         <div className="min-h-screen bg-background pb-32">
             <div
-                className="relative py-12 md:py-16 overflow-hidden"
-                style={{
-                    background: 'linear-gradient(to bottom, var(--hero-1) 0%, var(--hero-2) 15%, var(--hero-3) 35%, var(--hero-4) 50%, var(--hero-5) 75%, #F1F5F9 95%, hsl(var(--background)) 100%)'
-                }}
+                className="relative py-12 md:py-16 overflow-hidden bg-[#0A001F]"
             >
-                {/* Subtle Texture Overlay */}
-                <div className="absolute inset-0 bg-grid-white/[0.03] -z-10" />
-
-                {/* Radiant depth glows */}
-                <div className="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-purple-600/10 blur-[150px] rounded-full -z-10" />
-                <div className="absolute bottom-[20%] right-[-10%] w-[600px] h-[600px] bg-blue-600/10 blur-[150px] rounded-full -z-10" />
+                {/* Radiant Background Mix - Not top-to-bottom */}
+                <div className="absolute inset-0 overflow-hidden -z-10">
+                    <div className="absolute top-[-20%] left-[-10%] w-[120%] h-[120%] bg-[radial-gradient(circle_at_30%_30%,#2D0066_0%,#13005A_40%,#000000_100%)] opacity-80" />
+                    <div className="absolute bottom-[-20%] right-[-10%] w-[100%] h-[100%] bg-[radial-gradient(circle_at_70%_70%,#13005A_0%,#0A001F_50%,#000000_100%)] opacity-60" />
+                </div>
 
                 <div className="section-container relative z-10">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -87,8 +83,8 @@ export function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* Seamless bottom blend */}
-                <div className="absolute bottom-0 left-0 w-full h-[40%] bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none -z-10" />
+                {/* Hard Edge transition to next component */}
+                <div className="absolute bottom-0 left-0 w-full h-px bg-white/10" />
             </div>
 
             <div className="section-container mt-12 space-y-12">
@@ -111,7 +107,7 @@ export function AdminDashboard() {
                     isOpen={showHighAdmin}
                     onClose={() => setShowHighAdmin(false)}
                     title={t('admin.controls.title')}
-                    maxWidth="xl"
+                    maxWidth="lg"
                 >
                     <Suspense fallback={<div className="p-12 text-center text-muted-foreground">Loading system controls...</div>}>
                         <HighAdminControls />

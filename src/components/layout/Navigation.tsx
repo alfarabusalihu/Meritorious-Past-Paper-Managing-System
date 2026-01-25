@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { GraduationCap, Languages, ChevronDown, User, Shield, LayoutDashboard, LogOut, Menu, X } from 'lucide-react'
+import { Languages, ChevronDown, User, Shield, LayoutDashboard, LogOut, Menu, X, FileText } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAuth } from '../../context/AuthContext'
 import { useState, useRef, useEffect } from 'react'
@@ -36,30 +36,44 @@ export function Navigation() {
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [])
 
-    const handlePapersClick = () => {
+    const handleHomeClick = (e: React.MouseEvent) => {
         if (window.location.pathname === '/') {
-            document.getElementById('papers-section')?.scrollIntoView({ behavior: 'smooth' })
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setIsMobileMenuOpen(false);
+        }
+    }
+
+    const handlePapersClick = (e: React.MouseEvent) => {
+        if (window.location.pathname === '/') {
+            e.preventDefault();
+            document.getElementById('papers-section')?.scrollIntoView({ behavior: 'smooth' });
+            setIsMobileMenuOpen(false);
         } else {
-            navigate('/#papers-section')
+            navigate('/#papers-section');
         }
     }
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-muted bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
-            <div className="section-container flex h-20 items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <Link to="/" className="flex items-center gap-2 group">
-                        <div className="p-1.5 bg-primary rounded-lg text-primary-foreground transform transition-transform group-hover:scale-110 shadow-lg shadow-primary/20">
-                            <GraduationCap size={24} />
+            <div className="section-container flex md:grid md:grid-cols-3 h-20 items-center justify-between relative">
+                <div className="flex items-center justify-start">
+                    <Link to="/" onClick={handleHomeClick} className="flex items-center gap-2 group">
+                        <div className="h-10 w-10 bg-primary/10 rounded-xl overflow-hidden transform transition-transform group-hover:scale-110 shadow-lg shadow-primary/5">
+                            <img src="/logo.jpeg" alt="Merit O/L Series Logo" className="w-full h-full object-cover" />
                         </div>
-                        <span className="font-bold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-                            Merit Series
+                        <span className="font-extrabold text-lg tracking-[0.22em] uppercase text-secondary leading-none">
+                            Merit <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500">O/L</span> Series
                         </span>
                     </Link>
                 </div>
 
-                <nav className="hidden md:flex items-center gap-8 text-sm font-bold uppercase tracking-widest text-secondary/70">
-                    <Link to="/" className="transition-all hover:text-primary border-b-2 border-transparent hover:border-primary py-1 uppercase">
+                <nav className="hidden md:flex items-center justify-center gap-8 text-sm font-bold uppercase tracking-widest text-secondary/70 h-full">
+                    <Link
+                        to="/"
+                        onClick={handleHomeClick}
+                        className="transition-all hover:text-primary border-b-2 border-transparent hover:border-primary py-1 uppercase"
+                    >
                         {t('nav.home')}
                     </Link>
                     <button
@@ -80,7 +94,7 @@ export function Navigation() {
                     )}
                 </nav>
 
-                <div className="flex items-center gap-4 relative">
+                <div className="flex items-center justify-end gap-4 relative h-full">
                     {/* Language Switcher */}
                     <div className="relative hidden sm:block" ref={langRef}>
                         <button
@@ -178,22 +192,17 @@ export function Navigation() {
                         className="absolute top-[80px] left-0 w-full bg-background border-b border-muted shadow-2xl md:hidden z-40 overflow-hidden"
                     >
                         <div className="flex flex-col p-6 space-y-6">
-                            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3 uppercase tracking-widest">
+                            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3 uppercase tracking-widest text-balance">
                                 <LayoutDashboard size={20} className="text-primary/60" />
                                 {t('nav.home')}
                             </Link>
                             <button
-                                onClick={() => {
-                                    setIsMobileMenuOpen(false);
-                                    if (window.location.pathname === '/') {
-                                        document.getElementById('papers-section')?.scrollIntoView({ behavior: 'smooth' })
-                                    } else {
-                                        window.location.href = '/#papers-section'
-                                    }
+                                onClick={(e) => {
+                                    handlePapersClick(e);
                                 }}
-                                className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3 text-left w-full uppercase tracking-widest"
+                                className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3 text-left w-full uppercase tracking-widest text-balance"
                             >
-                                <User size={20} className="text-primary/60" />
+                                <FileText size={20} className="text-primary/60" />
                                 {t('nav.papers')}
                             </button>
 

@@ -10,7 +10,8 @@ import {
     Query,
     updateDoc,
     doc,
-    getDoc
+    getDoc,
+    increment
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, UploadTaskSnapshot, getDownloadURL } from "firebase/storage";
 import { Paper, FilterOptions } from "./schema";
@@ -179,15 +180,19 @@ export const papersApi = {
     async incrementDownloadCount(paperId: string) {
         const docRef = doc(db, PAPERS_COLLECTION, paperId);
         try {
-            const snapshot = await getDoc(docRef);
-            if (snapshot.exists()) {
-                const current = snapshot.data() as Paper;
-                await updateDoc(docRef, {
-                    downloadCount: (current.downloadCount || 0) + 1
-                });
+            // New Requirement: Unique download per user (IP-based)
+            const shouldIncrement = await statsApi.trackDownload(paperId);
 
-                // Also increment Global Engagement Stats
-                await statsApi.incrementEngagement();
+            if (shouldIncrement) {
+                const snapshot = await getDoc(docRef);
+                if (snapshot.exists()) {
+                    await updateDoc(docRef, {
+                        downloadCount: increment(1)
+                    });
+
+                    // Also increment Global Engagement Stats
+                    await statsApi.incrementEngagement();
+                }
             }
         } catch (error) {
             console.error("Failed to increment download count:", error);

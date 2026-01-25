@@ -32,14 +32,14 @@ export function DonationsTable({ onSnackbar }: DonationsTableProps) {
     }
 
     const handleSendEmail = (donation: Contribution) => {
-        const subject = encodeURIComponent("Thank You for Your Contribution - Merit Series");
+        const subject = encodeURIComponent("Thank You for Your Contribution - Merit O/L Series");
         const body = encodeURIComponent(
             `Dear ${donation.donorName},\n\n` +
             `We have received your generous contribution of $${donation.amount.toFixed(2)} (${donation.coffeeCount} coffee(s)).\n` +
             `Your support is invaluable in helping us maintain and expand the Meritorious Past Paper Management System.\n\n` +
             `You can find your official receipt attached (if provided) or referenced by ID: ${donation.receiptId}.\n\n` +
             `With gratitude,\n` +
-            `The Merit Series Team`
+            `The Merit O/L Series Team`
         );
         window.location.href = `mailto:${donation.email}?subject=${subject}&body=${body}`;
     };

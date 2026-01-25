@@ -10,7 +10,7 @@ interface FilterBarProps {
 }
 
 export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarProps) {
-    const { t } = useLanguage()
+    const { t, language: currentLanguage } = useLanguage()
     const { filters } = useFilters()
     const [subject, setSubject] = useState('')
     const [year, setYear] = useState('')
@@ -33,10 +33,10 @@ export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarPr
                 <div className="flex justify-end">
                     <Link
                         to="/add-paper"
-                        className="flex items-center gap-2 px-6 h-14 bg-primary text-primary-foreground rounded-2xl font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap"
+                        className="flex items-center gap-2 px-6 h-14 bg-primary text-primary-foreground rounded-2xl font-black text-[clamp(0.7rem,3vw,0.875rem)] shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all sm:whitespace-nowrap text-center text-balance overflow-hidden grow sm:grow-0"
                     >
-                        <Plus size={18} />
-                        Add Paper
+                        <Plus size={18} strokeWidth={3} className="shrink-0" />
+                        <span>{t('addPaper.title.add')} {t('addPaper.title.highlight')}</span>
                     </Link>
                 </div>
             )}
@@ -45,11 +45,12 @@ export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarPr
                 <div className="flex flex-col lg:flex-row gap-4 items-center">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-1 w-full">
                         {/* Subject Filter */}
-                        <div className="relative group">
+                        <div className="relative group flex-1">
                             <select
                                 value={subject}
                                 onChange={(e) => setSubject(e.target.value)}
-                                className="w-full h-10 pl-4 pr-10 bg-background border border-input rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
+                                className={`w-full h-10 pl-4 pr-10 bg-muted/50 border border-muted-foreground/20 rounded-2xl focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all font-bold appearance-none cursor-pointer truncate ${currentLanguage === 'ta' ? 'text-[10px]' : 'text-xs sm:text-sm'
+                                    }`}
                             >
                                 <option value="">{t('filters.placeholders.subject')}</option>
                                 {(filters?.subjects || []).slice().sort().map(s => (
@@ -60,11 +61,12 @@ export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarPr
                         </div>
 
                         {/* Year Filter */}
-                        <div className="relative group">
+                        <div className="relative group flex-1">
                             <select
                                 value={year}
                                 onChange={(e) => setYear(e.target.value)}
-                                className="w-full h-10 pl-4 pr-10 bg-background border border-input rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
+                                className={`w-full h-10 pl-4 pr-10 bg-muted/50 border border-muted-foreground/20 rounded-2xl focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all font-bold appearance-none cursor-pointer truncate ${currentLanguage === 'ta' ? 'text-[10px]' : 'text-xs sm:text-sm'
+                                    }`}
                             >
                                 <option value="">{t('filters.placeholders.year')}</option>
                                 {(filters?.years || []).slice().sort((a, b) => parseInt(b) - parseInt(a)).map((y) => (
@@ -77,13 +79,14 @@ export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarPr
                         </div>
 
                         {/* Language Filter */}
-                        <div className="relative group">
+                        <div className="relative group flex-1">
                             <select
                                 value={language}
                                 onChange={(e) => setLanguage(e.target.value)}
-                                className="w-full h-10 pl-4 pr-10 bg-background border border-input rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-bold text-xs sm:text-sm appearance-none cursor-pointer truncate"
+                                className={`w-full h-10 pl-4 pr-10 bg-muted/50 border border-muted-foreground/20 rounded-2xl focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all font-bold appearance-none cursor-pointer truncate ${currentLanguage === 'ta' ? 'text-[10px]' : 'text-xs sm:text-sm'
+                                    }`}
                             >
-                                <option value="">Languages</option>
+                                <option value="">{t('filters.placeholders.language')}</option>
                                 {(filters?.languages || []).map(l => (
                                     <option key={l} value={l}>{l}</option>
                                 ))}
@@ -98,7 +101,7 @@ export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarPr
                             <button
                                 onClick={resetFilters}
                                 type="button"
-                                className="h-12 px-6 flex items-center justify-center gap-2 bg-destructive/5 text-destructive hover:bg-destructive/10 rounded-xl transition-all font-bold text-sm w-full"
+                                className="h-12 px-6 flex items-center justify-center gap-2 bg-destructive/5 text-destructive hover:bg-destructive/10 rounded-2xl transition-all font-bold text-sm w-full"
                                 title={t('filters.reset')}
                             >
                                 <X className="h-5 w-5" />

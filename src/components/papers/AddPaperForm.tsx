@@ -205,10 +205,10 @@ export function AddPaperForm() {
                 </Button>
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold text-secondary tracking-tight">
-                        {paperToEdit ? 'Edit Paper' : 'Add New Paper'}
+                        {paperToEdit ? `${t('addPaper.title.edit')} ${t('addPaper.title.highlight')}` : `${t('addPaper.title.add')} ${t('addPaper.title.highlight')}`}
                     </h1>
-                    <p className="text-sm sm:text-base text-muted-foreground font-medium">
-                        {paperToEdit ? 'Update existing paper details' : 'Upload and catalogue a new past paper'}
+                    <p className="text-sm sm:text-base text-muted-foreground font-medium text-balance">
+                        {paperToEdit ? t('addPaper.help.edit') : t('addPaper.help.add')}
                     </p>
                 </div>
             </div>
@@ -220,11 +220,13 @@ export function AddPaperForm() {
                     <div className="space-y-4">
                         <h3 className="font-bold text-lg text-secondary flex items-center gap-2">
                             <FileText className="h-5 w-5" />
-                            Upload Files
+                            {t('addPaper.dashboard')}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="space-y-2">
-                                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground block text-center">Part 1 (Question)</span>
+                            <div className="space-y-2 text-center">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-secondary/40 text-balance block">
+                                    {t('addPaper.parts.p1')}
+                                </span>
                                 <FileUploadSection
                                     file={part1File}
                                     onFileChange={setPart1File}
@@ -237,8 +239,10 @@ export function AddPaperForm() {
                                     onChangeFile={() => setChangingPart1(true)}
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground block text-center">Part 2 (Question)</span>
+                            <div className="space-y-2 text-center">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-secondary/40 text-balance block">
+                                    {t('addPaper.parts.p2')}
+                                </span>
                                 <FileUploadSection
                                     file={part2File}
                                     onFileChange={setPart2File}
@@ -251,8 +255,10 @@ export function AddPaperForm() {
                                     onChangeFile={() => setChangingPart2(true)}
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground block text-center">Marking Scheme</span>
+                            <div className="space-y-2 text-center">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-secondary/40 text-balance block">
+                                    {t('addPaper.parts.scheme')}
+                                </span>
                                 <FileUploadSection
                                     file={schemeFile}
                                     onFileChange={setSchemeFile}
@@ -278,9 +284,9 @@ export function AddPaperForm() {
                         errors={validationErrors}
                     />
 
-                    <Button type="submit" className="w-full h-16 rounded-2xl font-bold text-lg shadow-2xl shadow-primary/20 hover:-translate-y-1 transition-all" isLoading={loading}>
+                    <Button type="submit" className="w-full h-16 rounded-[1.5rem] font-bold text-lg shadow-2xl shadow-primary/20 hover:-translate-y-1 transition-all" isLoading={loading}>
                         <Save className="mr-3" />
-                        {paperToEdit ? 'Update Paper' : 'Publish Paper'}
+                        {paperToEdit ? t('addPaper.form.submit.save') : t('addPaper.form.submit.publish')}
                     </Button>
                 </form>
             </Card>
