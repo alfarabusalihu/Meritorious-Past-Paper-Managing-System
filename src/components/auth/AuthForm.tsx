@@ -5,12 +5,10 @@ import {
     signOut,
     onAuthStateChanged,
     User,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword
+    signInWithEmailAndPassword
 } from 'firebase/auth'
 import { auth } from '../../lib/firebase'
 import { usersApi } from '../../lib/firebase/users'
-import { configsApi } from '../../lib/firebase/configs'
 import { sendPasswordResetEmail } from 'firebase/auth'
 import { ArrowRight, Mail, Lock, Eye, EyeOff, KeyRound } from 'lucide-react'
 import { Alert } from '../ui/Alert'
@@ -30,6 +28,10 @@ export function AuthForm() {
     const [authError, setAuthError] = useState<string | null>(null)
 
     useEffect(() => {
+        // Security: Clear any legacy sensitive keys from localStorage
+        const sensitiveKeys = ['adminEmail', 'adminmail', 'userEmail', 'lastLogin'];
+        sensitiveKeys.forEach(key => localStorage.removeItem(key));
+
         const unsubscribe = onAuthStateChanged(auth, async (u) => {
             setUser(u)
             if (u) {
@@ -68,48 +70,27 @@ export function AuthForm() {
         setAuthError(null)
 
         try {
-            const adminCreds = await configsApi.getAdminAuth()
-            const adminEmail = adminCreds.email || import.meta.env.VITE_ADMIN_EMAIL || 'admin@gmail.com'
-            const adminPassword = adminCreds.password || import.meta.env.VITE_ADMIN_PASSWORD || 'adminMeritSeries'
+            // Secure Login: Direct Firebase Authentication
+            // We no longer fetch or compare admin credentials on the client side
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const u = userCredential.user;
 
-            if (email === adminEmail && password === adminPassword) {
-                try {
-                    // Try to sign in as the official admin
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password)
-                    const u = userCredential.user
+            // Role check is handled by onAuthStateChanged or a simple fetch
+            const r = await usersApi.getUserRole(u.uid);
 
-                    // Ensure role is super-admin in Firestore
-                    await usersApi.updateUserRole(u.uid, 'super-admin')
-
-                    navigate('/admin')
-                    return
-                } catch (err) {
-                    const authErr = err as { code?: string; message: string }
-                    console.error("Admin Login Error:", authErr)
-                    if (authErr.code === 'auth/operation-not-allowed') {
-                        setAuthError('Error: "Email/Password" sign-in is disabled in your Firebase Console.')
-                        setLoading(false)
-                        return
-                    }
-                    if (authErr.code === 'auth/user-not-found' || authErr.code === 'auth/invalid-credential') {
-                        try {
-                            const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-                            const u = userCredential.user
-
-                            await usersApi.updateUserRole(u.uid, 'super-admin')
-                            navigate('/admin')
-                            return
-                        } catch (createErr) {
-                            throw createErr
-                        }
-                    }
-                    throw err
-                }
+            if (r === 'super-admin') {
+                navigate('/admin');
+            } else {
+                navigate('/'); // Redirect non-admins to home
             }
-
-            setAuthError('Invalid credentials. Access denied.')
         } catch (err) {
-            setAuthError((err as Error).message)
+            const authErr = err as { code?: string; message: string };
+            console.error("Login Error:", authErr);
+            if (authErr.code === 'auth/user-not-found' || authErr.code === 'auth/wrong-password' || authErr.code === 'auth/invalid-credential') {
+                setAuthError('Invalid credentials. Access denied.');
+            } else {
+                setAuthError(authErr.message || 'Authentication failed.');
+            }
         } finally {
             setLoading(false)
         }

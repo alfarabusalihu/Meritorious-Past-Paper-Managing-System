@@ -67,7 +67,6 @@ export const papersApi = {
                 (error: Error) => reject(error),
                 async () => {
                     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                    console.log('[DEBUG] Generated download URL:', downloadURL);
 
                     resolve({
                         url: downloadURL,

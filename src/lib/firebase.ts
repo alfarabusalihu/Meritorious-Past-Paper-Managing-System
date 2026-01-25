@@ -23,10 +23,6 @@ setPersistence(auth, browserSessionPersistence).catch((error) => {
     console.error("Failed to set auth persistence:", error);
 });
 
-// Use the bucket name directly from env (no processing needed for new format)
 const mainBucket = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET;
-
-console.log("Firebase Storage Bucket:", mainBucket);
-
 export const db = getFirestore(app);
 export const storage = getStorage(app, mainBucket);
