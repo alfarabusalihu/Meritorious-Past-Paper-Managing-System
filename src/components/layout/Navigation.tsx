@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { GraduationCap, Languages, ChevronDown, User, Shield, LayoutDashboard, LogOut, Menu, X, CreditCard } from 'lucide-react'
+import { GraduationCap, Languages, ChevronDown, User, Shield, LayoutDashboard, LogOut, Menu, X } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAuth } from '../../context/AuthContext'
 import { useState, useRef, useEffect } from 'react'
@@ -68,9 +68,6 @@ export function Navigation() {
                     >
                         {t('nav.papers')}
                     </button>
-                    <Link to="/contribute" className="transition-all hover:text-primary border-b-2 border-transparent hover:border-primary py-1 uppercase">
-                        {t('nav.contribute') || 'Contribute'}
-                    </Link>
                     {isSuperAdmin && (
                         <Link
                             to="/admin"
@@ -199,10 +196,6 @@ export function Navigation() {
                                 <User size={20} className="text-primary/60" />
                                 {t('nav.papers')}
                             </button>
-                            <Link to="/contribute" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-secondary hover:text-primary transition-colors flex items-center gap-3 uppercase tracking-widest">
-                                <CreditCard size={20} className="text-primary/60" />
-                                {t('nav.contribute') || 'Contribute'}
-                            </Link>
 
                             {isSuperAdmin && (
                                 <Link

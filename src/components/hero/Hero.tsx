@@ -71,13 +71,6 @@ export function Hero() {
                             <span>{t('hero.cta.primary')}</span>
                             <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                         </button>
-                        {/* <Link
-                            to="/contribute"
-                            className="w-full sm:w-auto px-10 py-5 bg-white/5 border border-white/10 text-white rounded-2xl font-black backdrop-blur-md hover:bg-white/10 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3"
-                        >
-                            <span>{t('hero.cta.secondary')}</span>
-                            <BookOpen className="h-5 w-5" />
-                        </Link> */}
                     </motion.div>
                 </div>
             </div>
