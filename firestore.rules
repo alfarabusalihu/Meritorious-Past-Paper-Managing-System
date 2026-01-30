@@ -8,6 +8,14 @@ service cloud.firestore {
         .hasOnly(['visitors', 'contributors', 'papersEngagement']);
     }
 
+    // Visitor logs: Anyone can create/update their own log (for tracking)
+    match /visitor_logs/{visitorId} {
+      allow read: if false; // Logs are write-only for privacy
+      allow create: if true; // Anyone can create their visitor log
+      allow update: if true; // Anyone can update their own log
+      allow delete: if false; // Prevent accidental deletion
+    }
+
     function isSuperAdmin() {
       return request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super-admin';

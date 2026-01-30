@@ -20,7 +20,7 @@ export const translations: Record<string, unknown> = {
                 highlight: "O/L Series",
                 sub: ""
             },
-            description: "Master your exams with ease. Access a comprehensive database of past papers, categorized and filtered for your academic success.",
+            description: "This is an educational initiative by Meritorious’19 (2019 A/L batch) of President’s Science College, Puttalam. We have conducted pilot examinations and explanation seminars in Mathematics and Science for G.C.E. O/L students in both Tamil and English medium. This website is created to provide past papers, marking schemes, and study resources to support the students in effective exam preparation and academic success.",
             cta: {
                 primary: "See Papers",
                 secondary: "Contribute"
@@ -84,9 +84,9 @@ export const translations: Record<string, unknown> = {
                     description: "Built for students, by students and educators committed to academic excellence."
                 }
             ],
-            mission: {
-                title: "Our Mission",
-                description: "To build the most accessible and student-friendly repository of academic resources, eliminating the barriers to high-quality preparation material."
+            vision: {
+                title: "Our Vision",
+                description: "To unite everyone regardless of race, religion, language, or cultural differences by drawing from past experiences and evolving world civilizations."
             }
         },
         addPaper: {
@@ -248,9 +248,9 @@ export const translations: Record<string, unknown> = {
                     description: "கல்வி சிறப்பிற்காக அர்ப்பணிக்கப்பட்ட மாணவர்கள் மற்றும் கல்வியாளர்களால் உருவாக்கப்பட்டது."
                 }
             ],
-            mission: {
-                title: "எங்கள் நோக்கம்",
-                description: "கல்வி வளங்களை மாணவர்கள் எளிதில் அணுகக்கூடிய வகையில் உருவாக்குவதே எங்களின் நோக்கம்."
+            vision: {
+                title: "எங்கள் தூரநோக்கு",
+                description: "முன்னைய அனுபவங்களை கொண்டும் வளர்ந்து வருகின்ற உலக நாகரிகங்களை கொண்டும் இன,  மத, மொழி, கலாசார பண்பாடுகள் பாராது அனைவரையும் ஐக்கியப்படுத்தல்."
             }
         },
         addPaper: {

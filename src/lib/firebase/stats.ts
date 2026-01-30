@@ -1,20 +1,17 @@
 import { db } from '../firebase'
 import { doc, getDoc, updateDoc, increment, setDoc, arrayUnion } from 'firebase/firestore'
+import { getOrCreateVisitorId } from '../cookieUtils'
 
 export interface SystemStats {
     visitors: number
     papersEngagement: number
 }
 
-const getVisitorId = async () => {
-    try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        return btoa(data.ip).replace(/=/g, '');
-    } catch (error) {
-        console.error('Failed to get visitor ID:', error);
-        return null;
-    }
+export interface VisitorLog {
+    lastVisit: number
+    downloads: string[]
+    createdAt: number
+    deleteAt: Date
 }
 
 export const statsApi = {
@@ -47,22 +44,30 @@ export const statsApi = {
     },
 
     async trackVisitor() {
-        const hashedId = await getVisitorId();
-        if (!hashedId) return;
+        // Don't track admin panel visits
+        if (window.location.pathname.startsWith('/admin')) {
+            return;
+        }
+
+        const visitorId = getOrCreateVisitorId();
+        if (!visitorId) return;
 
         try {
-            const visitorRef = doc(db, 'visitor_logs', hashedId);
+            const visitorRef = doc(db, 'visitor_logs', visitorId);
             const visitorSnap = await getDoc(visitorRef);
 
             const now = Date.now();
             const ONE_HOUR = 3600000;
+            const SIX_MONTHS_MS = 180 * 24 * 60 * 60 * 1000;
 
             if (!visitorSnap.exists()) {
                 // First time visitor
                 await this.incrementVisitors();
                 await setDoc(visitorRef, {
                     lastVisit: now,
-                    downloads: []
+                    downloads: [],
+                    createdAt: now,
+                    deleteAt: new Date(now + SIX_MONTHS_MS)
                 });
             } else {
                 const lastVisit = visitorSnap.data().lastVisit;
@@ -78,12 +83,13 @@ export const statsApi = {
     },
 
     async trackDownload(paperId: string): Promise<boolean> {
-        const hashedId = await getVisitorId();
-        if (!hashedId) return false;
+        const visitorId = getOrCreateVisitorId();
+        if (!visitorId) return false;
 
         try {
-            const visitorRef = doc(db, 'visitor_logs', hashedId);
+            const visitorRef = doc(db, 'visitor_logs', visitorId);
             const visitorSnap = await getDoc(visitorRef);
+            const SIX_MONTHS_MS = 180 * 24 * 60 * 60 * 1000;
 
             if (visitorSnap.exists()) {
                 const downloads = visitorSnap.data().downloads || [];
@@ -95,9 +101,12 @@ export const statsApi = {
                 }
             } else {
                 // If log doc doesn't exist for some reason, create it and allow increment
+                const now = Date.now();
                 await setDoc(visitorRef, {
-                    lastVisit: Date.now(),
-                    downloads: [paperId]
+                    lastVisit: now,
+                    downloads: [paperId],
+                    createdAt: now,
+                    deleteAt: new Date(now + SIX_MONTHS_MS)
                 });
                 return true;
             }

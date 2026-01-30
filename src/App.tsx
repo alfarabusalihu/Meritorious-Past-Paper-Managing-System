@@ -19,9 +19,11 @@ const AddPaperForm = lazy(() => import('./components/papers/AddPaperForm').then(
 const Hero = lazy(() => import('./components/hero/Hero').then(m => ({ default: m.Hero })))
 const AdminDashboard = lazy(() => import('./components/pages/AdminDashboard').then(m => ({ default: m.AdminDashboard })))
 const FeaturesGrid = lazy(() => import('./components/about/FeaturesGrid').then(m => ({ default: m.FeaturesGrid })))
-const MissionSection = lazy(() => import('./components/about/MissionSection').then(m => ({ default: m.MissionSection })))
+const VisionSection = lazy(() => import('./components/about/VisionSection').then(m => ({ default: m.VisionSection })))
 const VisitorStats = lazy(() => import('./components/about/VisitorStats').then(m => ({ default: m.VisitorStats })))
 const Contribute = lazy(() => import('./components/pages/Contribute').then(m => ({ default: m.Contribute })))
+const CookieConsent = lazy(() => import('./components/common/CookieConsent').then(m => ({ default: m.CookieConsent })))
+const NotFoundPage = lazy(() => import('./components/ui/NotFoundPage').then(m => ({ default: m.NotFoundPage })))
 
 function AppContent() {
     const isSpecialAdminPortal = isAdminHost()
@@ -38,7 +40,10 @@ function AppContent() {
                     <Suspense fallback={<LoadingPage />}>
                         <Routes>
                             {isSpecialAdminPortal ? (
-                                <Route path="/" element={<AdminDashboard />} />
+                                <>
+                                    <Route path="/" element={<AdminDashboard />} />
+                                    <Route path="*" element={<AdminDashboard />} />
+                                </>
                             ) : (
                                 <>
                                     <Route path="/" element={
@@ -47,11 +52,12 @@ function AppContent() {
                                             <div id="stats-section" className="section-container section-spacing">
                                                 <VisitorStats />
                                             </div>
+
                                             <div id="features-section" className="section-container section-spacing">
                                                 <FeaturesGrid />
                                             </div>
-                                            <div id="mission-section" className="section-container section-spacing">
-                                                <MissionSection />
+                                            <div id="vision-section" className="section-container section-spacing">
+                                                <VisionSection />
                                             </div>
                                             <div id="papers-section" className="section-container section-spacing space-y-12 scroll-mt-24">
                                                 <div className="space-y-4 text-center md:text-left flex flex-col items-center md:items-start">
@@ -76,11 +82,15 @@ function AppContent() {
                                     </div>
                                 </ProtectedRoute>
                             } />
+
+                            {/* Catch-all 404 Route */}
+                            <Route path="*" element={<NotFoundPage />} />
                         </Routes>
                     </Suspense>
                 </ErrorBoundary>
             </main>
             <Footer />
+            <CookieConsent />
         </div>
     )
 }

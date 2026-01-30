@@ -27,7 +27,7 @@ export function Hero() {
                         className="inline-flex items-center gap-2 sm:gap-3 px-6 py-2 sm:px-8 sm:py-3 bg-white/10 border border-white/20 rounded-full text-white text-sm sm:text-base font-black uppercase tracking-[0.2em] backdrop-blur-md shadow-2xl"
                     >
                         <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-purple-400 animate-pulse" />
-                        <span>MERITORIOUS</span>
+                        <span>MERITORIOUS' 19</span>
                     </motion.div>
 
                     <motion.div
@@ -40,8 +40,8 @@ export function Hero() {
                             Merit <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 tracking-normal">O/L</span> Series
                         </h1>
                         <p className={clsx(
-                            "text-sm sm:text-xl text-white/70 max-w-lg sm:max-w-2xl mx-auto font-bold leading-relaxed px-6",
-                            currentLanguage === 'ta' && "text-[0.9em] sm:text-[0.92em]"
+                            "text-base sm:text-lg text-white/80 max-w-2xl sm:max-w-6xl mx-auto font-medium leading-relaxed px-4 sm:px-6 text-balance",
+                            currentLanguage === 'ta' && "text-[0.9em] sm:text-[0.95em]"
                         )}>
                             {t('hero.description')}
                         </p>
