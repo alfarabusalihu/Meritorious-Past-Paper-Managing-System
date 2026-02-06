@@ -4,16 +4,16 @@ service cloud.firestore {
     // Stats: Anyone can read, anyone can increment
     match /stats/global {
       allow read: if true;
-      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+      allow create, update: if request.resource.data.diff(resource.data).affectedKeys()
         .hasOnly(['visitors', 'contributors', 'papersEngagement']);
     }
 
-    // Visitor logs: Anyone can create/update their own log (for tracking)
+    // Visitor logs: Anyone can create/update their own log
     match /visitor_logs/{visitorId} {
-      allow read: if false; // Logs are write-only for privacy
-      allow create: if true; // Anyone can create their visitor log
-      allow update: if true; // Anyone can update their own log
-      allow delete: if false; // Prevent accidental deletion
+      // Allow 'get' for status check, but not 'list' for privacy
+      allow get: if true; 
+      allow create, update: if true;
+      allow delete: if false;
     }
 
     function isSuperAdmin() {
