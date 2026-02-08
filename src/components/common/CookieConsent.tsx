@@ -15,7 +15,7 @@ export function CookieConsent() {
         } else {
             setIsVisible(false);
         }
-    }, [profile]);
+    }, [profile, isVisible]);
 
     const handleAccept = async () => {
         if (!user) return;

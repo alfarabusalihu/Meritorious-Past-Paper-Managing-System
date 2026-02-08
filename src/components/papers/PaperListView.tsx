@@ -72,7 +72,7 @@ export function PaperListView({
             }
         }
         fetchPapers()
-    }, [useClientSideFiltering, ...(!useClientSideFiltering ? [filters] : [])])
+    }, [useClientSideFiltering, filters])
 
     // Client-side filtering for admin mode
     useEffect(() => {

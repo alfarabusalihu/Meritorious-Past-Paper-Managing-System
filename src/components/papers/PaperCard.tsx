@@ -66,9 +66,9 @@ export function PaperCard({ paper, onView, isSuperAdmin, onEdit, onDelete }: Pap
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
             <div className="flex flex-col flex-grow relative z-10">
-                <div className="flex flex-col items-start gap-4 mb-4">
+                <div className="flex flex-col gap-4 mb-4">
                     {/* 1. Document Icon - Bigger & Hover Color Change */}
-                    <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110 transition-all duration-300 w-fit shadow-none">
+                    <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110 transition-all duration-300 w-fit">
                         <FileText size={48} strokeWidth={1.5} />
                     </div>
 
@@ -80,13 +80,13 @@ export function PaperCard({ paper, onView, isSuperAdmin, onEdit, onDelete }: Pap
 
                 {/* 3. Tags - Subject expands, others wrap */}
                 <div className="flex flex-wrap gap-2 mb-6">
-                    <span className="w-fit px-4 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-full uppercase tracking-widest border border-primary/10 text-center">
+                    <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-full uppercase tracking-widest border border-primary/10">
                         {paper.subject}
                     </span>
-                    <span className="w-24 py-1 bg-secondary/10 text-secondary text-[10px] font-black rounded-full uppercase tracking-widest border border-secondary/10 text-center truncate">
+                    <span className="px-3 py-1 bg-secondary/10 text-secondary text-[10px] font-black rounded-full uppercase tracking-widest border border-secondary/10">
                         {paper.year}
                     </span>
-                    <span className="w-24 py-1 bg-blue-500/10 text-blue-600 text-[10px] font-black rounded-full uppercase tracking-widest border border-blue-500/10 text-center truncate">
+                    <span className="px-3 py-1 bg-blue-500/10 text-blue-600 text-[10px] font-black rounded-full uppercase tracking-widest border border-blue-500/10">
                         {paper.language}
                     </span>
                 </div>

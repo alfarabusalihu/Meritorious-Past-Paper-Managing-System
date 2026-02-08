@@ -12,6 +12,7 @@ import { lazy, Suspense } from 'react'
 const HighAdminControls = lazy(() => import('../admin/HighAdminControls').then(m => ({ default: m.HighAdminControls })))
 const DeletePaperDialog = lazy(() => import('../admin/DeletePaperDialog').then(m => ({ default: m.DeletePaperDialog })))
 import { PaperListView } from '../papers/PaperListView'
+
 export function AdminDashboard() {
     const navigate = useNavigate()
     const { t } = useLanguage()

@@ -91,7 +91,8 @@ export const translations: Record<string, unknown> = {
             },
             initiative: {
                 title: "Our Initiative",
-                description: "This is an educational initiative by Meritorious’19 (2019 A/L batch) of President’s Science College, Puttalam. We have conducted pilot examinations and explanation seminars in Mathematics and Science for G.C.E. O/L students in both Tamil and English medium. This website is created to provide past papers, marking schemes, and study resources to support the students in effective exam preparation and academic success."
+                descriptionPart1: "This is an educational initiative by Meritorious’19 (2019 A/L batch) of President’s Science College, Puttalam. We have conducted pilot examinations and explanation seminars in Mathematics and Science for G.C.E. O/L students in both Tamil and English medium.",
+                descriptionPart2: "This website is created to provide past papers, marking schemes, and study resources to support the students in effective exam preparation and academic success."
             }
         },
         addPaper: {
@@ -260,7 +261,8 @@ export const translations: Record<string, unknown> = {
             },
             initiative: {
                 title: "எங்கள் முயற்சி",
-                description: "இது புத்தளம் மன்-பரேசா (2019 A/L அணி) மெரிடோரியஸ்’19 இன் ஒரு கல்வி முயற்சியாகும். க.பொ.த சாதாரண தர மாணவர்களுக்கு கணிதம் மற்றும் விஞ்ஞானப் பாடங்களில் முன்னோடிப் பரீட்சைகள் மற்றும் விளக்கக் கருத்தரங்குகளைத் தமிழ் மற்றும் ஆங்கில மொழிகளில் நடத்தியுள்ளோம். மாணவர்களின் பரீட்சைத் தயாரிப்பு மற்றும் கல்வி வெற்றிக்காக கடந்த கால வினாத்தாள்கள், புள்ளித்திட்டங்கள் மற்றும் கற்றல் வளங்களை வழங்குவதற்காக இந்த இணையதளம் உருவாக்கப்பட்டுள்ளது."
+                descriptionPart1: "இது புத்தளம் மன்-பரேசா (2019 A/L அணி) மெரிடோரியஸ்’19 இன் ஒரு கல்வி முயற்சியாகும். க.பொ.த சாதாரண தர மாணவர்களுக்கு கணிதம் மற்றும் விஞ்ஞானப் பாடங்களில் முன்னோடிப் பரீட்சைகள் மற்றும் விளக்கக் கருத்தரங்குகளைத் தமிழ் மற்றும் ஆங்கில மொழிகளில் நடத்தியுள்ளோம்.",
+                descriptionPart2: "மாணவர்களின் பரீட்சைத் தயாரிப்பு மற்றும் கல்வி வெற்றிக்காக கடந்த கால வினாத்தாள்கள், புள்ளித்திட்டங்கள் மற்றும் கற்றல் வளங்களை வழங்குவதற்காக இந்த இணையதளம் உருவாக்கப்பட்டுள்ளது."
             }
         },
         addPaper: {

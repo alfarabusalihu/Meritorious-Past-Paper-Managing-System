@@ -4,7 +4,7 @@ export function toSentenceCase(str: string): string {
 
     // 1. Remove all characters except text, numbers, spaces, and parentheses
     // 2. Replace underscores and hyphens with spaces
-    let cleaned = str.replace(/[_\-]+/g, ' ');
+    let cleaned = str.replace(/[_-]+/g, ' ');
     cleaned = cleaned.replace(/[^a-zA-Z0-9\s()]/g, '');
 
     // 3. Clean up multiple spaces

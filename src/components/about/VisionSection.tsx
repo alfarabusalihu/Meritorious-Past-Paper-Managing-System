@@ -11,7 +11,7 @@ export function VisionSection() {
         },
         {
             title: t('about.initiative.title'),
-            description: t('about.initiative.description'),
+            description: t('about.initiative.descriptionPart1'),
             gradient: "from-blue-500/20 to-emerald-500/20"
         }
     ]
@@ -28,7 +28,7 @@ export function VisionSection() {
                     <div className="absolute top-0 right-0 w-1/3 h-full bg-white/5 skew-x-12 -z-0 pointer-events-none" />
 
                     <div className="relative z-10 space-y-4">
-                        <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white/90">
+                        <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white/90 text-center">
                             {card.title}
                         </h2>
                         <p className="text-base sm:text-lg text-secondary-foreground/70 leading-relaxed font-medium text-balance">

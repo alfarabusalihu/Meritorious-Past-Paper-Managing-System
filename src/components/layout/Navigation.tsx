@@ -34,7 +34,7 @@ export function Navigation() {
         }
         document.addEventListener("mousedown", handleClickOutside)
         return () => document.removeEventListener("mousedown", handleClickOutside)
-    }, [])
+    }, []) // Ref setters and refs don't need to be in deps
 
     const handleHomeClick = (e: React.MouseEvent) => {
         if (window.location.pathname === '/') {
