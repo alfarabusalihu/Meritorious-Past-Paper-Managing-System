@@ -21,6 +21,7 @@ export const translations: Record<string, unknown> = {
                 sub: ""
             },
             description: "This is an educational initiative by Meritorious’19 (2019 A/L batch) of President’s Science College, Puttalam. We have conducted pilot examinations and explanation seminars in Mathematics and Science for G.C.E. O/L students in both Tamil and English medium. This website is created to provide past papers, marking schemes, and study resources to support the students in effective exam preparation and academic success.",
+            descriptionSummary: "An educational initiative by Meritorious’19, providing curated past papers and study resources for G.C.E. O/L students.",
             cta: {
                 primary: "See Papers",
                 secondary: "Contribute"
@@ -39,7 +40,7 @@ export const translations: Record<string, unknown> = {
             placeholders: {
                 subject: "Subjects",
                 year: "Years",
-                language: "Languages"
+                medium: "Medium"
             }
         },
         papers: {
@@ -87,6 +88,10 @@ export const translations: Record<string, unknown> = {
             vision: {
                 title: "Our Vision",
                 description: "To unite everyone regardless of race, religion, language, or cultural differences by drawing from past experiences and evolving world civilizations."
+            },
+            initiative: {
+                title: "Our Initiative",
+                description: "This is an educational initiative by Meritorious’19 (2019 A/L batch) of President’s Science College, Puttalam. We have conducted pilot examinations and explanation seminars in Mathematics and Science for G.C.E. O/L students in both Tamil and English medium. This website is created to provide past papers, marking schemes, and study resources to support the students in effective exam preparation and academic success."
             }
         },
         addPaper: {
@@ -98,7 +103,7 @@ export const translations: Record<string, unknown> = {
             },
             form: {
                 year: "Publication Year",
-                language: "Language",
+                medium: "Medium",
                 name: "Display Name",
                 subject: "Academic Subject",
                 placeholder: {
@@ -185,6 +190,7 @@ export const translations: Record<string, unknown> = {
                 sub: "Series"
             },
             description: "உங்கள் கல்வி வெற்றிக்குத் தேவையான வினாத்தாள்களின் விரிவான தரவுத்தளத்தை ஒரே இடத்தில் அணுகுங்கள்.",
+            descriptionSummary: "O/L வினாத்தாள்கள் மற்றும் கற்றல் வளங்களை எளிதாக அணுகுங்கள்.",
             cta: {
                 primary: "வினாத்தாள்களைக் காண்க",
                 secondary: "பங்களிக்கவும்"
@@ -203,7 +209,7 @@ export const translations: Record<string, unknown> = {
             placeholders: {
                 subject: "பாடங்கள்",
                 year: "ஆண்டுகள்",
-                language: "மொழிகள்"
+                medium: "மொழிமூலம்"
             }
         },
         papers: {
@@ -251,6 +257,10 @@ export const translations: Record<string, unknown> = {
             vision: {
                 title: "எங்கள் தூரநோக்கு",
                 description: "முன்னைய அனுபவங்களை கொண்டும் வளர்ந்து வருகின்ற உலக நாகரிகங்களை கொண்டும் இன,  மத, மொழி, கலாசார பண்பாடுகள் பாராது அனைவரையும் ஐக்கியப்படுத்தல்."
+            },
+            initiative: {
+                title: "எங்கள் முயற்சி",
+                description: "இது புத்தளம் மன்-பரேசா (2019 A/L அணி) மெரிடோரியஸ்’19 இன் ஒரு கல்வி முயற்சியாகும். க.பொ.த சாதாரண தர மாணவர்களுக்கு கணிதம் மற்றும் விஞ்ஞானப் பாடங்களில் முன்னோடிப் பரீட்சைகள் மற்றும் விளக்கக் கருத்தரங்குகளைத் தமிழ் மற்றும் ஆங்கில மொழிகளில் நடத்தியுள்ளோம். மாணவர்களின் பரீட்சைத் தயாரிப்பு மற்றும் கல்வி வெற்றிக்காக கடந்த கால வினாத்தாள்கள், புள்ளித்திட்டங்கள் மற்றும் கற்றல் வளங்களை வழங்குவதற்காக இந்த இணையதளம் உருவாக்கப்பட்டுள்ளது."
             }
         },
         addPaper: {
@@ -262,7 +272,7 @@ export const translations: Record<string, unknown> = {
             },
             form: {
                 year: "வெளியிடப்பட்ட ஆண்டு",
-                language: "மொழி",
+                medium: "மொழிமூலம்",
                 name: "பெயர்",
                 subject: "பாடம்",
                 placeholder: {

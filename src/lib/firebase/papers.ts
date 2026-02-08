@@ -177,11 +177,12 @@ export const papersApi = {
         await updateDoc(docRef, updates);
     },
 
-    async incrementDownloadCount(paperId: string) {
+    async incrementDownloadCount(paperId: string, uid: string) {
+        if (!uid) return;
         const docRef = doc(db, PAPERS_COLLECTION, paperId);
         try {
-            // New Requirement: Unique download per user (IP-based)
-            const shouldIncrement = await statsApi.trackDownload(paperId);
+            // New Requirement: Unique download per user (IP-based) - Now Auth based
+            const shouldIncrement = await statsApi.trackDownload(paperId, uid);
 
             if (shouldIncrement) {
                 const snapshot = await getDoc(docRef);

@@ -82,13 +82,13 @@ export function PaperFormFields({
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/60 px-1">Language</label>
+                    <label className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/60 px-1">{t('addPaper.form.medium')}</label>
                     <select
                         className={`h-14 w-full rounded-2xl border border-muted-foreground/20 bg-muted/50 px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all cursor-pointer ${errors.language ? 'ring-2 ring-destructive/20 border-destructive/50' : ''}`}
                         value={language}
                         onChange={(e) => setLanguage(e.target.value)}
                     >
-                        <option value="">Select Language</option>
+                        <option value="">Select Medium</option>
                         {((dynamicFilters?.languages as string[]) || []).map(l => (
                             <option key={l} value={l}>{l}</option>
                         ))}

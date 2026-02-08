@@ -56,7 +56,10 @@
 - ⚙️ **System Configuration**: 
   - Dynamic filter options ( Subjects, Years, Languages)
   - Social media link management
-- 📊 **Analytics Dashboard**: Visitor tracking and contribution monitoring
+- 📊 **Analytics Dashboard**: 
+  - Privacy-first Firebase-centric visitor tracking
+  - Unique paper engagement monitoring (Anonymous Auth based)
+  - Real-time global stats (calculated server-side/Firestore)
 
 ### Contribution System
 

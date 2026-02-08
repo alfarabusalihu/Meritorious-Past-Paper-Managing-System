@@ -45,6 +45,7 @@ export interface UserProfile {
     blocked?: boolean;
     photoURL?: string;
     papersUploaded?: number; // Track contributor stats
+    hasConsented?: boolean; // GDPR tracking consent
     createdAt: Timestamp | Date;
 }
 

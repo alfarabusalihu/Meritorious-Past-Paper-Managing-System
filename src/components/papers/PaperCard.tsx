@@ -40,6 +40,7 @@ export function PaperCard({ paper, onView, isSuperAdmin, onEdit, onDelete }: Pap
                         }}
                         className="p-3 bg-white/95 backdrop-blur-md rounded-2xl text-secondary shadow-xl hover:bg-primary hover:text-white transition-all transform hover:scale-110 active:scale-90 border border-muted"
                         title="Edit Paper"
+                        aria-label="Edit Paper"
                     >
                         <Pencil size={18} strokeWidth={2.5} />
                     </button>
@@ -50,6 +51,7 @@ export function PaperCard({ paper, onView, isSuperAdmin, onEdit, onDelete }: Pap
                         }}
                         className="p-3 bg-white/95 backdrop-blur-md rounded-2xl text-destructive shadow-xl hover:bg-destructive hover:text-white transition-all transform hover:scale-110 active:scale-90 border border-muted"
                         title="Delete Paper"
+                        aria-label="Delete Paper"
                     >
                         <Trash2 size={18} strokeWidth={2.5} />
                     </button>

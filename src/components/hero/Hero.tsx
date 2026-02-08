@@ -1,10 +1,12 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight, Sparkles, ChevronDown, ChevronUp } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
 import { clsx } from 'clsx'
 
 export function Hero() {
     const { t, language: currentLanguage } = useLanguage()
+    const [isExpanded, setIsExpanded] = useState(false)
 
     return (
         <section
@@ -34,24 +36,42 @@ export function Hero() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="flex flex-col items-center justify-center w-full relative space-y-3 sm:space-y-10"
+                        className="flex flex-col items-center justify-center w-full relative space-y-3 sm:space-y-8"
                     >
                         <h1 className="text-[clamp(1.75rem,7vw,8rem)] font-black tracking-[0.12em] sm:tracking-[0.16em] text-white leading-none uppercase whitespace-nowrap mr-[-0.12em] sm:mr-[-0.16em] select-none">
                             Merit <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 tracking-normal">O/L</span> Series
                         </h1>
-                        <p className={clsx(
-                            "text-base sm:text-lg text-white/80 max-w-2xl sm:max-w-6xl mx-auto font-medium leading-relaxed px-4 sm:px-6 text-balance",
-                            currentLanguage === 'ta' && "text-[0.9em] sm:text-[0.95em]"
-                        )}>
-                            {t('hero.description')}
-                        </p>
+
+                        <div className="max-w-xl sm:max-w-2xl mx-auto px-6">
+                            <motion.p
+                                layout
+                                className={clsx(
+                                    "text-sm sm:text-base text-white/70 font-medium leading-relaxed text-balance",
+                                    currentLanguage === 'ta' && "text-[0.85em]"
+                                )}
+                            >
+                                {isExpanded ? t('hero.description') : t('hero.descriptionSummary')}
+                            </motion.p>
+
+                            <motion.button
+                                layout
+                                onClick={() => setIsExpanded(!isExpanded)}
+                                className="mt-2 text-purple-400 hover:text-purple-300 text-xs sm:text-sm font-bold flex items-center gap-1 mx-auto transition-colors"
+                            >
+                                {isExpanded ? (
+                                    <>Show Less <ChevronUp className="h-4 w-4" /></>
+                                ) : (
+                                    <>Read More <ChevronDown className="h-4 w-4" /></>
+                                )}
+                            </motion.button>
+                        </div>
                     </motion.div>
 
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4 sm:pt-10"
+                        className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4 sm:pt-6"
                     >
                         <button
                             onClick={() => {

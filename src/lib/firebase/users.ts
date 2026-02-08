@@ -49,6 +49,11 @@ export const usersApi = {
         await setDoc(userRef, { role }, { merge: true });
     },
 
+    async updateUserConsent(uid: string, hasConsented: boolean) {
+        const userRef = doc(db, USERS_COLLECTION, uid);
+        await setDoc(userRef, { hasConsented }, { merge: true });
+    },
+
     async getAllUsers(): Promise<UserProfile[]> {
         const snapshot = await getDocs(collection(db, USERS_COLLECTION));
         return snapshot.docs.map(doc => doc.data() as UserProfile);

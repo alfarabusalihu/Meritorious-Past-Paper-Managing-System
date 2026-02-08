@@ -86,7 +86,7 @@ export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarPr
                                 className={`w-full h-10 pl-4 pr-10 bg-muted/50 border border-muted-foreground/20 rounded-2xl focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all font-bold appearance-none cursor-pointer truncate ${currentLanguage === 'ta' ? 'text-[10px]' : 'text-xs sm:text-sm'
                                     }`}
                             >
-                                <option value="">{t('filters.placeholders.language')}</option>
+                                <option value="">{t('filters.placeholders.medium')}</option>
                                 {(filters?.languages || []).map(l => (
                                     <option key={l} value={l}>{l}</option>
                                 ))}

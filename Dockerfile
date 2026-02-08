@@ -1,6 +1,5 @@
-# Multi-stage Dockerfile for Merit series
 # Stage 1: Build the application
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 

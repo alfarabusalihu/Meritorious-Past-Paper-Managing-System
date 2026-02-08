@@ -37,7 +37,12 @@ export function VisitorStats() {
                 setLoading(false)
             }
         }
+
         fetchStats()
+
+        // Listen for real-time tracking updates (e.g. from CookieConsent)
+        window.addEventListener('visitor-tracked', fetchStats);
+        return () => window.removeEventListener('visitor-tracked', fetchStats);
     }, [])
 
     const statsConfig = [

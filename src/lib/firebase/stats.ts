@@ -1,6 +1,6 @@
 import { db } from '../firebase'
-import { doc, getDoc, updateDoc, increment, setDoc, arrayUnion } from 'firebase/firestore'
-import { getOrCreateVisitorId } from '../cookieUtils'
+import { doc, getDoc, updateDoc, increment, setDoc, arrayUnion, onSnapshot } from 'firebase/firestore'
+import { auth } from '../firebase'
 
 export interface SystemStats {
     visitors: number
@@ -43,17 +43,27 @@ export const statsApi = {
         }
     },
 
-    async trackVisitor() {
+    subscribeToStats(callback: (stats: SystemStats) => void) {
+        const docRef = doc(db, 'stats', 'global');
+        return onSnapshot(docRef, (snap) => {
+            if (snap.exists()) {
+                callback(snap.data() as SystemStats);
+            } else {
+                callback({ visitors: 0, papersEngagement: 0 });
+            }
+        });
+    },
+
+    async trackVisitor(uid: string) {
         // Don't track admin panel visits
-        if (window.location.pathname.startsWith('/admin')) {
+        if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
             return;
         }
 
-        const visitorId = getOrCreateVisitorId();
-        if (!visitorId) return;
+        if (!uid) return;
 
         try {
-            const visitorRef = doc(db, 'visitor_logs', visitorId);
+            const visitorRef = doc(db, 'visitor_logs', uid);
             const visitorSnap = await getDoc(visitorRef);
 
             const now = Date.now();
@@ -70,7 +80,8 @@ export const statsApi = {
                     deleteAt: new Date(now + SIX_MONTHS_MS)
                 });
             } else {
-                const lastVisit = visitorSnap.data().lastVisit;
+                const data = visitorSnap.data() as VisitorLog;
+                const lastVisit = data.lastVisit;
                 if (now - lastVisit > ONE_HOUR) {
                     // Returning after 1 hour session
                     await this.incrementVisitors();
@@ -82,26 +93,27 @@ export const statsApi = {
         }
     },
 
-    async trackDownload(paperId: string): Promise<boolean> {
-        const visitorId = getOrCreateVisitorId();
-        if (!visitorId) return false;
+    async trackDownload(paperId: string, uid: string): Promise<boolean> {
+        if (!uid || !paperId) return false;
 
         try {
-            const visitorRef = doc(db, 'visitor_logs', visitorId);
+            const visitorRef = doc(db, 'visitor_logs', uid);
             const visitorSnap = await getDoc(visitorRef);
+            const now = Date.now();
             const SIX_MONTHS_MS = 180 * 24 * 60 * 60 * 1000;
 
             if (visitorSnap.exists()) {
-                const downloads = visitorSnap.data().downloads || [];
+                const data = visitorSnap.data() as VisitorLog;
+                const downloads = data.downloads || [];
                 if (!downloads.includes(paperId)) {
                     await updateDoc(visitorRef, {
-                        downloads: arrayUnion(paperId)
+                        downloads: arrayUnion(paperId),
+                        lastVisit: now // Also update last visit when they download
                     });
                     return true;
                 }
             } else {
-                // If log doc doesn't exist for some reason, create it and allow increment
-                const now = Date.now();
+                // If log doc doesn't exist, create it
                 await setDoc(visitorRef, {
                     lastVisit: now,
                     downloads: [paperId],
@@ -119,16 +131,12 @@ export const statsApi = {
     async incrementEngagement() {
         const docRef = doc(db, 'stats', 'global')
         try {
-            const snap = await getDoc(docRef)
-            if (!snap.exists()) {
-                await setDoc(docRef, { visitors: 0, papersEngagement: 1 })
-            } else {
-                await updateDoc(docRef, {
-                    papersEngagement: increment(1)
-                })
-            }
+            await updateDoc(docRef, {
+                papersEngagement: increment(1)
+            })
         } catch (error) {
-            console.error('Failed to increment engagement:', error)
+            // Fallback for missing global stats doc
+            await setDoc(docRef, { visitors: 0, papersEngagement: 1 }, { merge: true })
         }
     },
 

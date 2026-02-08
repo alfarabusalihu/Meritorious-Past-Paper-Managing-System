@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { onAuthStateChanged, User, signOut, setPersistence, browserSessionPersistence } from 'firebase/auth';
+import { onAuthStateChanged, User, signOut, setPersistence, browserSessionPersistence, signInAnonymously } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { usersApi } from '../lib/firebase/users';
 import { UserProfile } from '../lib/firebase/schema';
@@ -10,6 +10,7 @@ interface AuthContextType {
     profile: UserProfile | null;
     loading: boolean;
     isSuperAdmin: boolean;
+    updateConsent: (accepted: boolean) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,26 +29,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }, []);
 
+    const updateConsent = async (accepted: boolean) => {
+        if (!user) return;
+        try {
+            await usersApi.updateUserConsent(user.uid, accepted);
+            // Re-sync profile to reflect change
+            const p = await usersApi.syncUser(user.uid, user.email || '', user.displayName || (user.isAnonymous ? 'Visitor' : 'User'));
+            setProfile(p);
+        } catch (error) {
+            console.error('Failed to update consent:', error);
+        }
+    };
+
     // Auto-logout after 15 minutes of inactivity (900000ms)
-    // Only active when a user is logged in
-    useInactivity(handleLogout, 900000, !!user);
+    // Only active when a real user is logged in (not anonymous)
+    useInactivity(handleLogout, 900000, !!user && !user?.isAnonymous);
 
     useEffect(() => {
         // Enforce Session Persistence (Logout on Tab Close)
         setPersistence(auth, browserSessionPersistence).catch(console.error);
 
         const unsubscribe = onAuthStateChanged(auth, async (u) => {
-            setUser(u);
-            if (u) {
-                // Fetch profile to get roles
+            if (!u) {
+                // Automatically sign in anonymously if no one is present
                 try {
-                    const p = await usersApi.syncUser(u.uid, u.email || '', u.displayName || 'User');
-                    setProfile(p);
+                    await signInAnonymously(auth);
                 } catch (error) {
-                    console.error('Error syncing user:', error);
+                    console.error('Anonymous auth failed:', error);
+                    setLoading(false);
                 }
-            } else {
-                setProfile(null);
+                return;
+            }
+
+            setUser(u);
+            try {
+                const p = await usersApi.syncUser(u.uid, u.email || '', u.displayName || (u.isAnonymous ? 'Visitor' : 'User'));
+                setProfile(p);
+            } catch (error) {
+                console.error('Error syncing user:', error);
             }
             setLoading(false);
         });
@@ -58,7 +77,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         profile,
         loading,
-        isSuperAdmin: profile?.role === 'super-admin'
+        isSuperAdmin: profile?.role === 'super-admin',
+        updateConsent
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

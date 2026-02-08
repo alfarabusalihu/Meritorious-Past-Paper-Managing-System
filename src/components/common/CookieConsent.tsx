@@ -1,26 +1,32 @@
 import { useState, useEffect } from 'react';
 import { Cookie, X } from 'lucide-react';
-import { hasConsentChoice, setConsent } from '../../lib/cookieUtils';
+import { useAuth } from '../../context/AuthContext';
+import { statsApi } from '../../lib/firebase/stats';
 
 export function CookieConsent() {
+    const { user, profile, updateConsent } = useAuth();
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        // Only show if user hasn't made a choice yet
-        if (!hasConsentChoice()) {
-            // Delay showing banner slightly for better UX
+        // Show banner if consent choice hasn't been made yet (stored in Firestore)
+        if (profile && profile.hasConsented === undefined) {
             const timer = setTimeout(() => setIsVisible(true), 1000);
             return () => clearTimeout(timer);
+        } else {
+            setIsVisible(false);
         }
-    }, []);
+    }, [profile]);
 
-    const handleAccept = () => {
-        setConsent(true);
+    const handleAccept = async () => {
+        if (!user) return;
+        await updateConsent(true);
+        statsApi.trackVisitor(user.uid);
         setIsVisible(false);
     };
 
-    const handleDecline = () => {
-        setConsent(false);
+    const handleDecline = async () => {
+        if (!user) return;
+        await updateConsent(false);
         setIsVisible(false);
     };
 
