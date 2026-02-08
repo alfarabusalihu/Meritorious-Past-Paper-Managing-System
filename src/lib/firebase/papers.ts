@@ -53,7 +53,7 @@ export const papersApi = {
             }
         });
 
-        return new Promise<{ url: string; metadata: any }>((resolve, reject) => {
+        return new Promise<{ url: string; metadata: Paper['metadata'] }>((resolve, reject) => {
             let lastUpdate = 0;
             uploadTask.on('state_changed',
                 (snapshot: UploadTaskSnapshot) => {

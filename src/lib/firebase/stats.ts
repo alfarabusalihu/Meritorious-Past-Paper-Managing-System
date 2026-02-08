@@ -1,6 +1,5 @@
 import { db } from '../firebase'
 import { doc, getDoc, updateDoc, increment, setDoc, arrayUnion, onSnapshot } from 'firebase/firestore'
-import { auth } from '../firebase'
 
 export interface SystemStats {
     visitors: number
@@ -37,7 +36,7 @@ export const statsApi = {
             await updateDoc(docRef, {
                 visitors: increment(1)
             })
-        } catch (error) {
+        } catch {
             // If doc doesn't exist, create it
             await setDoc(docRef, { visitors: 1, papersEngagement: 0 }, { merge: true })
         }
@@ -134,7 +133,7 @@ export const statsApi = {
             await updateDoc(docRef, {
                 papersEngagement: increment(1)
             })
-        } catch (error) {
+        } catch {
             // Fallback for missing global stats doc
             await setDoc(docRef, { visitors: 0, papersEngagement: 1 }, { merge: true })
         }
