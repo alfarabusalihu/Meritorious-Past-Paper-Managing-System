@@ -22,10 +22,12 @@ export function usePaperPagination<T>({
 }: UsePaperPaginationProps<T>): UsePaperPaginationReturn<T> {
     const [currentPage, setCurrentPage] = useState(1)
 
+    const itemLength = items.length;
+
     // Reset to page 1 when filters or items change
     useEffect(() => {
         setCurrentPage(1)
-    }, [...resetTriggers, items.length])
+    }, [itemLength, resetTriggers])
 
     // Pagination calculations
     const indexOfLastItem = currentPage * itemsPerPage

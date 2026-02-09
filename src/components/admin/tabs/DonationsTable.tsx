@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { donationsApi } from '../../../lib/firebase/donations'
 import { Contribution } from '../../../lib/firebase/schema'
 import { generateReceipt } from '../../../lib/receipts'
@@ -14,11 +14,7 @@ export function DonationsTable({ onSnackbar }: DonationsTableProps) {
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
 
-    useEffect(() => {
-        fetchDonations()
-    }, [])
-
-    const fetchDonations = async () => {
+    const fetchDonations = useCallback(async () => {
         setLoading(true)
         try {
             const data = await donationsApi.getContributions()
@@ -29,7 +25,12 @@ export function DonationsTable({ onSnackbar }: DonationsTableProps) {
         } finally {
             setLoading(false)
         }
-    }
+    }, [onSnackbar]);
+
+    useEffect(() => {
+        fetchDonations()
+    }, [fetchDonations])
+
 
     const handleSendEmail = (donation: Contribution) => {
         const subject = encodeURIComponent("Thank You for Your Contribution - Merit O/L Series");
@@ -116,7 +117,7 @@ export function DonationsTable({ onSnackbar }: DonationsTableProps) {
                                 <td className="px-6 py-5 text-sm font-bold text-muted-foreground">
                                     {donation.timestamp instanceof Date
                                         ? donation.timestamp.toLocaleDateString()
-                                        : (donation.timestamp as any).toDate?.().toLocaleDateString() || 'N/A'}
+                                        : (donation.timestamp as { toDate?: () => Date }).toDate?.().toLocaleDateString() || 'N/A'}
                                 </td>
                                 <td className="px-6 py-5">
                                     <div className="flex items-center justify-center gap-2">

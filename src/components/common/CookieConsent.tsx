@@ -1,32 +1,42 @@
 import { useState, useEffect } from 'react';
 import { Cookie, X } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { statsApi } from '../../lib/firebase/stats';
+import { signInAnonymously } from 'firebase/auth';
+import { auth } from '../../lib/firebase';
 
 export function CookieConsent() {
-    const { user, profile, updateConsent } = useAuth();
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        // Show banner if consent choice hasn't been made yet (stored in Firestore)
-        if (profile && profile.hasConsented === undefined) {
-            const timer = setTimeout(() => setIsVisible(true), 1000);
-            return () => clearTimeout(timer);
-        } else {
-            setIsVisible(false);
-        }
-    }, [profile, isVisible]);
+        // Show banner if consent choice hasn't been made yet
+        import('../../lib/cookieUtils').then(({ hasConsentChoice }) => {
+            if (!hasConsentChoice()) {
+                const timer = setTimeout(() => setIsVisible(true), 1000);
+                return () => clearTimeout(timer);
+            } else {
+                setIsVisible(false);
+            }
+        });
+    }, []);
 
     const handleAccept = async () => {
-        if (!user) return;
-        await updateConsent(true);
-        statsApi.trackVisitor(user.uid);
+        const { setConsent } = await import('../../lib/cookieUtils');
+        setConsent(true);
+
+        // Trigger anonymous auth now that we have consent
+        try {
+            await signInAnonymously(auth);
+        } catch (err: unknown) {
+            // Already signed in or restricted
+            const error = err as { message?: string };
+            console.warn('Initial anonymous auth status:', error?.message);
+        }
+
         setIsVisible(false);
     };
 
     const handleDecline = async () => {
-        if (!user) return;
-        await updateConsent(false);
+        const { setConsent } = await import('../../lib/cookieUtils');
+        setConsent(false);
         setIsVisible(false);
     };
 

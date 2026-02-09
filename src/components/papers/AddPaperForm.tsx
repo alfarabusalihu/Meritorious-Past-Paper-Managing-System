@@ -157,7 +157,7 @@ export function AddPaperForm() {
 
             // Ensure 100% at the end
 
-            const paperData: any = {
+            const paperData = {
                 title: title.trim(),
                 subject,
                 year: parseInt(year),

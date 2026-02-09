@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, QuerySnapshot, DocumentData } from 'firebase/firestore';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import * as fs from 'fs';
-import * as path from 'path';
 import 'dotenv/config'; // Requires 'dotenv' to be installed or run with vite-node
 
 // Firebase config from .env
@@ -40,6 +39,7 @@ async function runSnapshot() {
         console.log('\n--- Health Check ---');
         let issues = 0;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data.papers.forEach((p: any) => {
             if (!p.files) {
                 console.warn(`⚠️  Paper [${p.id}] (${p.title}) is missing the 'files' object (Legacy).`);
@@ -47,6 +47,7 @@ async function runSnapshot() {
             }
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data.users.forEach((u: any) => {
             if (u.role === 'admin') {
                 console.warn(`⚠️  User [${u.uid}] (${u.email}) has the legacy 'admin' role.`);

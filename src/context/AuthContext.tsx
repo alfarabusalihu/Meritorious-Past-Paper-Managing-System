@@ -51,11 +51,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const unsubscribe = onAuthStateChanged(auth, async (u) => {
             if (!u) {
-                // Automatically sign in anonymously if no one is present
-                try {
-                    await signInAnonymously(auth);
-                } catch (error) {
-                    console.error('Anonymous auth failed:', error);
+                // Only sign in anonymously if cookie consent is already given
+                const { hasConsent } = await import('../lib/cookieUtils');
+                if (hasConsent()) {
+                    try {
+                        await signInAnonymously(auth);
+                    } catch (error) {
+                        console.error('Anonymous auth failed:', error);
+                        setLoading(false);
+                    }
+                } else {
                     setLoading(false);
                 }
                 return;
@@ -63,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             setUser(u);
             try {
+                // Visitors (anonymous) get a simple sync, real users get their profile
                 const p = await usersApi.syncUser(u.uid, u.email || '', u.displayName || (u.isAnonymous ? 'Visitor' : 'User'));
                 setProfile(p);
             } catch (error) {
@@ -84,6 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
     const context = useContext(AuthContext);
     if (context === undefined) {

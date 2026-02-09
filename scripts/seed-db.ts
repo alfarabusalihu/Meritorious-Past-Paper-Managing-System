@@ -31,7 +31,7 @@ export const seedData = async () => {
     // Initial Filters
     const filtersRef = doc(db, 'configs', 'filters')
     const filtersSnap = await getDoc(filtersRef)
-    const existingFilters = filtersSnap.exists() ? filtersSnap.data() as any : {}
+    const existingFilters = filtersSnap.exists() ? filtersSnap.data() as { subjects?: string[]; languages?: string[]; years?: string[] } : {}
 
     console.log('🔍 Configuring filters...');
     const coreFilters = {
