@@ -42,5 +42,6 @@ dist-ssr
 *.local
 DEPLOYMENT.md
 ARCHITECTURE.md
+check.txt
 db-snapshot.json
 *.json.local

@@ -61,68 +61,74 @@ export const statsApi = {
 
         if (!uid) return;
 
+        const visitorRef = doc(db, 'visitor_logs', uid);
+        const now = Date.now();
+        const SIX_MONTHS_MS = 180 * 24 * 60 * 60 * 1000;
+
         try {
-            const visitorRef = doc(db, 'visitor_logs', uid);
-            const visitorSnap = await getDoc(visitorRef);
+            // Attempt to update existing visitor log
+            await updateDoc(visitorRef, {
+                lastVisit: now
+            });
 
-            const now = Date.now();
-            const ONE_HOUR = 3600000;
-            const SIX_MONTHS_MS = 180 * 24 * 60 * 60 * 1000;
+            // Note: We'd need to check if incrementing is still needed based on lastVisit
+            // but updateDoc doesn't return the data. To keep it optimized with ONE_HOUR gap,
+            // we'll stick to getDoc if we REALLY need that logic, OR we can use a cookie-based session
+            // check which is already done in useVisitorTracker.ts. 
+            // Since useVisitorTracker already checks isSessionActive(), we can safely increment here.
+            await this.incrementVisitors();
 
-            if (!visitorSnap.exists()) {
+        } catch (error: any) {
+            if (error.code === 'not-found') {
                 // First time visitor
-                await this.incrementVisitors();
-                await setDoc(visitorRef, {
-                    lastVisit: now,
-                    downloads: [],
-                    createdAt: now,
-                    deleteAt: new Date(now + SIX_MONTHS_MS)
-                });
-            } else {
-                const data = visitorSnap.data() as VisitorLog;
-                const lastVisit = data.lastVisit;
-                if (now - lastVisit > ONE_HOUR) {
-                    // Returning after 1 hour session
+                try {
                     await this.incrementVisitors();
-                    await updateDoc(visitorRef, { lastVisit: now });
+                    await setDoc(visitorRef, {
+                        lastVisit: now,
+                        downloads: [],
+                        createdAt: now,
+                        deleteAt: new Date(now + SIX_MONTHS_MS)
+                    });
+                } catch (innerErr) {
+                    console.error('Visitor doc creation failed:', innerErr);
                 }
+            } else {
+                console.error('Visitor tracking update failed:', error);
             }
-        } catch (error) {
-            console.error('Visitor tracking failed:', error);
         }
     },
 
     async trackDownload(paperId: string, uid: string): Promise<boolean> {
         if (!uid || !paperId) return false;
 
-        try {
-            const visitorRef = doc(db, 'visitor_logs', uid);
-            const visitorSnap = await getDoc(visitorRef);
-            const now = Date.now();
-            const SIX_MONTHS_MS = 180 * 24 * 60 * 60 * 1000;
+        const visitorRef = doc(db, 'visitor_logs', uid);
+        const now = Date.now();
+        const SIX_MONTHS_MS = 180 * 24 * 60 * 60 * 1000;
 
-            if (visitorSnap.exists()) {
-                const data = visitorSnap.data() as VisitorLog;
-                const downloads = data.downloads || [];
-                if (!downloads.includes(paperId)) {
-                    await updateDoc(visitorRef, {
-                        downloads: arrayUnion(paperId),
-                        lastVisit: now // Also update last visit when they download
+        try {
+            // Attempt to update existing visitor log with arrayUnion
+            // Firestore arrayUnion is idempotent, so we don't need to check if paperId exists
+            await updateDoc(visitorRef, {
+                downloads: arrayUnion(paperId),
+                lastVisit: now
+            });
+            return true;
+        } catch (error: any) {
+            if (error.code === 'not-found') {
+                try {
+                    await setDoc(visitorRef, {
+                        lastVisit: now,
+                        downloads: [paperId],
+                        createdAt: now,
+                        deleteAt: new Date(now + SIX_MONTHS_MS)
                     });
                     return true;
+                } catch (innerErr) {
+                    console.error('Download log creation failed:', innerErr);
                 }
             } else {
-                // If log doc doesn't exist, create it
-                await setDoc(visitorRef, {
-                    lastVisit: now,
-                    downloads: [paperId],
-                    createdAt: now,
-                    deleteAt: new Date(now + SIX_MONTHS_MS)
-                });
-                return true;
+                console.error('Download tracking update failed:', error);
             }
-        } catch (error) {
-            console.error('Download tracking failed:', error);
         }
         return false;
     },

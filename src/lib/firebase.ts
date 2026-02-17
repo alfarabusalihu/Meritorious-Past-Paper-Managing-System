@@ -1,6 +1,10 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, setPersistence, browserSessionPersistence } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import {
+    initializeFirestore,
+    persistentLocalCache,
+    persistentMultipleTabManager
+} from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -11,6 +15,23 @@ const firebaseConfig = {
     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
     appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
+
+// Validate Firebase config
+const requiredKeys = [
+    'apiKey',
+    'authDomain',
+    'projectId',
+    'storageBucket',
+    'messagingSenderId',
+    'appId'
+] as const;
+
+const missingKeys = requiredKeys.filter(key => !firebaseConfig[key]);
+
+if (missingKeys.length > 0) {
+    console.warn(`Missing Firebase configuration keys: ${missingKeys.join(', ')}. Some features may not work correctly.`);
+}
+
 
 
 // Initialize Firebase (Singleton pattern)
@@ -24,5 +45,12 @@ setPersistence(auth, browserSessionPersistence).catch((error) => {
 });
 
 const mainBucket = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET;
-export const db = getFirestore(app);
+
+// Initialize Firestore with modern persistence settings
+export const db = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+        tabManager: persistentMultipleTabManager()
+    })
+});
+
 export const storage = getStorage(app, mainBucket);

@@ -19,30 +19,24 @@ export function VisitorStats() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const [globalStats, papers] = await Promise.all([
-                    statsApi.getStats(),
-                    papersApi.getPapers()
-                ])
+        // Subscribe to real-time stats
+        const unsubscribe = statsApi.subscribeToStats((newStats) => {
+            setStats(prev => ({
+                ...prev,
+                visitors: newStats.visitors,
+                downloads: newStats.papersEngagement
+            }));
+            setLoading(false);
+        });
 
-                setStats({
-                    visitors: globalStats.visitors,
-                    papers: papers.length,
-                    downloads: globalStats.papersEngagement
-                })
-            } catch (error) {
-                console.error('Failed to fetch stats:', error)
-            } finally {
-                setLoading(false)
-            }
-        }
+        // Fetch papers count separately (doesn't change often)
+        papersApi.getPapers()
+            .then(papers => {
+                setStats(prev => ({ ...prev, papers: papers.length }));
+            })
+            .catch(console.error);
 
-        fetchStats()
-
-        // Listen for real-time tracking updates (e.g. from CookieConsent)
-        window.addEventListener('visitor-tracked', fetchStats);
-        return () => window.removeEventListener('visitor-tracked', fetchStats);
+        return () => unsubscribe();
     }, [])
 
     const statsConfig = [

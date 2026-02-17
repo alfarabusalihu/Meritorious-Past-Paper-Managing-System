@@ -8,12 +8,18 @@ export function CookieConsent() {
 
     useEffect(() => {
         // Show banner if consent choice hasn't been made yet
-        import('../../lib/cookieUtils').then(({ hasConsentChoice }) => {
+        import('../../lib/cookieUtils').then(({ hasConsentChoice, hasConsent }) => {
             if (!hasConsentChoice()) {
                 const timer = setTimeout(() => setIsVisible(true), 1000);
                 return () => clearTimeout(timer);
             } else {
                 setIsVisible(false);
+                // If already consented, ensure we are signed in (for visitor tracking)
+                if (hasConsent()) {
+                    signInAnonymously(auth).catch(err => {
+                        console.debug('Auto-sign-in failed:', err);
+                    });
+                }
             }
         });
     }, []);
@@ -26,9 +32,9 @@ export function CookieConsent() {
         try {
             await signInAnonymously(auth);
         } catch (err: unknown) {
-            // Already signed in or restricted
+            // Already signed in or restricted - this is expected in many flows
             const error = err as { message?: string };
-            console.warn('Initial anonymous auth status:', error?.message);
+            console.debug('Anonymous auth status:', error?.message);
         }
 
         setIsVisible(false);

@@ -187,12 +187,13 @@ export const papersApi = {
             if (shouldIncrement) {
                 const snapshot = await getDoc(docRef);
                 if (snapshot.exists()) {
-                    await updateDoc(docRef, {
-                        downloadCount: increment(1)
-                    });
-
-                    // Also increment Global Engagement Stats
-                    await statsApi.incrementEngagement();
+                    // Update both Paper and Global stats in parallel
+                    await Promise.all([
+                        updateDoc(docRef, {
+                            downloadCount: increment(1)
+                        }),
+                        statsApi.incrementEngagement()
+                    ]);
                 }
             }
         } catch (error) {

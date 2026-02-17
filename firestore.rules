@@ -8,11 +8,10 @@ service cloud.firestore {
         .hasOnly(['visitors', 'contributors', 'papersEngagement']);
     }
 
-    // Visitor logs: Anyone can create/update their own log
+    // Visitor logs: Users can only manage their own logs
     match /visitor_logs/{visitorId} {
-      // Allow 'get' for status check, but not 'list' for privacy
       allow get: if true; 
-      allow create, update: if true;
+      allow create, update: if request.auth != null && request.auth.uid == visitorId;
       allow delete: if false;
     }
 

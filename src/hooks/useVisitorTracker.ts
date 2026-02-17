@@ -11,14 +11,7 @@ export function useVisitorTracker() {
         // Check for 1-hour session gap
         import('../lib/cookieUtils').then(({ hasConsent, isSessionActive, startSession }) => {
             if (!hasConsent() || isSessionActive()) return;
-
-            // Only track in production (no localhost)
-            const isProduction = import.meta.env.PROD &&
-                !window.location.hostname.includes('localhost') &&
-                !window.location.hostname.includes('127.0.0.1');
-
-            if (!isProduction) return
-
+            console.log("Attempting to track visitor...");
             statsApi.trackVisitor(user.uid).then(() => {
                 startSession(); // Start 1-hour session timer
             });
