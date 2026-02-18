@@ -21,7 +21,7 @@ export function VisionSection() {
             {cards.map((card, index) => (
                 <section
                     key={index}
-                    className="group relative rounded-[3rem] bg-secondary text-secondary-foreground p-10 md:p-14 space-y-6 overflow-hidden shadow-2xl shadow-secondary/10 hover:shadow-secondary/20 transition-all duration-500 flex flex-col justify-center border border-white/5"
+                    className="group relative rounded-[3rem] bg-secondary text-secondary-foreground p-10 md:p-14 space-y-6 overflow-hidden shadow-2xl shadow-secondary/10 hover:shadow-secondary/20 transition-all duration-500 flex flex-col border border-white/5"
                 >
                     {/* Dynamic Gradient Background */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-30 -z-10 group-hover:scale-110 transition-transform duration-700`} />

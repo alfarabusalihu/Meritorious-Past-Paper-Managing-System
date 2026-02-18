@@ -14,8 +14,7 @@ export interface SocialConfig {
 }
 
 export interface DonationConfig {
-    coffeePrice?: number
-    enabled?: boolean
+    coffeePrice: number
 }
 
 export const configsApi = {
@@ -65,7 +64,7 @@ export const configsApi = {
     async getDonationSettings(): Promise<DonationConfig> {
         const docRef = doc(db, 'configs', 'donations')
         const snap = await getDoc(docRef)
-        return snap.exists() ? snap.data() as DonationConfig : { coffeePrice: 5, enabled: true }
+        return snap.exists() ? snap.data() as DonationConfig : { coffeePrice: 5 }
     },
 
     async updateDonationSettings(settings: DonationConfig) {

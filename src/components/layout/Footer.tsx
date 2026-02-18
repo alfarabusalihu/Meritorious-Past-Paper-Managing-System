@@ -39,18 +39,18 @@ export function Footer() {
                             {socials ? (
                                 <>
                                     {socials.twitter && (
-                                        <a href={socials.twitter} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 border border-white/10 rounded-2xl text-secondary-foreground hover:bg-primary hover:text-white transition-all duration-300">
-                                            <Twitter className="h-5 w-5" />
+                                        <a href={socials.twitter} target="_blank" rel="noopener noreferrer" aria-label="Follow us on Twitter" className="p-3 bg-white/5 border border-white/10 rounded-2xl text-secondary-foreground hover:bg-primary hover:text-white transition-all duration-300">
+                                            <Twitter className="h-5 w-5" aria-hidden="true" />
                                         </a>
                                     )}
                                     {socials.instagram && (
-                                        <a href={socials.instagram} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 border border-white/10 rounded-2xl text-secondary-foreground hover:bg-primary hover:text-white transition-all duration-300">
-                                            <Instagram className="h-5 w-5" />
+                                        <a href={socials.instagram} target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" className="p-3 bg-white/5 border border-white/10 rounded-2xl text-secondary-foreground hover:bg-primary hover:text-white transition-all duration-300">
+                                            <Instagram className="h-5 w-5" aria-hidden="true" />
                                         </a>
                                     )}
                                     {socials.facebook && (
-                                        <a href={socials.facebook} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 border border-white/10 rounded-2xl text-secondary-foreground hover:bg-primary hover:text-white transition-all duration-300">
-                                            <Facebook className="h-5 w-5" />
+                                        <a href={socials.facebook} target="_blank" rel="noopener noreferrer" aria-label="Follow us on Facebook" className="p-3 bg-white/5 border border-white/10 rounded-2xl text-secondary-foreground hover:bg-primary hover:text-white transition-all duration-300">
+                                            <Facebook className="h-5 w-5" aria-hidden="true" />
                                         </a>
                                     )}
                                 </>

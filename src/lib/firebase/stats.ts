@@ -13,6 +13,11 @@ export interface VisitorLog {
     deleteAt: Date
 }
 
+interface FirestoreError {
+    code: string;
+    message?: string;
+}
+
 export const statsApi = {
     async getStats(): Promise<SystemStats> {
         try {
@@ -24,8 +29,8 @@ export const statsApi = {
             const defaults = { visitors: 0, papersEngagement: 0 }
             await setDoc(docRef, defaults)
             return defaults
-        } catch (error) {
-            console.error('Failed to get stats:', error)
+        } catch (e) {
+            console.error('Failed to get stats:', e)
             return { visitors: 0, papersEngagement: 0 }
         }
     },
@@ -78,7 +83,8 @@ export const statsApi = {
             // Since useVisitorTracker already checks isSessionActive(), we can safely increment here.
             await this.incrementVisitors();
 
-        } catch (error: any) {
+        } catch (e) {
+            const error = e as FirestoreError;
             if (error.code === 'not-found') {
                 // First time visitor
                 try {
@@ -93,7 +99,7 @@ export const statsApi = {
                     console.error('Visitor doc creation failed:', innerErr);
                 }
             } else {
-                console.error('Visitor tracking update failed:', error);
+                console.error('Visitor tracking update failed:', e);
             }
         }
     },
@@ -113,7 +119,8 @@ export const statsApi = {
                 lastVisit: now
             });
             return true;
-        } catch (error: any) {
+        } catch (e) {
+            const error = e as FirestoreError;
             if (error.code === 'not-found') {
                 try {
                     await setDoc(visitorRef, {
@@ -127,7 +134,7 @@ export const statsApi = {
                     console.error('Download log creation failed:', innerErr);
                 }
             } else {
-                console.error('Download tracking update failed:', error);
+                console.error('Download tracking update failed:', e);
             }
         }
         return false;

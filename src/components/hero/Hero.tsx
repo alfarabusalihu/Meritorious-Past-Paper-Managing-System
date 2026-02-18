@@ -68,10 +68,11 @@ export function Hero() {
                                         element.scrollIntoView({ behavior: 'smooth' });
                                     }
                                 }}
+                                aria-label={t('hero.cta.primary')}
                                 className="w-fit min-w-[180px] sm:min-w-[200px] sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-[#0A001F] rounded-[2rem] font-black text-sm sm:text-base shadow-[0_20px_50px_rgba(255,255,255,0.1)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 sm:gap-4 group mx-auto text-balance text-center"
                             >
                                 <span className="leading-tight">{t('hero.cta.primary')}</span>
-                                <ArrowRight className="h-5 w-5 sm:h-6 sm:w-6 group-hover:translate-x-2 transition-transform shrink-0" />
+                                <ArrowRight className="h-5 w-5 sm:h-6 sm:w-6 group-hover:translate-x-2 transition-transform shrink-0" aria-hidden="true" />
                             </button>
                         </motion.div>
                     </div>

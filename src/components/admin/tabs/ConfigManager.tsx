@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { SocialConfig } from '../../../lib/firebase/configs'
 import { statsApi } from '../../../lib/firebase/stats'
 import { Button } from '../../ui/Button'
 import { Input } from '../../ui/Input'
 import { Save, RotateCcw } from 'lucide-react'
+import { ConfirmationDialog } from '../../ui/ConfirmationDialog'
 
 interface ConfigManagerProps {
     filterTexts: Record<string, string>;
@@ -27,9 +29,10 @@ export function ConfigManager({
     onSaveSocials,
     onSnackbar
 }: ConfigManagerProps) {
+    const [showResetConfirm, setShowResetConfirm] = useState(false)
 
     const handleResetVisitors = async () => {
-        if (!window.confirm("Are you sure you want to reset the visitor count to zero?")) return
+        setShowResetConfirm(false)
         try {
             await statsApi.resetVisitors()
             onSnackbar('Visitor count reset successfully!', 'success')
@@ -40,6 +43,15 @@ export function ConfigManager({
 
     return (
         <div className="space-y-12 pb-8">
+            <ConfirmationDialog
+                isOpen={showResetConfirm}
+                onClose={() => setShowResetConfirm(false)}
+                onConfirm={handleResetVisitors}
+                title="Reset Analytics"
+                description="Are you sure you want to reset the visitor count to zero? This action cannot be undone."
+                confirmLabel="Reset Now"
+                variant="danger"
+            />
             <section>
                 <h3 className="text-xl font-bold text-secondary mb-2">Global Filters</h3>
                 <p className="text-sm text-muted-foreground mb-6 font-medium">Manage the available options for subjects, languages, and years.</p>
@@ -94,7 +106,7 @@ export function ConfigManager({
                         <p className="text-sm text-muted-foreground font-medium">Clear the public visitor counter. This action cannot be undone.</p>
                     </div>
                     <Button
-                        onClick={handleResetVisitors}
+                        onClick={() => setShowResetConfirm(true)}
                         className="bg-destructive hover:bg-destructive/90 text-white font-bold px-10 h-14 rounded-2xl shadow-xl shadow-destructive/20"
                         isLoading={false} // Reset isn't tied to save states
                     >

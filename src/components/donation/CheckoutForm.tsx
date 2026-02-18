@@ -34,7 +34,7 @@ export function CheckoutForm({ amount, coffeeCount, onSuccess }: CheckoutFormPro
             return
         }
 
-        const { error, paymentMethod } = await stripe.createPaymentMethod({
+        const { error } = await stripe.createPaymentMethod({
             type: 'card',
             card: cardElement,
             billing_details: {
@@ -47,7 +47,6 @@ export function CheckoutForm({ amount, coffeeCount, onSuccess }: CheckoutFormPro
             setError(error.message || 'Payment failed')
             setLoading(false)
         } else {
-            console.log('[PaymentMethod]', paymentMethod)
             // Simulated delay for demo
             setTimeout(async () => {
                 const contribution = {

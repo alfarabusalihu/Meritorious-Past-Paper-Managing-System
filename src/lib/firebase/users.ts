@@ -9,7 +9,7 @@ export const usersApi = {
         const userRef = doc(db, USERS_COLLECTION, uid);
         const snapshot = await getDoc(userRef);
 
-        const envSuperAdminEmail = import.meta.env.VITE_SUPER_ADMIN_EMAIL || 'admin@gmail.com';
+        const envSuperAdminEmail = import.meta.env.VITE_SUPER_ADMIN_EMAIL;
 
         // Check if any super-admin exists in the DB
         const usersSnapshot = await getDocs(collection(db, USERS_COLLECTION));

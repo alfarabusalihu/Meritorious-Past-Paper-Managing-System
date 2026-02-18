@@ -1,12 +1,89 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { X, ChevronDown, Plus } from 'lucide-react'
+import { X, ChevronDown, Plus, Check } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
 import { useFilters } from '../../context/FilterContext'
+import { AnimatePresence, motion } from 'framer-motion'
 
 interface FilterBarProps {
     onFilterChange: (filters: { searchQuery: string, subject: string, year: string, language: string }) => void
     showAddButton?: boolean
+}
+
+interface CustomSelectProps {
+    value: string;
+    onChange: (val: string) => void;
+    options: string[];
+    placeholder: string;
+    isTamil?: boolean;
+}
+
+function CustomSelect({ value, onChange, options, placeholder, isTamil }: CustomSelectProps) {
+    const [isOpen, setIsOpen] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    return (
+        <div className="relative flex-1" ref={containerRef}>
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                aria-haspopup="listbox"
+                aria-expanded={isOpen}
+                aria-controls="filter-options"
+                className={`w-full h-12 px-5 bg-muted/30 border border-muted-foreground/10 rounded-2xl flex items-center justify-between gap-2 hover:bg-muted/50 hover:border-primary/30 transition-all group ${isTamil ? 'text-[11px]' : 'text-sm'
+                    } ${value ? 'text-secondary font-bold' : 'text-muted-foreground font-medium'}`}
+            >
+                <span className="truncate">{value || placeholder}</span>
+                <ChevronDown className={`h-4 w-4 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : 'text-muted-foreground'}`} aria-hidden="true" />
+            </button>
+
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        id="filter-options"
+                        role="listbox"
+                        className="absolute top-14 left-0 w-full bg-white border border-muted rounded-2xl shadow-2xl p-2 z-[60] max-h-[300px] overflow-y-auto custom-scrollbar"
+                    >
+                        <button
+                            onClick={() => { onChange(''); setIsOpen(false); }}
+                            role="option"
+                            aria-selected={!value}
+                            className={`w-full text-left px-4 py-3 rounded-xl hover:bg-muted transition-colors flex items-center justify-between text-sm ${!value ? 'text-primary font-bold bg-primary/5' : 'text-muted-foreground font-medium'}`}
+                        >
+                            <span>{placeholder}</span>
+                            {!value && <Check size={14} aria-hidden="true" />}
+                        </button>
+                        {options.map((opt) => (
+                            <button
+                                key={opt}
+                                onClick={() => { onChange(opt); setIsOpen(false); }}
+                                role="option"
+                                aria-selected={value === opt}
+                                className={`w-full text-left px-4 py-3 rounded-xl hover:bg-muted transition-colors flex items-center justify-between text-sm ${value === opt ? 'text-primary font-bold bg-primary/5' : 'text-secondary font-medium'}`}
+                            >
+                                <span className="truncate">{opt}</span>
+                                {value === opt && <Check size={14} aria-hidden="true" />}
+                            </button>
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
 }
 
 export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarProps) {
@@ -27,6 +104,9 @@ export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarPr
         setLanguage('')
     }
 
+    const sortedYears = (filters?.years || []).slice().sort((a, b) => parseInt(b) - parseInt(a));
+    const sortedSubjects = (filters?.subjects || []).slice().sort();
+
     return (
         <div className="w-full space-y-6 mt-6">
             {showAddButton && (
@@ -41,73 +121,53 @@ export function FilterBar({ onFilterChange, showAddButton = false }: FilterBarPr
                 </div>
             )}
 
-            <div className="bg-card border border-muted rounded-[2rem] p-6 lg:p-8 shadow-xl shadow-black/5">
-                <div className="flex flex-col lg:flex-row gap-4 items-center">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-1 w-full">
-                        {/* Subject Filter */}
-                        <div className="relative group flex-1">
-                            <select
-                                value={subject}
-                                onChange={(e) => setSubject(e.target.value)}
-                                className={`w-full h-10 pl-4 pr-10 bg-muted/50 border border-muted-foreground/20 rounded-2xl focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all font-bold appearance-none cursor-pointer truncate ${currentLanguage === 'ta' ? 'text-[10px]' : 'text-xs sm:text-sm'
-                                    }`}
-                            >
-                                <option value="">{t('filters.placeholders.subject')}</option>
-                                {(filters?.subjects || []).slice().sort().map(s => (
-                                    <option key={s} value={s}>{s}</option>
-                                ))}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none group-focus-within:rotate-180 transition-transform" />
-                        </div>
-
-                        {/* Year Filter */}
-                        <div className="relative group flex-1">
-                            <select
-                                value={year}
-                                onChange={(e) => setYear(e.target.value)}
-                                className={`w-full h-10 pl-4 pr-10 bg-muted/50 border border-muted-foreground/20 rounded-2xl focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all font-bold appearance-none cursor-pointer truncate ${currentLanguage === 'ta' ? 'text-[10px]' : 'text-xs sm:text-sm'
-                                    }`}
-                            >
-                                <option value="">{t('filters.placeholders.year')}</option>
-                                {(filters?.years || []).slice().sort((a, b) => parseInt(b) - parseInt(a)).map((y) => (
-                                    <option key={y} value={y} className="truncate">
-                                        {y}
-                                    </option>
-                                ))}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none group-focus-within:rotate-180 transition-transform" />
-                        </div>
-
-                        {/* Language Filter */}
-                        <div className="relative group flex-1">
-                            <select
-                                value={language}
-                                onChange={(e) => setLanguage(e.target.value)}
-                                className={`w-full h-10 pl-4 pr-10 bg-muted/50 border border-muted-foreground/20 rounded-2xl focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all font-bold appearance-none cursor-pointer truncate ${currentLanguage === 'ta' ? 'text-[10px]' : 'text-xs sm:text-sm'
-                                    }`}
-                            >
-                                <option value="">{t('filters.placeholders.medium')}</option>
-                                {(filters?.languages || []).map(l => (
-                                    <option key={l} value={l}>{l}</option>
-                                ))}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none group-focus-within:rotate-180 transition-transform" />
-                        </div>
+            <div
+                className="bg-card border border-muted rounded-[2.5rem] p-6 lg:p-8 shadow-2xl shadow-black/5"
+                role="search"
+                aria-label="Filter papers"
+            >
+                <div className="flex flex-col lg:flex-row gap-6 items-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6 flex-1 w-full">
+                        <CustomSelect
+                            value={subject}
+                            onChange={setSubject}
+                            options={sortedSubjects}
+                            placeholder={t('filters.placeholders.subject')}
+                            isTamil={currentLanguage === 'ta'}
+                        />
+                        <CustomSelect
+                            value={year}
+                            onChange={setYear}
+                            options={sortedYears}
+                            placeholder={t('filters.placeholders.year')}
+                            isTamil={currentLanguage === 'ta'}
+                        />
+                        <CustomSelect
+                            value={language}
+                            onChange={setLanguage}
+                            options={filters?.languages || []}
+                            placeholder={t('filters.placeholders.medium')}
+                            isTamil={currentLanguage === 'ta'}
+                        />
                     </div>
 
                     {/* Clear Filter Button - Only shows when filters are active */}
                     {(subject || year || language) && (
-                        <div className="w-full lg:w-auto animate-in fade-in slide-in-from-right-4 duration-300">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="w-full lg:w-auto"
+                        >
                             <button
                                 onClick={resetFilters}
                                 type="button"
-                                className="h-12 px-6 flex items-center justify-center gap-2 bg-destructive/5 text-destructive hover:bg-destructive/10 rounded-2xl transition-all font-bold text-sm w-full"
+                                className="h-12 px-8 flex items-center justify-center gap-3 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-2xl transition-all font-black text-sm w-full lg:w-fit whitespace-nowrap shadow-lg shadow-rose-200/20"
                                 title={t('filters.reset')}
                             >
-                                <X className="h-5 w-5" />
-                                {t('filters.reset')}
+                                <X className="h-4 w-4" />
+                                {t('filters.reset').toUpperCase()}
                             </button>
-                        </div>
+                        </motion.div>
                     )}
                 </div>
             </div>
